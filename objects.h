@@ -1,3 +1,6 @@
+#pragma once
+#ifndef MRETOR
+#define MRETOR
 struct point{
   double x;
   double y;
@@ -10,3 +13,4 @@ struct circle{
   point center;
   double R;
 };
+#endif
