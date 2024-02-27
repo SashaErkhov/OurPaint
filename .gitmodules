@@ -1,0 +1,3 @@
+[submodule "additions"]
+	path = additions
+	url = https://github.com/SashaErkhov/ClassArray
