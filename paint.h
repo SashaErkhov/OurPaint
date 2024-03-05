@@ -12,8 +12,11 @@ class Paint
     Arry<section> sectionar;
     Arry<circle> circlear;
 public:
-    
-    //void addElement(Element et, const Arry<Element>*);
+    //Добавление элементов с указанием их типа и необходимого набора параментов
+    void addElement(Element et, const Arry<double>& params);
+    //Отрисовка текущего состаяния
+    void paint();
+
 };
 
 #endif
