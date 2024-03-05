@@ -1,8 +1,8 @@
 #pragma once
 #ifndef PAINT_23
 #define PAINT_23
-
-#include "Array.h"
+#include "./PVM13.02.24/code/BMPfile.h"
+#include "./additions/Array.h"
 #include "objects.h"
 
 enum Element{ET_POINT, ET_SECTION, ET_CIRCLE};
@@ -12,7 +12,8 @@ class Paint
     Arry<section> sectionar;
     Arry<circle> circlear;
 public:
-    void addElement(Element et, const Arry* <& parametr>);
+    
+    //void addElement(Element et, const Arry<Element>*);
 };
 
 #endif
