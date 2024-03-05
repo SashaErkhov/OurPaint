@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 project(ourpaint)
 add_executable(ourpaint main.cpp)
-#include_directories(addition)
+include_directories(additions)
+include_directories(PVM13.02.24/code)
+add_subdirectory(PVM13.02.24)
