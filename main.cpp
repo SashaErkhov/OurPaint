@@ -1,4 +1,4 @@
-#include "Array.h"
+#include "Arry.h"
 #include "BMPfile.h"
 #include "objects.h"
 #include "paint.h"
