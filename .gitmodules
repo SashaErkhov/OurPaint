@@ -1,3 +1,6 @@
 [submodule "additions"]
 	path = additions
 	url = https://github.com/SashaErkhov/Containers.git
+[submodule "BMPfile"]
+	path = BMPfile
+	url = https://github.com/SashaErkhov/BMPfile.git
