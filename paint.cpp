@@ -1,6 +1,6 @@
 #include "paint.h"
 #include "./PVM13.02.24/code/BMPfile.h"
-#include "./additions/Array.h"
+#include "./additions/Arry.h"
 #include "objects.h"
 
 ID Paint::addElement(const ElementData& ed)
