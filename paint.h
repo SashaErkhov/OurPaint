@@ -14,7 +14,7 @@ class Paint
 public:
     //Добавление элементов с указанием их типа и необходимого набора параментов
     void addElement(Element et, const Arry<double>& params);
-    //Отрисовка текущего состаяния
+    //Отрисовка текущего состояния
     void paint();
 
 };
