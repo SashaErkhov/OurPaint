@@ -1,7 +1,7 @@
 #pragma once
 #ifndef PAINT_23
 #define PAINT_23
-#include "./PVM13.02.24/code/BMPfile.h"
+#include "./BMPfile/code/BMPfile.h"
 #include "./additions/Arry.h"
 #include "objects.h"
 
