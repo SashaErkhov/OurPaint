@@ -22,7 +22,14 @@ class Paint
     List<point> m_pointStorage;
     List<section> m_sectionStorage;
     List<circle> m_circleStorage;
+private:
+    // Необходимые элементы для quickSort
+    int part2(int left, int right);
+    void part1(int start, int end);
 public:
+    // Быстрая сортировка
+    void quickSort();
+
     //Добавление элементов с указанием их типа и необходимого набора параметров
     ID addElement(const ElementData& ed);
 
