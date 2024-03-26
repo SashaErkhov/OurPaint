@@ -39,6 +39,7 @@
 	{
 
 	}
+<<<<<<< HEAD
 }*/
 
 void Paint::drawSection(section s, bool isWhite){
@@ -93,3 +94,34 @@ void Paint::drawCircle(circle c, bool isWhite){
 
 
 }
+=======
+}
+
+// Реализация part2, часть qucksort
+int Paint::part2(int left, int right) {
+	idxPoint pivot = m_pointIndex[(left + right) / 2];
+	while (left <= right) {
+		while (m_pointIndex[left].id < pivot.id) left++;
+		while (m_pointIndex[right].id > pivot.id) right--;
+		if (left <= right) {
+			std::swap(m_pointIndex[left], m_pointIndex[right]);
+			left++;
+			right--;
+		}
+	}
+	return left;
+}
+
+// Реализация part1, часть qucksort
+void Paint::part1(int start, int end) {
+	if (start >= end) return;
+	int rightStart = part2(start, end);
+	part1(start, rightStart - 1);
+	part1(rightStart, end);
+}
+
+// Реализация quickSort
+void Paint::quickSort() {
+	part1(0, m_pointIndex.size() - 1);
+}
+>>>>>>> 0a017cc7ee81567d29a7ea44edbc88ec1c02d2fb
