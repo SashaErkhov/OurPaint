@@ -94,8 +94,7 @@ void Paint::drawCircle(circle c, bool isWhite){
 
 
 }
-=======
-}
+
 
 // Реализация part2, часть qucksort
 int Paint::part2(int left, int right) {
@@ -124,4 +123,3 @@ void Paint::part1(int start, int end) {
 void Paint::quickSort() {
 	part1(0, m_pointIndex.size() - 1);
 }
->>>>>>> 0a017cc7ee81567d29a7ea44edbc88ec1c02d2fb
