@@ -14,7 +14,7 @@ struct ElementData{
 
 class Paint
 {
-    struct idx{
+    struct idxPoint{
         ID id;
         List<Point>::iterator it;
     }
@@ -29,7 +29,6 @@ public:
     // Получение информации об объекте    
     ElementData getElementInfo(ID id);
      
-
     // Сохранение данных в файл
     void saveToFile(const char* filename);
 
