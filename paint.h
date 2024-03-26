@@ -14,9 +14,14 @@ struct ElementData{
 
 class Paint
 {
-    Arry<point> pointar;
-    Arry<section> sectionar;
-    Arry<circle> circlear;
+    struct idx{
+        ID id;
+        List<Point>::iterator it;
+    }
+    Array<idxPoint> m_pointIndex;
+    List<point> m_pointStorage;
+    List<section> m_sectionStorage;
+    List<circle> m_circleStorage;
 public:
     //Добавление элементов с указанием их типа и необходимого набора параметров
     ID addElement(const ElementData& ed);
