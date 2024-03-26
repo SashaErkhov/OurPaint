@@ -27,7 +27,7 @@ class Paint {
     struct idxCircle {
         ID id;
         List<circle>::iterator it;
-    }
+    };
     Arry <idxPoint> m_pointIndex;
     List <point> m_pointStorage;
     List <section> m_sectionStorage;

@@ -123,3 +123,14 @@ void Paint::part1(int start, int end) {
 void Paint::quickSort() {
 	part1(0, m_pointIndex.size() - 1);
 }
+void Paint::paint(){
+    for (auto point = m_pointStorage.begin(); point < m_pointStorage.end(); point++){
+        drawPoint(*point, false);
+    }
+    for (auto circle = m_circleStorage.begin(); circle < m_circleStorage.end(); circle++){
+        drawCircle(*circle, false);
+    }
+    for (auto section  = m_sectionStorage.begin(); section < m_sectionStorage.end(); section++){
+        drawSection(*section, false);
+    }
+}
