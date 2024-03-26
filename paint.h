@@ -1,43 +1,53 @@
 #pragma once
 #ifndef PAINT_23
 #define PAINT_23
+
 #include "./BMPfile/code/BMPfile.h"
 #include "./additions/Arry.h"
 #include "objects.h"
-
-enum Element{ET_POINT, ET_SECTION, ET_CIRCLE};
-
-struct ElementData{
-    Element et;
-    Arry<double> params;
+#include <cmath>
+enum Element {
+    ET_POINT, ET_SECTION, ET_CIRCLE
 };
 
-class Paint
-{
-    struct idxPoint{
+struct ElementData {
+    Element et;
+    Array<double> params;
+};
+
+class Paint {
+    struct idxPoint {
         ID id;
-        List<Point>::iterator it;
-    }
-    Array<idxPoint> m_pointIndex;
-    List<point> m_pointStorage;
-    List<section> m_sectionStorage;
-    List<circle> m_circleStorage;
+        List<point>::iterator it;
+    };
+    struct idxSection {
+        ID id;
+        List<section>::iterator it;
+    };
+    Arry <idxPoint> m_pointIndex;
+    List <point> m_pointStorage;
+    List <section> m_sectionStorage;
+    List <circle> m_circleStorage;
+    BMPfile filename;
 public:
     //Добавление элементов с указанием их типа и необходимого набора параметров
-    ID addElement(const ElementData& ed);
+    ID addElement(const ElementData &ed);
 
     // Получение информации об объекте    
     ElementData getElementInfo(ID id);
-     
+
     // Сохранение данных в файл
-    void saveToFile(const char* filename);
+    void saveToFile(const char *filename);
 
     // Загрузка данных из файла
-    void loadFromFile(const char* filename);
-
-    //Отрисовка текущего состояния
+    void loadFromFile(const char *filename);
+    //Отрисвока отрезка
     void paint();
 
+private:
+    void drawPoint(point pt, bool isWhite=false);
+    void drawSection(section sec, bool isWhite=false);
+    void drawCircle(circle c, bool isWhite=false);
 };
 
 #endif
