@@ -4,46 +4,46 @@
 #include "./additions/List.h"
 #include "objects.h"
 #include <fstream>
-
-/*ID Paint::addElement(const ElementData& ed)
-{
-	if (ed.et == ET_POINT)
-	{
-		point tmp;
-		tmp.x = ed.params.getElement(0);
-		tmp.y = ed.params.getElement(1);
-		tmp.id;//TODO
-		pointar.addElement(tmp);
-		return tmp.id;
-	}
-	if (ed.et == ET_SECTION)
-	{
-		point tmp1;
-		tmp1.x = ed.params.getElement(0);
-		tmp1.y = ed.params.getElement(1);
-		tmp1.id;//TODO
-		pointar.addElement(tmp1);
-		point tmp2;
-		tmp2.x = ed.params.getElement(2);
-		tmp2.y = ed.params.getElement(3);
-		tmp2.id;//TODO
-		pointar.addElement(tmp2);
-		section tmp;
-		//tmp.beg=&
-		//tmp.end=&
-		tmp.id;//TODO
-
-
-
-		return tmp.id;
-	}
-	if (ed.et == ET_CIRCLE)
-	{
-
-	}
-<<<<<<< HEAD
-}*/
-
+ID Paint::addElement(const ElementData &ed) {
+    if (ed.et == ET_POINT) {
+        point tmp;
+        tmp.x = ed.params[0];
+        tmp.y = ed.params[1];
+        m_pointStorage.addElement(tmp);
+        ++maxPointId.id;
+        return maxPointId;
+    }
+    if (ed.et == ET_SECTION) {
+        point tmp1;
+        tmp1.x = ed.params[0];
+        tmp1.y = ed.params[1];
+        ++maxPointId.id;
+        m_pointStorage.addElement(tmp1);
+        point tmp2;
+        tmp2.x = ed.params[2];
+        tmp2.y = ed.params[3];
+        ++maxPointId.id;
+        m_pointStorage.addElement(tmp2);
+        section tmp;
+        tmp.beg = &tmp1;
+        tmp.end = &tmp2;
+        m_sectionStorage.addElement(tmp);
+        ++maxSectionId.id;
+        return maxSectionId;
+    }
+    if (ed.et == ET_CIRCLE) {
+        point center;
+        center.x = ed.params[0];
+        center.y = ed.params[1];
+        ++maxPointId.id;
+        m_pointStorage.addElement(center);
+        circle tmp;
+        tmp.center = &center;
+        tmp.R = ed.params[2];
+        return maxCircleId;
+    }
+    return ID{-1};
+}
 void Paint::drawSection(section s, bool isWhite){
     //Алгоритм Брезенхема
     int x0 = s.beg->x;
