@@ -1,7 +1,7 @@
 #include "paint.h"
-#include "./BMPfile/code/BMPfile.h"
-#include "./additions/Arry.h"
-#include "./additions/List.h"
+#include "BMPfile.h"
+#include "Arry.h"
+#include "List.h"
 #include "objects.h"
 #include <fstream>
 ID Paint::addElement(const ElementData &ed) {
