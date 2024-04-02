@@ -1,7 +1,9 @@
 #include "paint.h"
-#include "./PVM13.02.24/code/BMPfile.h"
+#include "./BMPfile/code/BMPfile.h"
 #include "./additions/Arry.h"
+#include "./additions/List.h"
 #include "objects.h"
+#include <fstream>
 
 /*ID Paint::addElement(const ElementData& ed)
 {
@@ -133,4 +135,39 @@ void Paint::paint(){
     for (auto section  = m_sectionStorage.begin(); section < m_sectionStorage.end(); section++){
         drawSection(*section, false);
     }
+}
+
+void Paint::loadFromFile(const char* filen){
+	std::ifstream file;
+	file.open(filen);
+	if (!(file.is_open())){
+		throw "We can't open file";
+	}
+	size_t size=0;
+	size_t count=0;
+	file>>size;
+	file>>count;
+	idxPoint input;
+	for(size_t i=0; i<count;++i){//проверка на размер size и count нужна
+		file>>input;//нужно создать ввод для таких элементов
+		m_pointIndex.addElement(input);
+	}
+	file>>size;
+	point need;
+	for(size_t i=0; i<size; ++i){
+		file>>need;//нужно создать ввод для таких элементов
+		m_pointStorage.addElement(need);
+	}
+	file>>size;
+	section work;
+	for(size_t i=0; i<size; ++i){
+		file>>work;//нужно создать ввод для таких элементов
+		m_sectionStorage.addElement(work);
+	}
+	file>>size;
+	circle worker;
+	for(size_t i=0; i<size; ++i){
+		file>>worker;//нужно создать ввод для таких элементов
+		m_circleStorage.addElement(worker);
+	}
 }

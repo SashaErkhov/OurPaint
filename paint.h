@@ -4,6 +4,7 @@
 
 #include "./BMPfile/code/BMPfile.h"
 #include "./additions/Arry.h"
+#include "./additions/List.h"
 #include "objects.h"
 #include <cmath>
 enum Element {
@@ -12,7 +13,7 @@ enum Element {
 
 struct ElementData {
     Element et;
-    Array<double> params;
+    Arry<double> params;
 };
 
 class Paint {
