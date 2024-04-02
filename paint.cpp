@@ -145,7 +145,9 @@ void Paint::loadFromFile(const char* filen){
 	}
 	file>>size;
 	point need;
+	ID id;
 	for(size_t i=0; i<size; ++i){
+		file>>id;
 		file>>need;//нужно создать ввод для таких элементов
 		m_pointStorage.addElement(need);
 	}
@@ -161,29 +163,6 @@ void Paint::loadFromFile(const char* filen){
 		file>>worker;//нужно создать ввод для таких элементов
 		m_circleStorage.addElement(worker);
 	}
-}
-
-//Element constract
-
-ElementData::ElementData(point& pt){
-	et=ET_POINT;
-	params.addElement(pt.x);
-	params.addElement(pt.y);
-}
-
-ElementData::ElementData(section& sec){
-	et=ET_SECTION;
-	params.addElement(sec.beg->x);
-	params.addElement(sec.beg->y);
-	params.addElement(sec.end->x);
-	params.addElement(sec.end->y);
-}
-
-ElementData::ElementData(circle& cir){
-	et=ET_CIRCLE;
-	params.addElement(cir.center->x);
-	params.addElement(cir.center->y);
-	params.addElement(cir.R);
 }
 
 void Paint::exportToBMP(const char *file) {
