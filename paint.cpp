@@ -162,3 +162,5 @@ void Paint::loadFromFile(const char* filen){
 		m_circleStorage.addElement(worker);
 	}
 }
+
+//Element constract

@@ -14,6 +14,10 @@ enum Element {
 struct ElementData {
     Element et;
     Arry<double> params;
+
+    ElementData(point& pt);
+    ElementData(section& sec);
+    ElementData(circle& cir);
 };
 
 class Paint {
