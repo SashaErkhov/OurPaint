@@ -57,7 +57,7 @@ public:
     void saveToFile(const char *filename);
 
     // Загрузка данных из файла
-    void loadFromFile(const char *filename);
+    void loadFromFile(const char *filen);
     //Отрисвока отрезка
     void paint();
 
