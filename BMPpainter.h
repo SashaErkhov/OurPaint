@@ -14,6 +14,7 @@ public:
     void drawPoint(point pt, bool isWhite=false);
     void drawSection(section sec, bool isWhite=false);
     void drawCircle(circle c, bool isWhite=false);
+    void saveBMP(const char* filename);
 };
 
 

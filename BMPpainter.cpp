@@ -58,3 +58,6 @@ void BMPpainter::drawCircle(circle c, bool isWhite){
 
 
 }
+void BMPpainter::saveBMP(const char* file){
+    filename.saveBmp(file);
+}
