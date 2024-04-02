@@ -164,3 +164,17 @@ void Paint::loadFromFile(const char* filen){
 }
 
 //Element constract
+
+ElementData::ElementData(point& pt){
+	et=ET_POINT;
+	params.addElement(pt.x);
+	params.addElement(pt.y);
+}
+
+ElementData::ElementData(section& sec){
+
+}
+
+ElementData::ElementData(circle& cir){
+
+}
