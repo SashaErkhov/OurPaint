@@ -34,11 +34,9 @@ class Paint {
         List<circle>::iterator it;
     };
     Arry <idxPoint> m_pointIndex;
-    ID maxPointId;
     Arry <idxSection> m_sectionIndex;
-    ID maxSectionId;
     Arry <idxCircle> m_circleIndex;
-    ID maxCircleId;
+    ID maxID;
     List <point> m_pointStorage;
     List <section> m_sectionStorage;
     List <circle> m_circleStorage;
@@ -64,9 +62,9 @@ public:
     void exportToBMP(const char *file);
     // Загрузка данных из файла
     void loadFromFile(const char *file);
-    // изменить BMP
+    // Задает фон(изменяет filename файл)
     void changeBMP(const char* file);
-    void paint();
+    void paint(); 
 
 private:
     void drawPoint(point pt, bool isWhite=false);
