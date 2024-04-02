@@ -60,9 +60,12 @@ public:
     // Сохранение данных в файл
     void saveToFile(const char *filename);
 
+    //экспорт в BMP файл
+    void exportToBMP(const char *file);
     // Загрузка данных из файла
-    void loadFromFile(const char *filen);
-    //Отрисвока отрезка
+    void loadFromFile(const char *file);
+    // изменить BMP
+    void changeBMP(const char* file);
     void paint();
 
 private:
