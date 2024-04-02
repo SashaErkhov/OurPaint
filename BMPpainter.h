@@ -10,6 +10,7 @@
 class BMPpainter {
     BMPfile filename;
 public:
+    BMPpainter();	
     BMPpainter(const char* filename);
     void drawPoint(point pt, bool isWhite=false);
     void drawSection(section sec, bool isWhite=false);

@@ -3,8 +3,8 @@
 //
 
 #include "BMPpainter.h"
-BMPpainter::BMPpainter(const char* file){
-    filename = file;
+BMPpainter::BMPpainter(/*const char* file*/){
+    //filename = file;
 }
 void BMPpainter::drawSection(section s, bool isWhite){
     //Алгоритм Брезенхема
