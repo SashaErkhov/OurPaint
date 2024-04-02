@@ -137,12 +137,12 @@ ElementData::ElementData(circle& cir){
 void Paint::exportToBMP(const char *file) {
     paint();
     try {
-        filename.saveBmp(file);
+        filename.filename.saveBmp(file);
     } catch (...) {
         throw std::invalid_argument("Can not opened file!");
     }
 }
 
 void Paint::changeBMP(const char *file) {
-    filename = file;
+    filename = BMPpainter(file);
 }
