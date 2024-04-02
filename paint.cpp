@@ -180,5 +180,8 @@ ElementData::ElementData(section& sec){
 }
 
 ElementData::ElementData(circle& cir){
-
+	et=ET_CIRCLE;
+	params.addElement(cir.center->x);
+	params.addElement(cir.center->y);
+	params.addElement(cir.R);
 }
