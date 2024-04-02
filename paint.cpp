@@ -137,30 +137,36 @@ void Paint::paint(){
     }
 }
 
-void Paint::loadFromFile(const char* filen){
-	std::ifstream file;
-	file.open(filen);
-	if (!(file.is_open())){
+void Paint::loadFromFile(const char* file){
+	std::ifstream files;
+	files.open(file);
+	if (!(files.is_open())){
 		throw "We can't open file";
 	}
-	file>>size;
+	size_t size=0;
+	files>>size;
 	point need;
 	ID id;
+	idxPoint el;
+	List<point>::iterator iter;
 	for(size_t i=0; i<size; ++i){
-		file>>id;
-		file>>need;//нужно создать ввод для таких элементов
+		files>>id;
+		files>>need;//нужно создать ввод для таких элементов
 		m_pointStorage.addElement(need);
+		if(m_pointStorage.getSize()==1){
+			;
+		}
 	}
-	file>>size;
+	files>>size;
 	section work;
 	for(size_t i=0; i<size; ++i){
-		file>>work;//нужно создать ввод для таких элементов
+		files>>work;//нужно создать ввод для таких элементов
 		m_sectionStorage.addElement(work);
 	}
-	file>>size;
+	files>>size;
 	circle worker;
 	for(size_t i=0; i<size; ++i){
-		file>>worker;//нужно создать ввод для таких элементов
+		files>>worker;//нужно создать ввод для таких элементов
 		m_circleStorage.addElement(worker);
 	}
 }
