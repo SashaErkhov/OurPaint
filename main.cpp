@@ -30,7 +30,9 @@ int main()
             std::cout << "cirle x y r \t-\t Draw circle with radius r and center at (x,y)" << std::endl;
             std::cout << "clear \t- \tClears the screen" << std::endl;
             std::cout << "export file_name.bmp \t- \tExports the image to file_name.bmp" << std::endl;
-            std::cout << "save file_name.bmp \t- \tSaves the image to file_name.bmp" << std::endl;
+            std::cout << "save file_name.db \t- \tload the information about objects to file_name.db like a table" << std::endl;
+            std::cout << "load <bmp/db> file_name.<bmp/db> \t- \tload the information about objects from file_name.db if db or"
+                         "just load the image from file_name.bmp" << std::endl;
             std::cout << "q \t- \tQuit" << std::endl;
             std::cout << "help \t- \tHelp that show you commands to use" << std::endl;
         }
@@ -67,26 +69,42 @@ int main()
             ID id = screen.addElement(section);
             std::cout << "Section between points (" << x1 << ", " << y1 << ") and (" << x2 << ", " << y2 << ") added with id " << id.id << std::endl;
         }
-        if (strcmp(command, "save") == 0) {
-            char fileName[100];
-            std::cin >> fileName;
-            try{
-            screen.saveToFile(fileName);
-                std::cout << "Saved to file " << fileName << " SUCCESS!"<< std::endl;
-            }
-            catch (std::exception& e){
-                std::cout << "Saved to file " << fileName << " FAILED!"<< std::endl;
-            }
-        }
-        if (strcmp(command, "import") == 0) {
-            char fileName[100];
+        if (strcmp(command, "export") == 0) {
+            char fileName[256];
             std::cin >> fileName;
             try {
-                screen.loadFromFile(fileName);
-                std::cout << "Import from file " << fileName << " SUCCESS!" << std::endl;
+                screen.exportToBMP(fileName);
+                std::cout << "Exported to " << fileName << " SUCCESS!"<< std::endl;
             }
-            catch (std::exception& e) {
-                std::cout << "Import from file " << fileName << " FAILED!" << std::endl;
+            catch(std::exception& e){
+                std::cout << "Exported to " << fileName << " FAILED (file not found)" << std::endl;
+            }
+        }
+        if (strcmp(command, "save") == 0) {
+            char fileName[256];
+            std::cin >> fileName;
+            try {
+                screen.saveToFile(fileName);
+                std::cout << "Saved to " << fileName << " SUCCESS!" << std::endl;
+            }
+            catch (std::exception &e) {
+                std::cout << "Saved to " << fileName << " FAILED (file not found)" << std::endl;
+            }
+        }
+        if (strcmp(command, "load") == 0) {
+            char fileResolution[4];
+            char fileName[256];
+            std::cin >> fileResolution >> fileName;
+            try {
+                if (strcmp(fileResolution, "db") == 0) {
+                    screen.loadFromFile(fileName);
+                }
+                if (strcmp(fileResolution, "bmp") == 0){
+                    screen.changeBMP(fileName);
+                }
+                std::cout << "Loaded from " << fileName << " SUCCESS!" << std::endl;
+            }catch (...){
+                std::cout << "Loaded from " << fileName << " FAILED!" << std::endl;
             }
         }
     }
