@@ -30,6 +30,11 @@ class Paint {
         List<circle>::iterator it;
     };
     Arry <idxPoint> m_pointIndex;
+    ID maxPointId;
+    Arry <idxSection> m_sectionIndex;
+    ID maxSectionId;
+    Arry <idxCircle> m_circleIndex;
+    ID maxCircleId;
     List <point> m_pointStorage;
     List <section> m_sectionStorage;
     List <circle> m_circleStorage;
