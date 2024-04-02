@@ -70,8 +70,13 @@ int main()
         if (strcmp(command, "save") == 0) {
             char fileName[100];
             std::cin >> fileName;
+            try{
             screen.saveToFile(fileName);
-            std::cout << "Saved to file " << fileName << std::endl;
+                std::cout << "Saved to file " << fileName << " SUCCESS!"<< std::endl;
+            }
+            catch (std::exception& e){
+                std::cout << "Saved to file " << fileName << " FAILED!"<< std::endl;
+            }
         }
         if (strcmp(command, "import") == 0) {
             char fileName[100];
