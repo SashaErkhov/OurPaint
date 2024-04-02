@@ -143,32 +143,6 @@ void Paint::loadFromFile(const char* filen){
 	if (!(file.is_open())){
 		throw "We can't open file";
 	}
-	size_t size=0;
-	size_t count=0;
-	file>>size;
-	file>>count;
-	idxPoint input;
-	for(size_t i=0; i<count;++i){//проверка на размер size и count нужна
-		file>>input;//нужно создать ввод для таких элементов
-		m_pointIndex.addElement(input);
-	}
-	file>>maxPointId;
-	file>>size;
-	file>>count;
-	idxSection sec;
-	for(size_t i=0; i<count;++i){//проверка на размер size и count нужна
-		file>>input;//нужно создать ввод для таких элементов
-		m_sectionIndex.addElement(sec);
-	}
-	file>>maxSectionId;
-	file>>size;
-	file>>count;
-	idxCircle circ;
-	for(size_t i=0; i<count;++i){//проверка на размер size и count нужна
-		file>>input;//нужно создать ввод для таких элементов
-		m_circleIndex.addElement(circ);
-	}
-	file>>maxCircleId;
 	file>>size;
 	point need;
 	for(size_t i=0; i<size; ++i){

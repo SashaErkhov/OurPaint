@@ -2,7 +2,8 @@
 #ifndef MRETOR
 #define MRETOR
 struct ID{
-    int id;
+  int id;
+  ID(int i=0): id(i){}
 };
 struct point{
   double x;
