@@ -10,37 +10,37 @@ ID Paint::addElement(const ElementData &ed) {
         tmp.x = ed.params[0];
         tmp.y = ed.params[1];
         m_pointStorage.addElement(tmp);
-        ++maxPointId.id;
-        return maxPointId;
+        ++maxID.id;
+        return maxID;
     }
     if (ed.et == ET_SECTION) {
         point tmp1;
         tmp1.x = ed.params[0];
         tmp1.y = ed.params[1];
-        ++maxPointId.id;
+        ++maxID.id;
         m_pointStorage.addElement(tmp1);
         point tmp2;
         tmp2.x = ed.params[2];
         tmp2.y = ed.params[3];
-        ++maxPointId.id;
+        ++maxID.id;
         m_pointStorage.addElement(tmp2);
         section tmp;
         tmp.beg = &tmp1;
         tmp.end = &tmp2;
         m_sectionStorage.addElement(tmp);
-        ++maxSectionId.id;
-        return maxSectionId;
+        ++maxID.id;
+        return maxID;
     }
     if (ed.et == ET_CIRCLE) {
         point center;
         center.x = ed.params[0];
         center.y = ed.params[1];
-        ++maxPointId.id;
+        ++maxID.id;
         m_pointStorage.addElement(center);
         circle tmp;
         tmp.center = &center;
         tmp.R = ed.params[2];
-        return maxCircleId;
+        return maxID;
     }
     return ID{-1};
 }
