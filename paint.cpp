@@ -172,7 +172,11 @@ ElementData::ElementData(point& pt){
 }
 
 ElementData::ElementData(section& sec){
-
+	et=ET_SECTION;
+	params.addElement(sec.beg->x);
+	params.addElement(sec.beg->y);
+	params.addElement(sec.end->x);
+	params.addElement(sec.end->y);
 }
 
 ElementData::ElementData(circle& cir){
