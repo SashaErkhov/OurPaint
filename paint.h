@@ -7,6 +7,7 @@
 #include "List.h"
 #include "objects.h"
 #include <cmath>
+#include "BMPpainter.h"
 enum Element {
     ET_POINT, ET_SECTION, ET_CIRCLE
 };
@@ -36,7 +37,7 @@ class Paint {
     List <point> m_pointStorage;
     List <section> m_sectionStorage;
     List <circle> m_circleStorage;
-    BMPfile filename;
+    BMPpainter filename;
 private:
     // Необходимые элементы для quickSort
     int part2(int left, int right);
@@ -60,12 +61,7 @@ public:
     void loadFromFile(const char *file);
     // Задает фон(изменяет filename файл)
     void changeBMP(const char* file);
-    void paint(); 
-
-private:
-    void drawPoint(point pt, bool isWhite=false);
-    void drawSection(section sec, bool isWhite=false);
-    void drawCircle(circle c, bool isWhite=false);
+    void paint();
 };
 
 #endif
