@@ -161,12 +161,21 @@ void Paint::loadFromFile(const char* file){
     idxCircle circle_idx;
 	List<circle>::iterator circle_iter;
     m_circleStorage=List<circle>(0);
+    ID center;
+    bool end_index_center=false;
 	for(size_t i=0; i<size; ++i){
 		files>>id;
         if(id>maxID){
             maxID=id;
         }
-		files>>worker;//нужно создать ввод для таких элементов
+		files>>center;
+        end_index_center=false;
+        for(size_t j=0; j<m_pointIndex.getSize() && !(end_index_center); ++j){
+            if (m_pointIndex.getElement(j).id==center){
+                worker.center= &(*m_pointIndex.getElement(j).it);
+                end_index_center=true;
+            }
+        }
         files>>worker.R;
 		m_circleStorage.addElement(worker);
 
