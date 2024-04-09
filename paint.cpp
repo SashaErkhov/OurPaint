@@ -91,25 +91,53 @@ void Paint::loadFromFile(const char* file){
 	if (!(files.is_open())){
 		throw "We can't open file";
 	}
+    m_pointIndex=Arry<idxPoint>(0);
+    m_sectionIndex=Arry<idxSection>(0);
+    m_circleIndex=Arry<idxCircle>(0);
 	size_t size=0;
 	files>>size;
 	point need;
 	ID id;
+    maxID=0;
 	idxPoint el;
 	List<point>::iterator iter;
+    m_pointStorage=List<point>(0);
 	for(size_t i=0; i<size; ++i){
 		files>>id;
+        if(id>maxID){
+            maxID=id;
+        }
 		files>>need;//нужно создать ввод для таких элементов
 		m_pointStorage.addElement(need);
-		if(m_pointStorage.getSize()==1){
-			;
-		}
+        if(m_pointStorage.getSize()==1){
+            iter=m_pointStorage.begin();
+        } else {
+            ++iter;
+        }
+		el.id=id;
+        el.it=iter;
+        m_pointIndex.addElement(el);
 	}
 	files>>size;
 	section work;
+    idxSection el;
+	List<section>::iterator iter;
+    m_sectionStorage=List<section>(0);
 	for(size_t i=0; i<size; ++i){
+		files>>id;
+        if(id>maxID){
+            maxID=id;
+        }
 		files>>work;//нужно создать ввод для таких элементов
 		m_sectionStorage.addElement(work);
+        if(m_pointStorage.getSize()==1){
+            iter=m_pointStorage.begin();
+        } else {
+            ++iter;
+        }
+		el.id=id;
+        el.it=iter;
+        m_pointIndex.addElement(el);
 	}
 	files>>size;
 	circle worker;
