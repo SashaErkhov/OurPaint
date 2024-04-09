@@ -123,12 +123,15 @@ void Paint::loadFromFile(const char* file){
     idxSection section_idx;
 	List<section>::iterator section_iter;
     m_sectionStorage=List<section>(0);
+    ID beg_section;
+    ID end_section;
 	for(size_t i=0; i<size; ++i){
 		files>>id;
         if(id>maxID){
             maxID=id;
         }
-		files>>work;//нужно создать ввод для таких элементов
+		files>>beg_section;
+        files>>end_section;
 		m_sectionStorage.addElement(work);
         if(m_sectionStorage.getSize()==1){
             section_iter=m_sectionStorage.begin();
