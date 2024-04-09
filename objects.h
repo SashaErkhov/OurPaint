@@ -4,14 +4,10 @@
 struct ID{
   int id;
   ID(int i=0): id(i){}
+  ID& operator=(const ID& x);
 };
 
-bool operator>(const ID& left, const ID& right){
-  if(left.id<right.id){
-    return false;
-  }
-  return true;
-}
+bool operator>(const ID& left, const ID& right);
 
 struct point{
   double x;
