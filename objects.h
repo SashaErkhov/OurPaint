@@ -1,9 +1,10 @@
 #pragma once
 #ifndef MRETOR
 #define MRETOR
+
 struct ID{
-  int id;
-  ID(int i=0): id(i){}
+  long long int id;
+  ID(long long int i=0): id(i){}
 };
 struct point{
   double x;

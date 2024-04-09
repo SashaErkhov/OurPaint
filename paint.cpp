@@ -71,16 +71,16 @@ void Paint::part1(int start, int end) {
 
 // Реализация quickSort
 void Paint::quickSort() {
-	part1(0, m_pointIndex.size() - 1);
+	part1(0, m_pointIndex.getSize() - 1);
 }
 void Paint::paint(){
-    for (auto point = m_pointStorage.begin(); point < m_pointStorage.end(); point++){
+    for (auto point = m_pointStorage.begin(); point != m_pointStorage.end(); ++point){
         filename.drawPoint(*point, false);
     }
-    for (auto circle = m_circleStorage.begin(); circle < m_circleStorage.end(); circle++){
+    for (auto circle = m_circleStorage.begin(); circle != m_circleStorage.end(); ++circle){
         filename.drawCircle(*circle, false);
     }
-    for (auto section  = m_sectionStorage.begin(); section < m_sectionStorage.end(); section++){
+    for (auto section  = m_sectionStorage.begin(); section != m_sectionStorage.end(); ++section){
         filename.drawSection(*section, false);
     }
 }

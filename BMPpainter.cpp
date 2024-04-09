@@ -3,6 +3,8 @@
 //
 
 #include "BMPpainter.h"
+#include <iostream>
+
 BMPpainter::BMPpainter(/*const char* file*/){
     //filename = file;
 }
