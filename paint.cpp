@@ -99,8 +99,8 @@ void Paint::loadFromFile(const char* file){
 	point need;
 	ID id;
     maxID=0;
-	idxPoint el;
-	List<point>::iterator iter;
+	idxPoint point_idx;
+	List<point>::iterator point_iter;
     m_pointStorage=List<point>(0);
 	for(size_t i=0; i<size; ++i){
 		files>>id;
@@ -110,18 +110,18 @@ void Paint::loadFromFile(const char* file){
 		files>>need;//нужно создать ввод для таких элементов
 		m_pointStorage.addElement(need);
         if(m_pointStorage.getSize()==1){
-            iter=m_pointStorage.begin();
+            point_iter=m_pointStorage.begin();
         } else {
-            ++iter;
+            ++point_iter;
         }
-		el.id=id;
-        el.it=iter;
-        m_pointIndex.addElement(el);
+		point_idx.id=id;
+        point_idx.it=point_iter;
+        m_pointIndex.addElement(point_idx);
 	}
 	files>>size;
 	section work;
-    idxSection el;
-	List<section>::iterator iter;
+    idxSection section_idx;
+	List<section>::iterator section_iter;
     m_sectionStorage=List<section>(0);
 	for(size_t i=0; i<size; ++i){
 		files>>id;
@@ -130,20 +130,35 @@ void Paint::loadFromFile(const char* file){
         }
 		files>>work;//нужно создать ввод для таких элементов
 		m_sectionStorage.addElement(work);
-        if(m_pointStorage.getSize()==1){
-            iter=m_pointStorage.begin();
+        if(m_sectionStorage.getSize()==1){
+            section_iter=m_sectionStorage.begin();
         } else {
-            ++iter;
+            ++section_iter;
         }
-		el.id=id;
-        el.it=iter;
-        m_pointIndex.addElement(el);
+		section_idx.id=id;
+        section_idx.it=section_iter;
+        m_sectionIndex.addElement(section_idx);
 	}
 	files>>size;
 	circle worker;
+    idxCircle circle_idx;
+	List<circle>::iterator circle_iter;
+    m_circleStorage=List<circle>(0);
 	for(size_t i=0; i<size; ++i){
+		files>>id;
+        if(id>maxID){
+            maxID=id;
+        }
 		files>>worker;//нужно создать ввод для таких элементов
 		m_circleStorage.addElement(worker);
+        if(m_circleStorage.getSize()==1){
+            circle_iter=m_circleStorage.begin();
+        } else {
+            ++circle_iter;
+        }
+		circle_idx.id=id;
+        circle_idx.it=circle_iter;
+        m_circleIndex.addElement(circle_idx);
 	}
 }
 
