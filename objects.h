@@ -5,6 +5,14 @@ struct ID{
   int id;
   ID(int i=0): id(i){}
 };
+
+bool operator>(const ID& left, const ID& right){
+  if(left.id<right.id){
+    return false;
+  }
+  return true;
+}
+
 struct point{
   double x;
   double y;
