@@ -167,6 +167,7 @@ void Paint::loadFromFile(const char* file){
             maxID=id;
         }
 		files>>worker;//нужно создать ввод для таких элементов
+        files>>worker.R;
 		m_circleStorage.addElement(worker);
 
         if(m_circleStorage.getSize()==1){
