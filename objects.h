@@ -5,7 +5,11 @@
 struct ID{
   long long int id;
   ID(long long int i=0): id(i){}
+  ID& operator=(const ID& x);
 };
+
+bool operator>(const ID& left, const ID& right);
+
 struct point{
   double x;
   double y;
