@@ -132,6 +132,14 @@ void Paint::loadFromFile(const char* file){
         }
 		files>>beg_section;
         files>>end_section;
+        for(size_t j=0; j<m_pointIndex.getSize(); ++j){
+            if (m_pointIndex.getElement(j).id==beg_section){
+                
+            }
+            if (m_pointIndex.getElement(j).id==end_section){
+
+            }
+        }
 		m_sectionStorage.addElement(work);
         if(m_sectionStorage.getSize()==1){
             section_iter=m_sectionStorage.begin();
