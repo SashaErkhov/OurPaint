@@ -16,6 +16,7 @@ struct ElementData {
     Element et;
     Arry<double> params;
 
+    ElementData(){}
     ElementData(point& pt);
     ElementData(section& sec);
     ElementData(circle& cir);
@@ -47,6 +48,8 @@ private:
     int part2(int left, int right);
     void part1(int start, int end);
 public:
+    Paint(){}
+
     // Быстрая сортировка
     void quickSort();
 
