@@ -125,6 +125,8 @@ void Paint::loadFromFile(const char* file){
     m_sectionStorage=List<section>(0);
     ID beg_section;
     ID end_section;
+    bool end_index_beg=false;
+    bool end_index_end=false;
 	for(size_t i=0; i<size; ++i){
 		files>>id;
         if(id>maxID){
@@ -132,12 +134,16 @@ void Paint::loadFromFile(const char* file){
         }
 		files>>beg_section;
         files>>end_section;
-        for(size_t j=0; j<m_pointIndex.getSize(); ++j){
+        end_index_beg=false;
+        end_index_end=false;
+        for(size_t j=0; j<m_pointIndex.getSize() && (!(end_index_beg) ||  !(end_index_end)); ++j){
             if (m_pointIndex.getElement(j).id==beg_section){
-                
+                work.beg= &(*m_pointIndex.getElement(j).it);
+                end_index_beg=true;
             }
             if (m_pointIndex.getElement(j).id==end_section){
-
+                work.end= &(*m_pointIndex.getElement(j).it);
+                end_index_end=true;
             }
         }
 		m_sectionStorage.addElement(work);
@@ -162,6 +168,7 @@ void Paint::loadFromFile(const char* file){
         }
 		files>>worker;//нужно создать ввод для таких элементов
 		m_circleStorage.addElement(worker);
+
         if(m_circleStorage.getSize()==1){
             circle_iter=m_circleStorage.begin();
         } else {
