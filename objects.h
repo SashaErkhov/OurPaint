@@ -15,6 +15,9 @@ struct point{
   double x;
   double y;
 };
+
+std::ifstream& operator>> (std::ifstream& in, point& x);
+
 struct section{
   point *beg;
   point *end;

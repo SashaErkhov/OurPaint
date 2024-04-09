@@ -19,3 +19,9 @@ std::ifstream& operator>> (std::ifstream& in, ID& x){
     in>>x.id;
     return in;
 }
+
+std::ifstream& operator>> (std::ifstream& in, point& x){
+    in>>x.x;
+    in>>x.y;
+    return in;
+}
