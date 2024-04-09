@@ -9,6 +9,7 @@ struct ID{
 };
 
 bool operator>(const ID& left, const ID& right);
+std::ifstream& operator>> (std::ifstream& in, ID& x);
 
 struct point{
   double x;
