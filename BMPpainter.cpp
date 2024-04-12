@@ -1,14 +1,11 @@
-//
-// Created by Eugene Bychkov on 02.04.2024.
-//
-
 #include "BMPpainter.h"
 #include <iostream>
 
 BMPpainter::BMPpainter(/*const char* file*/){
     //filename = file;
 }
-void BMPpainter::drawSection(section s, bool isWhite){
+
+void BMPpainter::drawSection(section s, bool isWhite) {
     //Алгоритм Брезенхема
     int x0 = s.beg->x;
     int y0 = s.beg->y;
@@ -29,10 +26,11 @@ void BMPpainter::drawSection(section s, bool isWhite){
     }
 }
 
-void BMPpainter::drawPoint(point p, bool isWhite){
+void BMPpainter::drawPoint(point p, bool isWhite) {
     filename.setPixel(p.x, p.y, isWhite);
 }
-void BMPpainter::drawCircle(circle c, bool isWhite){
+
+void BMPpainter::drawCircle(circle c, bool isWhite) {
     int x = 0;
     int y = static_cast<int>(c.R);
     int delta = 1 - 2 * y;
@@ -57,9 +55,8 @@ void BMPpainter::drawCircle(circle c, bool isWhite){
         }
         delta += 2 * (++x - --y);
     }
-
-
 }
-void BMPpainter::saveBMP(const char* file){
+
+void BMPpainter::saveBMP(const char* file) {
     filename.saveBmp(file);
 }

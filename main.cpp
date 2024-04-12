@@ -32,7 +32,7 @@ int main()
             std::cout << "export file_name.bmp \t- \tExports the image to file_name.bmp" << std::endl;
             std::cout << "save file_name.db \t- \tload the information about objects to file_name.db like a table" << std::endl;
             std::cout << "load <bmp/db> file_name.<bmp/db> \t- \tload the information about objects from file_name.db if db or"
-                         "just load the image from file_name.bmp" << std::endl;
+                "just load the image from file_name.bmp" << std::endl;
             std::cout << "q \t- \tQuit" << std::endl;
             std::cout << "help \t- \tHelp that show you commands to use" << std::endl;
         }
@@ -74,9 +74,9 @@ int main()
             std::cin >> fileName;
             try {
                 screen.exportToBMP(fileName);
-                std::cout << "Exported to " << fileName << " SUCCESS!"<< std::endl;
+                std::cout << "Exported to " << fileName << " SUCCESS!" << std::endl;
             }
-            catch(std::exception& e){
+            catch (std::exception& e) {
                 std::cout << "Exported to " << fileName << " FAILED (file not found)" << std::endl;
             }
         }
@@ -87,7 +87,7 @@ int main()
                 screen.saveToFile(fileName);
                 std::cout << "Saved to " << fileName << " SUCCESS!" << std::endl;
             }
-            catch (std::exception &e) {
+            catch (std::exception& e) {
                 std::cout << "Saved to " << fileName << " FAILED (file not found)" << std::endl;
             }
         }
@@ -99,11 +99,12 @@ int main()
                 if (strcmp(fileResolution, "db") == 0) {
                     screen.loadFromFile(fileName);
                 }
-                if (strcmp(fileResolution, "bmp") == 0){
+                if (strcmp(fileResolution, "bmp") == 0) {
                     screen.changeBMP(fileName);
                 }
                 std::cout << "Loaded from " << fileName << " SUCCESS!" << std::endl;
-            }catch (...){
+            }
+            catch (...) {
                 std::cout << "Loaded from " << fileName << " FAILED!" << std::endl;
             }
         }
