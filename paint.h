@@ -8,6 +8,7 @@
 #include "objects.h"
 #include <cmath>
 #include "BMPpainter.h"
+#include "Assoc.h"
 
 enum Element {
     ET_POINT, ET_SECTION, ET_CIRCLE
@@ -19,27 +20,23 @@ struct ElementData {
 };
 
 class Paint {
-    struct idxPoint {
-        ID id;
-        List<point>::iterator it;
-    };
-    struct idxSection {
-        ID id;
-        List<section>::iterator it;
-    };
-    struct idxCircle {
-        ID id;
-        List<circle>::iterator it;
-    };
+    Assoc<ID, List<point>::iterator> m_pointStorage;
+    Assoc<ID, List<section>::iterator> m_sectionStorage;
+    Assoc<ID, List<circle>::iterator> m_circleStorage;
 
-    Arry <idxPoint> m_pointIndex;
-    Arry <idxSection> m_sectionIndex;
-    Arry <idxCircle> m_circleIndex;
     ID maxID;
-    List <point> m_pointStorage;
-    List <section> m_sectionStorage;
-    List <circle> m_circleStorage;
-    BMPpainter filename;
+
+    List<point> pointList;
+    List<section> sectionList;
+    List<circle> circleList;
+
+    BMPpainter bmpPainter;
+
+    /*
+    * TODO
+    * All methods (addElement, getElementInfo, etc.) must be adapted to work with the new data structure,
+    * utilizing Assoc methods for adding, searching, and deleting elements.
+    */
 
 public:
     // Добавление элементов с указанием их типа и необходимого набора параметров
