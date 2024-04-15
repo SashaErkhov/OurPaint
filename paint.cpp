@@ -59,9 +59,48 @@ void Paint::paint() {
     }
 }
 
-void Paint::loadFromFile(const char* file) {
+void Paint::saveToFile(const char* file) {
+    std::ofstream fout;
+    fout.open(file);
+    if (!(fout.is_open())) {
+        throw "We can't open file";
+    }
+    fout << m_pointStotage.getSize();
+    for (int i = 0; i < maxID; ++i) {
+        try {
+            fout << m_pointStorage.findByKey(i)<<" ";
+        }
+        catch (...) {
+            continue;
+        }
+    }
+    fout << "\n";
+    fout << m_sectorStotage.getSize();
+    for (int i = 0; i < maxID; ++i) {
+        try {
+            fout << m_sectorStorage.findByKey(i) << " ";
+        }
+        catch (...) {
+            continue;
+        }
+    }
+    fout << "\n";
+    fout << m_circleStotage.getSize();
+    for (int i = 0; i < maxID; ++i) {
+        try {
+            fout << m_circleStorage.findByKey(i) << " ";
+        }
+        catch (...) {
+            continue;
+        }
+    }
+    fout.close()
+}
+
+
+void Paint::loadFromFile(const char* filename) {
     std::ifstream files;
-    files.open(file);
+    files.open(filename);
     if (!(files.is_open())) {
         throw "We can't open file";
     }
