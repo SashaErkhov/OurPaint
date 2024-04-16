@@ -121,13 +121,7 @@ void Paint::loadFromFile(const char* filename) {
             maxID = id;
         }
         files >> need;//нужно создать ввод для таких элементов
-        m_pointStorage.addElement(need);
-        if (m_pointStorage.getSize() == 1) {
-            point_iter = m_pointStorage.begin();
-        }
-        else {
-            ++point_iter;
-        }
+        point_iter =m_pointStorage.addElement(need);
         point_idx.id = id;
         point_idx.it = point_iter;
         m_pointIndex.addElement(point_idx);
@@ -160,13 +154,7 @@ void Paint::loadFromFile(const char* filename) {
                 end_index_end = true;
             }
         }
-        m_sectionStorage.addElement(work);
-        if (m_sectionStorage.getSize() == 1) {
-            section_iter = m_sectionStorage.begin();
-        }
-        else {
-            ++section_iter;
-        }
+        section_iter = m_sectionStorage.addElement(work);
         section_idx.id = id;
         section_idx.it = section_iter;
         m_sectionIndex.addElement(section_idx);
@@ -192,14 +180,7 @@ void Paint::loadFromFile(const char* filename) {
             }
         }
         files >> worker.R;
-        m_circleStorage.addElement(worker);
-
-        if (m_circleStorage.getSize() == 1) {
-            circle_iter = m_circleStorage.begin();
-        }
-        else {
-            ++circle_iter;
-        }
+        circle_iter = m_circleStorage.addElement(worker);
         circle_idx.id = id;
         circle_idx.it = circle_iter;
         m_circleIndex.addElement(circle_idx);
