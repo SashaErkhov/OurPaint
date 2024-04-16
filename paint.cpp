@@ -135,18 +135,7 @@ void Paint::loadFromFile(const char* filename) {
         files >> beg_section;
         files >> end_section;
         work.beg=&(*m_pointIDs.findByKey(beg_section));
-        end_index_beg = false;
-        end_index_end = false;
-        for (size_t j = 0; j < m_pointIDs.getSize() && (!(end_index_beg) || !(end_index_end)); ++j) {
-            if (m_pointIndex.getElement(j).id == beg_section) {
-                work.beg = &(*m_pointIndex.getElement(j).it);
-                end_index_beg = true;
-            }
-            if (m_pointIndex.getElement(j).id == end_section) {
-                work.end = &(*m_pointIndex.getElement(j).it);
-                end_index_end = true;
-            }
-        }
+        work.end=&(*m_pointIDs.findByKey(end_section));
         section_iter = m_sectionStorage.addElement(work);
         m_sectionIDs.addPair(id, section_iter);
     }
@@ -162,13 +151,7 @@ void Paint::loadFromFile(const char* filename) {
             s_maxID = id;
         }
         files >> center;
-        end_index_center = false;
-        for (size_t j = 0; j < m_pointIDs.getSize() && !(end_index_center); ++j) {
-            if (m_pointIDs.getElement(j).id == center) {
-                worker.center = &(*m_pointIndex.getElement(j).it);
-                end_index_center = true;
-            }
-        }
+        worker.center=&(*m_pointIDs.findByKey(center));
         files >> worker.R;
         circle_iter = m_circleStorage.addElement(worker);
         m_circleIDs.addPair(id, circle_iter);
