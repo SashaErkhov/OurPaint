@@ -55,7 +55,8 @@ public:
     void loadFromFile(const char *file);
 
     // Задает фон(изменяет filename файл)
-    void changeBMP(const char* file);
+    void changeBMP(const BMPfile& file);
+    void changeBMP(const char* filename);
 
     void paint();
 };

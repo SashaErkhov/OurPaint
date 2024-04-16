@@ -8,6 +8,9 @@ class BMPpainter {
     BMPfile file;
 public:
     BMPpainter(unsigned int weight = 1000, unsigned int height = 1000);
+    BMPpainter(const BMPfile &file);
+    BMPpainter(const BMPpainter &other);
+    BMPpainter &operator=(const BMPpainter &other);
     void drawPoint(point pt, bool isWhite = false);
     void drawSection(section sec, bool isWhite = false);
     void drawCircle(circle c, bool isWhite = false);

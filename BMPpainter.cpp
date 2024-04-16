@@ -6,6 +6,21 @@ BMPpainter::BMPpainter(unsigned int weight, unsigned int height)
     file=BMPfile(weight, height);
 }
 
+BMPpainter::BMPpainter(const BMPpainter &other)
+{
+    file=other.file;
+}
+
+BMPpainter& BMPpainter::operator=(const BMPpainter &other)
+{
+    file=other.file;
+    return *this;
+}
+
+BMPpainter::BMPpainter(const BMPfile &file)
+{
+    this->file=file;
+}
 
 void BMPpainter::drawSection(section s, bool isWhite) {
     //Алгоритм Брезенхема
@@ -59,6 +74,6 @@ void BMPpainter::drawCircle(circle c, bool isWhite) {
     }
 }
 
-void BMPpainter::saveBMP(const char* file) {
-    file.saveBmp(file);
+void BMPpainter::saveBMP(const char* filename) {
+    file.saveBmp(filename);
 }

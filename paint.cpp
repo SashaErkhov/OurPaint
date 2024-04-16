@@ -2,6 +2,7 @@
 #include "BMPfile.h"
 #include "Arry.h"
 #include "List.h"
+#include "Assoc.h"
 #include "objects.h"
 #include <fstream>
 
@@ -64,7 +65,7 @@ void Paint::saveToFile(const char* file) {
     fout << m_pointStorage.getSize();
     for (int i = 0; i < s_maxID; ++i) {
         try {
-            fout << m_pointStorage.findByKey(i)<<" ";
+            fout << *(m_pointIDs.findByKey(i))<<" ";
         }
         catch (...) {
             continue;
@@ -74,7 +75,7 @@ void Paint::saveToFile(const char* file) {
     fout << m_sectionStorage.getSize();
     for (int i = 0; i < s_maxID; ++i) {
         try {
-            fout << m_sectorStorage.findByKey(i) << " ";
+            fout << *(m_sectionIDs.findByKey(i)) << " ";
         }
         catch (...) {
             continue;
@@ -84,13 +85,13 @@ void Paint::saveToFile(const char* file) {
     fout << m_circleStorage.getSize();
     for (int i = 0; i < s_maxID; ++i) {
         try {
-            fout << m_circleStorage.findByKey(i) << " ";
+            fout << *(m_circleIDs.findByKey(i)) << " ";
         }
         catch (...) {
             continue;
         }
     }
-    fout.close()
+    fout.close();
 }
 
 
@@ -165,18 +166,12 @@ void Paint::exportToBMP(const char* file) {
     }
 }
 
-void Paint::changeBMP(const char* file) {
-    c_bmpPainter = file;
+void Paint::changeBMP(const BMPfile& file)
+{
+    c_bmpPainter = BMPpainter(file);
 }
 
-// TODO: Implement this function to fulfill its intended functionality.
-ElementData Paint::getElementInfo(ID id)
+void Paint::changeBMP(const char* filename)
 {
-    return ElementData();
-}
-
-// TODO: Implement this function to fulfill its intended functionality.
-void Paint::saveToFile(const char* filename)
-{
-    // ...
+    c_bmpPainter = BMPpainter(BMPfile(filename));
 }
