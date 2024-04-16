@@ -5,14 +5,13 @@
 #include <cmath>
 
 class BMPpainter {
-    BMPfile filename;
+    BMPfile file;
 public:
-    BMPpainter();
-    BMPpainter(const char* filename);
+    BMPpainter(unsigned int weight = 1000, unsigned int height = 1000);
     void drawPoint(point pt, bool isWhite = false);
     void drawSection(section sec, bool isWhite = false);
     void drawCircle(circle c, bool isWhite = false);
-    void saveBMP(const char* filename);
+    void saveBMP(const char* filename="print.bmp");
 };
 
 #endif //OURPAINT_BMPPAINTER_H

@@ -1,9 +1,11 @@
 #include "BMPpainter.h"
 #include <iostream>
 
-BMPpainter::BMPpainter(/*const char* file*/){
-    //filename = file;
+BMPpainter::BMPpainter(unsigned int weight, unsigned int height)
+{
+    file=BMPfile(weight, height);
 }
+
 
 void BMPpainter::drawSection(section s, bool isWhite) {
     //Алгоритм Брезенхема
@@ -18,7 +20,7 @@ void BMPpainter::drawSection(section s, bool isWhite) {
     int err = deltaX + deltaY;
     int e2;
     for (;;) {
-        filename.setPixel(x0, y0, isWhite);
+        file.setPixel(x0, y0, isWhite);
         if (x0 == x1 && y0 == y1) break;
         e2 = 2 * err;
         if (e2 <= deltaX) { err += deltaX; y0 += dirY; } /* e_xy+e_y < 0 */
@@ -27,7 +29,7 @@ void BMPpainter::drawSection(section s, bool isWhite) {
 }
 
 void BMPpainter::drawPoint(point p, bool isWhite) {
-    filename.setPixel(p.x, p.y, isWhite);
+    file.setPixel(p.x, p.y, isWhite);
 }
 
 void BMPpainter::drawCircle(circle c, bool isWhite) {
@@ -36,14 +38,14 @@ void BMPpainter::drawCircle(circle c, bool isWhite) {
     int delta = 1 - 2 * y;
     int error = 0;
     while (y >= x) {
-        filename.setPixel(c.center->x + x, c.center->y + y, isWhite);
-        filename.setPixel(c.center->x + x, c.center->y - y, isWhite);
-        filename.setPixel(c.center->x - x, c.center->y + y, isWhite);
-        filename.setPixel(c.center->x - x, c.center->y - y, isWhite);
-        filename.setPixel(c.center->x + y, c.center->y + x, isWhite);
-        filename.setPixel(c.center->x + y, c.center->y - x, isWhite);
-        filename.setPixel(c.center->x - y, c.center->y + x, isWhite);
-        filename.setPixel(c.center->x - y, c.center->y - x, isWhite);
+        file.setPixel(c.center->x + x, c.center->y + y, isWhite);
+        file.setPixel(c.center->x + x, c.center->y - y, isWhite);
+        file.setPixel(c.center->x - x, c.center->y + y, isWhite);
+        file.setPixel(c.center->x - x, c.center->y - y, isWhite);
+        file.setPixel(c.center->x + y, c.center->y + x, isWhite);
+        file.setPixel(c.center->x + y, c.center->y - x, isWhite);
+        file.setPixel(c.center->x - y, c.center->y + x, isWhite);
+        file.setPixel(c.center->x - y, c.center->y - x, isWhite);
         error = (delta + y) * 2 - 1;
         if ((delta < 0) && (error <= 0)) {
             delta += 2 * ++x + 1;
@@ -58,5 +60,5 @@ void BMPpainter::drawCircle(circle c, bool isWhite) {
 }
 
 void BMPpainter::saveBMP(const char* file) {
-    filename.saveBmp(file);
+    file.saveBmp(file);
 }
