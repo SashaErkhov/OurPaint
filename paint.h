@@ -26,9 +26,9 @@ class Paint {
 
     ID maxID;
 
-    List<point> pointList;
-    List<section> sectionList;
-    List<circle> circleList;
+    List<point> m_pointStorage;
+    List<section> m_sectionStorage;
+    List<circle> m_circleStorage;
 
     BMPpainter bmpPainter;
 
