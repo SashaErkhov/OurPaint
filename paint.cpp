@@ -100,9 +100,9 @@ void Paint::loadFromFile(const char* filename) {
     if (!(files.is_open())) {
         throw "We can't open file";
     }
-    m_pointIDs = Assoc<ID, List<point>::iterator>(0);
-    m_sectionIDs = Assoc<ID, List<section>::iterator>(0);
-    m_circleIDs = Assoc<ID, List<circle>::iterator>(0);
+    m_pointIDs = Assoc<ID, List<point>::iterator>();
+    m_sectionIDs = Assoc<ID, List<section>::iterator>();
+    m_circleIDs = Assoc<ID, List<circle>::iterator>();
     size_t size=0;
     files >> size;
     point need;
@@ -134,6 +134,7 @@ void Paint::loadFromFile(const char* filename) {
         }
         files >> beg_section;
         files >> end_section;
+        work.beg=&(*m_pointIDs.findByKey(beg_section));
         end_index_beg = false;
         end_index_end = false;
         for (size_t j = 0; j < m_pointIDs.getSize() && (!(end_index_beg) || !(end_index_end)); ++j) {
