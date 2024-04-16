@@ -100,15 +100,14 @@ void Paint::loadFromFile(const char* filename) {
     if (!(files.is_open())) {
         throw "We can't open file";
     }
-    m_pointIndex = Arry<idxPoint>(0);
-    m_sectionIndex = Arry<idxSection>(0);
-    m_circleIndex = Arry<idxCircle>(0);
-    size_t size = 0;
+    m_pointIDs = Assoc<ID, List<point>::iterator>();
+    m_sectionIDs = Assoc<ID, List<section>::iterator>();
+    m_circleIDs = Assoc<ID, List<circle>::iterator>();
+    size_t size=0;
     files >> size;
     point need;
     ID id;
     s_maxID = 0;
-    idxPoint point_idx;
     List<point>::iterator point_iter;
     m_pointStorage = List<point>(0);
     for (size_t i = 0; i < size; ++i) {
@@ -118,13 +117,10 @@ void Paint::loadFromFile(const char* filename) {
         }
         files >> need;//нужно создать ввод для таких элементов
         point_iter =m_pointStorage.addElement(need);
-        point_idx.id = id;
-        point_idx.it = point_iter;
-        m_pointIndex.addElement(point_idx);
+        m_pointIDs.addPair(id, point_iter);
     }
     files >> size;
     section work;
-    idxSection section_idx;
     List<section>::iterator section_iter;
     m_sectionStorage = List<section>(0);
     ID beg_section;
@@ -138,9 +134,10 @@ void Paint::loadFromFile(const char* filename) {
         }
         files >> beg_section;
         files >> end_section;
+        work.beg=&(*m_pointIDs.findByKey(beg_section));
         end_index_beg = false;
         end_index_end = false;
-        for (size_t j = 0; j < m_pointIndex.getSize() && (!(end_index_beg) || !(end_index_end)); ++j) {
+        for (size_t j = 0; j < m_pointIDs.getSize() && (!(end_index_beg) || !(end_index_end)); ++j) {
             if (m_pointIndex.getElement(j).id == beg_section) {
                 work.beg = &(*m_pointIndex.getElement(j).it);
                 end_index_beg = true;
@@ -151,13 +148,10 @@ void Paint::loadFromFile(const char* filename) {
             }
         }
         section_iter = m_sectionStorage.addElement(work);
-        section_idx.id = id;
-        section_idx.it = section_iter;
-        m_sectionIndex.addElement(section_idx);
+        m_sectionIDs.addPair(id, section_iter);
     }
     files >> size;
     circle worker;
-    idxCircle circle_idx;
     List<circle>::iterator circle_iter;
     m_circleStorage = List<circle>(0);
     ID center;
@@ -169,17 +163,15 @@ void Paint::loadFromFile(const char* filename) {
         }
         files >> center;
         end_index_center = false;
-        for (size_t j = 0; j < m_pointIndex.getSize() && !(end_index_center); ++j) {
-            if (m_pointIndex.getElement(j).id == center) {
+        for (size_t j = 0; j < m_pointIDs.getSize() && !(end_index_center); ++j) {
+            if (m_pointIDs.getElement(j).id == center) {
                 worker.center = &(*m_pointIndex.getElement(j).it);
                 end_index_center = true;
             }
         }
         files >> worker.R;
         circle_iter = m_circleStorage.addElement(worker);
-        circle_idx.id = id;
-        circle_idx.it = circle_iter;
-        m_circleIndex.addElement(circle_idx);
+        m_circleIDs.addPair(id, circle_iter);
     }
 }
 
