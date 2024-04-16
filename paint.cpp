@@ -49,13 +49,13 @@ ID Paint::addElement(const ElementData& ed) {
 
 void Paint::paint() {
     for (auto point = m_pointStorage.begin(); point != m_pointStorage.end(); ++point) {
-        filename.drawPoint(*point, false);
+        c_bmpPainter.drawPoint(*point, false);
     }
     for (auto circle = m_circleStorage.begin(); circle != m_circleStorage.end(); ++circle) {
-        filename.drawCircle(*circle, false);
+        c_bmpPainter.drawCircle(*circle, false);
     }
     for (auto section = m_sectionStorage.begin(); section != m_sectionStorage.end(); ++section) {
-        filename.drawSection(*section, false);
+        c_bmpPainter.drawSection(*section, false);
     }
 }
 
@@ -190,7 +190,7 @@ void Paint::loadFromFile(const char* filename) {
 void Paint::exportToBMP(const char* file) {
     paint();
     try {
-        filename.saveBMP(file);
+        c_bmpPainter.saveBMP(file);
     }
     catch (...) {
         throw std::invalid_argument("Can not opened file!");
@@ -198,7 +198,7 @@ void Paint::exportToBMP(const char* file) {
 }
 
 void Paint::changeBMP(const char* file) {
-    filename = file;
+    c_bmpPainter = file;
 }
 
 // TODO: Implement this function to fulfill its intended functionality.
