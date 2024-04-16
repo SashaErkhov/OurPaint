@@ -125,8 +125,6 @@ void Paint::loadFromFile(const char* filename) {
     m_sectionStorage = List<section>(0);
     ID beg_section;
     ID end_section;
-    bool end_index_beg = false;
-    bool end_index_end = false;
     for (size_t i = 0; i < size; ++i) {
         files >> id;
         if (id > s_maxID) {
@@ -144,7 +142,6 @@ void Paint::loadFromFile(const char* filename) {
     List<circle>::iterator circle_iter;
     m_circleStorage = List<circle>(0);
     ID center;
-    bool end_index_center = false;
     for (size_t i = 0; i < size; ++i) {
         files >> id;
         if (id > s_maxID) {
