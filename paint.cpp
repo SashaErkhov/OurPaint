@@ -65,7 +65,7 @@ void Paint::saveToFile(const char* file) {
     if (!(fout.is_open())) {
         throw "We can't open file";
     }
-    fout << m_pointStotage.getSize();
+    fout << m_pointStorage.getSize();
     for (int i = 0; i < maxID; ++i) {
         try {
             fout << m_pointStorage.findByKey(i)<<" ";
@@ -75,7 +75,7 @@ void Paint::saveToFile(const char* file) {
         }
     }
     fout << "\n";
-    fout << m_sectorStotage.getSize();
+    fout << m_sectionStorage.getSize();
     for (int i = 0; i < maxID; ++i) {
         try {
             fout << m_sectorStorage.findByKey(i) << " ";
@@ -85,7 +85,7 @@ void Paint::saveToFile(const char* file) {
         }
     }
     fout << "\n";
-    fout << m_circleStotage.getSize();
+    fout << m_circleStorage.getSize();
     for (int i = 0; i < maxID; ++i) {
         try {
             fout << m_circleStorage.findByKey(i) << " ";
