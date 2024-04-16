@@ -20,9 +20,9 @@ struct ElementData {
 };
 
 class Paint {
-    Assoc<ID, List<point>::iterator> m_pointStorage;
-    Assoc<ID, List<section>::iterator> m_sectionStorage;
-    Assoc<ID, List<circle>::iterator> m_circleStorage;
+    Assoc<ID, List<point>::iterator> pointIDs;
+    Assoc<ID, List<section>::iterator> sectionIDs;
+    Assoc<ID, List<circle>::iterator> circleIDs;
 
     ID maxID;
 
