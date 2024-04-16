@@ -11,37 +11,33 @@ ID Paint::addElement(const ElementData& ed) {
         point tmp;
         tmp.x = ed.params[0];
         tmp.y = ed.params[1];
-        m_pointStorage.addElement(tmp);
-        ++s_maxID.id;
+        m_pointIDs.addPair(++s_maxID.id,m_pointStorage.addElement(tmp));
         return s_maxID;
     }
     if (ed.et == ET_SECTION) {
         point tmp1;
         tmp1.x = ed.params[0];
-        tmp1.y = ed.params[1];
-        ++s_maxID.id;
-        m_pointStorage.addElement(tmp1);
+        tmp1.y = ed.params[1];        
+        m_pointIDs.addPair(++s_maxID.id,m_pointStorage.addElement(tmp1));
         point tmp2;
         tmp2.x = ed.params[2];
         tmp2.y = ed.params[3];
-        ++s_maxID.id;
-        m_pointStorage.addElement(tmp2);
+        m_pointIDs.addPair(++s_maxID.id,m_pointStorage.addElement(tmp2));
         section tmp;
         tmp.beg = &tmp1;
         tmp.end = &tmp2;
-        m_sectionStorage.addElement(tmp);
-        ++s_maxID.id;
+        m_sectionIDs.addPair(++s_maxID.id,m_sectionStorage.addElement(tmp));
         return s_maxID;
     }
     if (ed.et == ET_CIRCLE) {
         point center;
         center.x = ed.params[0];
         center.y = ed.params[1];
-        ++s_maxID.id;
-        m_pointStorage.addElement(center);
+        m_pointIDs.addPair(++s_maxID.id,m_pointStorage.addElement(center));
         circle tmp;
         tmp.center = &center;
         tmp.R = ed.params[2];
+        m_circleIDs.addPair(++s_maxID.id,m_circleStorage.addElement(tmp));
         return s_maxID;
     }
     return ID{ -1 };
