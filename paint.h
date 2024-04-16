@@ -18,7 +18,7 @@ struct ElementData {
     Element et;
     Arry<double> params;
 };
-
+//c_ - класс, v_- переменная, s_структура, m_ - контейнеры(списки, массивы и другие)
 class Paint {
     Assoc<ID, List<point>::iterator> m_pointIDs;
     Assoc<ID, List<section>::iterator> m_sectionIDs;
