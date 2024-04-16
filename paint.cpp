@@ -11,38 +11,34 @@ ID Paint::addElement(const ElementData& ed) {
         point tmp;
         tmp.x = ed.params[0];
         tmp.y = ed.params[1];
-        m_pointStorage.addElement(tmp);
-        ++maxID.id;
-        return maxID;
+        m_pointIDs.addPair(++s_maxID.id,m_pointStorage.addElement(tmp));
+        return s_maxID;
     }
     if (ed.et == ET_SECTION) {
         point tmp1;
         tmp1.x = ed.params[0];
-        tmp1.y = ed.params[1];
-        ++maxID.id;
-        m_pointStorage.addElement(tmp1);
+        tmp1.y = ed.params[1];        
+        m_pointIDs.addPair(++s_maxID.id,m_pointStorage.addElement(tmp1));
         point tmp2;
         tmp2.x = ed.params[2];
         tmp2.y = ed.params[3];
-        ++maxID.id;
-        m_pointStorage.addElement(tmp2);
+        m_pointIDs.addPair(++s_maxID.id,m_pointStorage.addElement(tmp2));
         section tmp;
         tmp.beg = &tmp1;
         tmp.end = &tmp2;
-        m_sectionStorage.addElement(tmp);
-        ++maxID.id;
-        return maxID;
+        m_sectionIDs.addPair(++s_maxID.id,m_sectionStorage.addElement(tmp));
+        return s_maxID;
     }
     if (ed.et == ET_CIRCLE) {
         point center;
         center.x = ed.params[0];
         center.y = ed.params[1];
-        ++maxID.id;
-        m_pointStorage.addElement(center);
+        m_pointIDs.addPair(++s_maxID.id,m_pointStorage.addElement(center));
         circle tmp;
         tmp.center = &center;
         tmp.R = ed.params[2];
-        return maxID;
+        m_circleIDs.addPair(++s_maxID.id,m_circleStorage.addElement(tmp));
+        return s_maxID;
     }
     return ID{ -1 };
 }
@@ -66,7 +62,7 @@ void Paint::saveToFile(const char* file) {
         throw "We can't open file";
     }
     fout << m_pointStorage.getSize();
-    for (int i = 0; i < maxID; ++i) {
+    for (int i = 0; i < s_maxID; ++i) {
         try {
             fout << m_pointStorage.findByKey(i)<<" ";
         }
@@ -76,7 +72,7 @@ void Paint::saveToFile(const char* file) {
     }
     fout << "\n";
     fout << m_sectionStorage.getSize();
-    for (int i = 0; i < maxID; ++i) {
+    for (int i = 0; i < s_maxID; ++i) {
         try {
             fout << m_sectorStorage.findByKey(i) << " ";
         }
@@ -86,7 +82,7 @@ void Paint::saveToFile(const char* file) {
     }
     fout << "\n";
     fout << m_circleStorage.getSize();
-    for (int i = 0; i < maxID; ++i) {
+    for (int i = 0; i < s_maxID; ++i) {
         try {
             fout << m_circleStorage.findByKey(i) << " ";
         }
@@ -111,14 +107,14 @@ void Paint::loadFromFile(const char* filename) {
     files >> size;
     point need;
     ID id;
-    maxID = 0;
+    s_maxID = 0;
     idxPoint point_idx;
     List<point>::iterator point_iter;
     m_pointStorage = List<point>(0);
     for (size_t i = 0; i < size; ++i) {
         files >> id;
-        if (id > maxID) {
-            maxID = id;
+        if (id > s_maxID) {
+            s_maxID = id;
         }
         files >> need;//нужно создать ввод для таких элементов
         m_pointStorage.addElement(need);
@@ -143,8 +139,8 @@ void Paint::loadFromFile(const char* filename) {
     bool end_index_end = false;
     for (size_t i = 0; i < size; ++i) {
         files >> id;
-        if (id > maxID) {
-            maxID = id;
+        if (id > s_maxID) {
+            s_maxID = id;
         }
         files >> beg_section;
         files >> end_section;
@@ -180,8 +176,8 @@ void Paint::loadFromFile(const char* filename) {
     bool end_index_center = false;
     for (size_t i = 0; i < size; ++i) {
         files >> id;
-        if (id > maxID) {
-            maxID = id;
+        if (id > s_maxID) {
+            s_maxID = id;
         }
         files >> center;
         end_index_center = false;
