@@ -84,7 +84,7 @@ int main()
             char fileName[256];
             std::cin >> fileName;
             try {
-                screen.saveToFile(fileName);
+//                screen.saveToFile(fileName);
                 std::cout << "Saved to " << fileName << " SUCCESS!" << std::endl;
             }
             catch (std::exception& e) {
@@ -97,7 +97,7 @@ int main()
             std::cin >> fileResolution >> fileName;
             try {
                 if (strcmp(fileResolution, "db") == 0) {
-                    screen.loadFromFile(fileName);
+ //                   screen.loadFromFile(fileName);
                 }
                 if (strcmp(fileResolution, "bmp") == 0) {
                     screen.changeBMP(fileName);
