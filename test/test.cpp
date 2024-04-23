@@ -15,3 +15,22 @@ TEST(PaintTest, AddingElems){
   ASSERT_EQ(ed.params.getElement(0),1.0);
   ASSERT_EQ(ed.params.getElement(1),2.0); 
 }
+
+TEST(PaintTest, save_and_load){
+  Paint paint;
+  ElementData in;
+  in.et=ET_POINT;
+  in.params.addElement(3.0);
+  in.params.addElement(2.0);
+  paint.addElement(in);
+  in.et=ET_POINT;
+  in.params.addElement(8.0);
+  in.params.addElement(7.0);
+  paint.addElement(in);
+  in.et=ET_SECTION;
+  in.params.addElement(87.0);
+  in.params.addElement(77.0);
+  in.params.addElement(78.0);
+  in.params.addElement(87.0);
+  paint.addElement(in);
+}

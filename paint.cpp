@@ -65,8 +65,8 @@ void Paint::saveToFile(const char* file) {
     fout << m_pointStorage.getSize();
     point prm;
     for(auto pos=m_pointIDs.begin(); pos!=m_pointIDs.end(); ++pos){
-        fout<<(*pos).first().id();
-        prm=*(*(pos).second());
+        fout<<(*pos).first.id();
+        prm=*((*pos).second);
         fout<<prm.x;
         fout<<prm.y;
     }
@@ -77,16 +77,16 @@ void Paint::saveToFile(const char* file) {
     for (auto pos=m_sectionIDs.begin(); pos!=m_sectionIDs.end(); ++pos) {
         end=false;
         fout<<(*pos).first().id();
-        sct=*(*(pos).second());
+        sct=*((*pos).second());
         for(auto pos=m_pointIDs.begin(); pos!=m_pointIDs.end() && !(end); ++pos){
-            if(&(*(*(pos).second()))==sct.beg){
-                fout<<(*pos).first().id();
+            if(&(*((*pos).second))==sct.beg){
+                fout<<(*pos).first.id();
                 end=true;
             }
         }
         for(auto pos=m_pointIDs.begin(); pos!=m_pointIDs.end() && !(end); ++pos){
-            if(&(*(*(pos).second()))==sct.end){
-                fout<<(*pos).first().id();
+            if(&(*((*pos).second))==sct.end){
+                fout<<(*pos).first.id();
                 end=true;
             }
         }
@@ -97,11 +97,11 @@ void Paint::saveToFile(const char* file) {
     bool end=false;
     for (auto pos=m_sectionIDs.begin(); pos!=m_sectionIDs.end(); ++pos) {
         end=false;
-        fout<<(*pos).first().id();
-        crc=*(*(pos).second());
+        fout<<(*pos).first.id();
+        crc=*((*pos).second);
         for(auto pos=m_pointIDs.begin(); pos!=m_pointIDs.end() && !(end); ++pos){
-            if(&(*(*(pos).second()))==crc.center){
-                fout<<(*pos).first().id();
+            if(&(*((*pos).second))==crc.center){
+                fout<<(*pos).first.id();
                 end=true;
             }
         }
