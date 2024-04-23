@@ -67,28 +67,45 @@ void Paint::saveToFile(const char* file) {
     for(auto pos=m_pointIDs.begin(); pos!=m_pointIDs.end(); ++pos){
         fout<<(*pos).first().id();
         prm=*(*(pos).second());
-        fout<<prm.x();
-        fout<<prm.y();
+        fout<<prm.x;
+        fout<<prm.y;
     }
     fout << "\n";
     fout << m_sectionStorage.getSize();
-    for (int i = 0; i < s_maxID; ++i) {
-        try {
-            fout << *(m_sectionIDs.findByKey(i)) << " ";
+    section sct;
+    bool end=false;
+    for (auto pos=m_sectionIDs.begin(); pos!=m_sectionIDs.end(); ++pos) {
+        end=false;
+        fout<<(*pos).first().id();
+        sct=*(*(pos).second());
+        for(auto pos=m_pointIDs.begin(); pos!=m_pointIDs.end() && !(end); ++pos){
+            if(&(*(*(pos).second()))==sct.beg){
+                fout<<(*pos).first().id();
+                end=true;
+            }
         }
-        catch (...) {
-            continue;
+        for(auto pos=m_pointIDs.begin(); pos!=m_pointIDs.end() && !(end); ++pos){
+            if(&(*(*(pos).second()))==sct.end){
+                fout<<(*pos).first().id();
+                end=true;
+            }
         }
     }
     fout << "\n";
     fout << m_circleStorage.getSize();
-    for (int i = 0; i < s_maxID; ++i) {
-        try {
-            fout << *(m_circleIDs.findByKey(i)) << " ";
+    circle crc;
+    bool end=false;
+    for (auto pos=m_sectionIDs.begin(); pos!=m_sectionIDs.end(); ++pos) {
+        end=false;
+        fout<<(*pos).first().id();
+        crc=*(*(pos).second());
+        for(auto pos=m_pointIDs.begin(); pos!=m_pointIDs.end() && !(end); ++pos){
+            if(&(*(*(pos).second()))==crc.center){
+                fout<<(*pos).first().id();
+                end=true;
+            }
         }
-        catch (...) {
-            continue;
-        }
+        fout<<crc.R;
     }
     fout.close();
 }
