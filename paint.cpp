@@ -63,13 +63,12 @@ void Paint::saveToFile(const char* file) {
         throw "We can't open file";
     }
     fout << m_pointStorage.getSize();
-    for (int i = 0; i < s_maxID; ++i) {
-        try {
-            fout << *(m_pointIDs.findByKey(i))<<" ";
-        }
-        catch (...) {
-            continue;
-        }
+    point prm;
+    for(auto pos=m_pointIDs.begin(); pos!=m_pointIDs.end(); ++pos){
+        fout<<(*pos).first().id();
+        prm=*(*(pos).second());
+        fout<<prm.x();
+        fout<<prm.y();
     }
     fout << "\n";
     fout << m_sectionStorage.getSize();
