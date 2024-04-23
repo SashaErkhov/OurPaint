@@ -11,12 +11,14 @@
 #include "Assoc.h"
 
 enum Element {
-    ET_POINT, ET_SECTION, ET_CIRCLE
+    ET_POINT, ET_SECTION, ET_CIRCLE, ET_OUT
 };
 
 struct ElementData {
     Element et;
     Arry<double> params;
+
+    ElementData();
 };
 //c_ - класс, v_- переменная, s_структура, m_ - контейнеры(списки, массивы и другие)
 class Paint {
@@ -39,15 +41,8 @@ class Paint {
     */
 
 public:
-    Paint() : s_maxID(0), c_bmpPainter() {
-            m_pointIDs = Assoc<ID, List<point>::iterator>();
-            m_sectionIDs = Assoc<ID, List<section>::iterator>();
-            m_circleIDs = Assoc<ID, List<circle>::iterator>();
-
-            m_pointStorage = List<point>();
-            m_sectionStorage = List<section>();
-            m_circleStorage = List<circle>();
-    }
+    Paint() : s_maxID(0), c_bmpPainter(), m_pointIDs(), m_sectionIDs(), m_circleIDs(), m_pointStorage(),
+              m_sectionStorage(), m_circleStorage() {}//default constructor
     // Добавление элементов с указанием их типа и необходимого набора параметров
     ID addElement(const ElementData &ed);
 

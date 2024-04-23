@@ -6,6 +6,10 @@
 #include "objects.h"
 #include <fstream>
 
+ElementData::ElementData(){
+    et=ET_OUT;
+    params=Arry<double>();
+}
 
 ID Paint::addElement(const ElementData& ed) {
     if (ed.et == ET_POINT) {
@@ -56,40 +60,56 @@ void Paint::paint() {
     }
 }
 
-/*void Paint::saveToFile(const char* file) {
+void Paint::saveToFile(const char* file) {
     std::ofstream fout;
     fout.open(file);
     if (!(fout.is_open())) {
         throw "We can't open file";
     }
     fout << m_pointStorage.getSize();
-    for (int i = 0; i < s_maxID; ++i) {
-        try {
-            fout << *(m_pointIDs.findByKey(i)) << " ";
-        }
-        catch (...) {
-            continue;
-        }
+    point prm;
+    for(auto pos=m_pointIDs.begin(); pos!=m_pointIDs.end(); ++pos){
+        fout<<(*pos).first.id();
+        prm=*((*pos).second);
+        fout<<prm.x;
+        fout<<prm.y;
     }
     fout << "\n";
     fout << m_sectionStorage.getSize();
-    for (int i = 0; i < s_maxID; ++i) {
-        try {
-            fout << *(m_sectionIDs.findByKey(i)) << " ";
+    section sct;
+    bool end=false;
+    for (auto pos=m_sectionIDs.begin(); pos!=m_sectionIDs.end(); ++pos) {
+        end=false;
+        fout<<(*pos).first().id();
+        sct=*((*pos).second());
+        for(auto pos=m_pointIDs.begin(); pos!=m_pointIDs.end() && !(end); ++pos){
+            if(&(*((*pos).second))==sct.beg){
+                fout<<(*pos).first.id();
+                end=true;
+            }
         }
-        catch (...) {
-            continue;
+        for(auto pos=m_pointIDs.begin(); pos!=m_pointIDs.end() && !(end); ++pos){
+            if(&(*((*pos).second))==sct.end){
+                fout<<(*pos).first.id();
+                end=true;
+            }
         }
     }
     fout << "\n";
     fout << m_circleStorage.getSize();
-    for (int i = 0; i < s_maxID; ++i) {
-        try {
-            fout << *(m_circleIDs.findByKey(i)) << " ";
+    circle crc;
+    bool end=false;
+    for (auto pos=m_sectionIDs.begin(); pos!=m_sectionIDs.end(); ++pos) {
+        end=false;
+        fout<<(*pos).first.id();
+        crc=*((*pos).second);
+        for(auto pos=m_pointIDs.begin(); pos!=m_pointIDs.end() && !(end); ++pos){
+            if(&(*((*pos).second))==crc.center){
+                fout<<(*pos).first.id();
+                end=true;
+            }
         }
-        catch (...) {
-            continue;
-        }
+        fout<<crc.R;
     }
     fout.close();
 }
@@ -154,7 +174,7 @@ void Paint::loadFromFile(const char* filename) {
         circle_iter = m_circleStorage.addElement(worker);
         m_circleIDs.addPair(id, circle_iter);
     }
-}*/
+}
 
 void Paint::exportToBMP(const char* file) {
     paint();
@@ -165,6 +185,56 @@ void Paint::exportToBMP(const char* file) {
         throw std::invalid_argument("Can not opened file!");
     }
 }
+
+void Paint::makeMySectionOrt(const ElementData& ed, ElementData& changing){
+	if (ed.et != ET_SECTION or changing.et != ET_SECTION) {
+		throw "Some of the elements is not section!";
+	}
+	//изменяем changing так, чтобы он был ортогонален с ed(cкорее всего, поворотом одной из точек)
+}
+void Paint::makeMySectionEqual(const ElementData& ed, ElementData& changing) {
+	if (ed.et != ET_SECTION or changing.et != ET_SECTION) {
+		throw "Some of the elements is not section!";
+	}
+	//изменяем changing так, чтобы его длина была равна длине ed (cкорее всего, поворотом одной из точек)
+	//например поменяем Y второй точки
+	/*double len2 = pow(ed.point1.x - ed.point2.x, 2) + pow(ed.point1.x - ed.point2.x, 2)
+	changing.point1.y = sqrt(len2-pow(changing.point1.x -changing.point2.x, 2))+ changing.point1.y*/
+}
+void Paint::makeMySectionParallel(const ElementData& ed, ElementData& changing) {
+	if (ed.et != ET_SECTION or changing.et != ET_SECTION) {
+		throw "Some of the elements is not section!";
+	}
+	//изменяем changing так, чтобы он стал параллелен ed
+}
+void Paint::makeMySectionVertical(ElementData& changing) {
+	if (changing.et != ET_SECTION) {
+		throw "The element is not section!";
+	}
+	//отрезок становится строго вертикальным
+	/*
+	changing.point2.x=changing.point1.x; - чтобы были равны X координаты точек
+	*/
+}
+void Paint::makeMySectionHorizontal(ElementData& changing) {
+	if (changing.et != ET_SECTION) {
+		throw "The element is not section!";
+	}
+	//отрезок становится строго горизонтальным2
+	/*
+	changing.point2.y=changing.point1.y; - чтобы были равны Y координаты точек
+	*/
+}
+void Paint::makeMyCircleEqual(const ElementData& ed, ElementData& changing) {
+	if (ed.et != ET_CIRCLE or changing.et != ET_CIRCLE) {
+		throw "Some of the elements is not Circle!";
+	}
+	//окружности становятся одинакового размера
+	/*
+	changing.radius = ed.radius;
+	*/
+}
+
 
 void Paint::changeBMP(const BMPfile& file)
 {
