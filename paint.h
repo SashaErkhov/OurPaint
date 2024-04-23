@@ -39,6 +39,8 @@ class Paint {
     */
 
 public:
+    Paint() : s_maxID(0), c_bmpPainter(), m_pointIDs(), m_sectionIDs(), m_circleIDs(), m_pointStorage(),
+              m_sectionStorage(), m_circleStorage() {} - //default constructor
     // Добавление элементов с указанием их типа и необходимого набора параметров
     ID addElement(const ElementData &ed);
 
