@@ -11,12 +11,14 @@
 #include "Assoc.h"
 
 enum Element {
-    ET_POINT, ET_SECTION, ET_CIRCLE
+    ET_POINT, ET_SECTION, ET_CIRCLE, ET_OUT
 };
 
 struct ElementData {
     Element et;
     Arry<double> params;
+
+    ElementData();
 };
 //c_ - класс, v_- переменная, s_структура, m_ - контейнеры(списки, массивы и другие)
 class Paint {

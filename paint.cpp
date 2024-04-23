@@ -6,6 +6,10 @@
 #include "objects.h"
 #include <fstream>
 
+ElementData::ElementData(){
+    et=ET_OUT;
+    params=Arry<double>();
+}
 
 ID Paint::addElement(const ElementData& ed) {
     if (ed.et == ET_POINT) {
