@@ -64,7 +64,7 @@ public:
 
     void paint();
 
-    bool operator==(const Paint& left, const Paint& right);
+    //bool operator==(const Paint& left, const Paint& right);
 };
 
 #endif
