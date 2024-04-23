@@ -11,7 +11,7 @@
 #include "Assoc.h"
 
 enum Element {
-    ET_POINT, ET_SECTION, ET_CIRCLE, ET_OUT
+    ET_POINT, ET_SECTION, ET_CIRCLE
 };
 
 struct ElementData {
@@ -63,6 +63,8 @@ public:
     void changeBMP(const char* filename);
 
     void paint();
+
+    bool operator==(const Paint& left, const Paint& right);
 };
 
 #endif

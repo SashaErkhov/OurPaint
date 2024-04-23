@@ -7,7 +7,6 @@
 #include <fstream>
 
 ElementData::ElementData(){
-    et=ET_OUT;
     params=Arry<double>();
 }
 
@@ -244,4 +243,8 @@ void Paint::changeBMP(const BMPfile& file)
 void Paint::changeBMP(const char* filename)
 {
     c_bmpPainter = BMPpainter(BMPfile(filename));
+}
+
+bool operator==(const Paint& left, const Paint& right){
+
 }
