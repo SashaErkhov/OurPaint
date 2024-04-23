@@ -56,7 +56,7 @@ void Paint::paint() {
     }
 }
 
-void Paint::saveToFile(const char* file) {
+/*void Paint::saveToFile(const char* file) {
     std::ofstream fout;
     fout.open(file);
     if (!(fout.is_open())) {
@@ -65,7 +65,7 @@ void Paint::saveToFile(const char* file) {
     fout << m_pointStorage.getSize();
     for (int i = 0; i < s_maxID; ++i) {
         try {
-            fout << *(m_pointIDs.findByKey(i))<<" ";
+            fout << *(m_pointIDs.findByKey(i)) << " ";
         }
         catch (...) {
             continue;
@@ -154,7 +154,7 @@ void Paint::loadFromFile(const char* filename) {
         circle_iter = m_circleStorage.addElement(worker);
         m_circleIDs.addPair(id, circle_iter);
     }
-}
+}*/
 
 void Paint::exportToBMP(const char* file) {
     paint();

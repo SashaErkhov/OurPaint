@@ -39,6 +39,15 @@ class Paint {
     */
 
 public:
+    Paint() : s_maxID(0), c_bmpPainter() {
+            m_pointIDs = Assoc<ID, List<point>::iterator>();
+            m_sectionIDs = Assoc<ID, List<section>::iterator>();
+            m_circleIDs = Assoc<ID, List<circle>::iterator>();
+
+            m_pointStorage = List<point>();
+            m_sectionStorage = List<section>();
+            m_circleStorage = List<circle>();
+    }
     // Добавление элементов с указанием их типа и необходимого набора параметров
     ID addElement(const ElementData &ed);
 

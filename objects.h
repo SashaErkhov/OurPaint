@@ -1,7 +1,7 @@
 #pragma once
 #ifndef MRETOR
 #define MRETOR
-
+#include <fstream>
 struct ID {
 	long long int id;
 	ID(long long int i = 0) : id(i) {}
