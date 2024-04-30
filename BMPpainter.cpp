@@ -1,19 +1,16 @@
 #include "BMPpainter.h"
 #include <iostream>
 
-BMPpainter::BMPpainter(unsigned int weight, unsigned int height)
-{
-    file=BMPfile(weight, height);
-}
 
-BMPpainter::BMPpainter(const BMPpainter &other)
-{
+BMPpainter::BMPpainter(const BMPpainter &other){
     file=other.file;
 }
 
 BMPpainter& BMPpainter::operator=(const BMPpainter &other)
 {
-    file=other.file;
+    if(this!=&other){
+        file=other.file;
+    }
     return *this;
 }
 

@@ -28,8 +28,8 @@ ID Paint::addElement(const ElementData& ed) {
         tmp2.y = ed.params[3];
         m_pointIDs.addPair(++s_maxID.id,m_pointStorage.addElement(tmp2));
         section tmp;
-        tmp.beg = &tmp1;
-        tmp.end = &tmp2;
+        tmp.beg = &(*(m_pointIDs.findByKey(ID(s_maxID.id-1))));
+        tmp.end = &(*(m_pointIDs.findByKey(ID(s_maxID.id))));
         m_sectionIDs.addPair(++s_maxID.id,m_sectionStorage.addElement(tmp));
         return s_maxID;
     }
@@ -39,7 +39,7 @@ ID Paint::addElement(const ElementData& ed) {
         center.y = ed.params[1];
         m_pointIDs.addPair(++s_maxID.id,m_pointStorage.addElement(center));
         circle tmp;
-        tmp.center = &center;
+        tmp.center = &(*(m_pointIDs.findByKey(ID(s_maxID.id))));
         tmp.R = ed.params[2];
         m_circleIDs.addPair(++s_maxID.id,m_circleStorage.addElement(tmp));
         return s_maxID;
@@ -239,8 +239,4 @@ void Paint::changeBMP(const BMPfile& file)
 void Paint::changeBMP(const char* filename)
 {
     c_bmpPainter = BMPpainter(BMPfile(filename));
-}
-
-bool operator==(const Paint& left, const Paint& right){
-
 }
