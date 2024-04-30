@@ -47,6 +47,43 @@ ID Paint::addElement(const ElementData& ed) {
     return ID{ -1 };
 }
 
+
+ElementData Paint::getElementInfo(ID id) {
+    ElementData result;
+
+    try {
+        auto& pt = m_pointIDs.findByKey(id);
+        result.et = ET_POINT;
+        result.params.addElement(pt.x);
+        result.params.addElement(pt.y);
+    }
+    catch (const std::runtime_error&) {
+        try {
+            auto& sec = m_sectionIDs.findByKey(id);
+            result.et = ET_SECTION;
+            result.params.addElement(sec.beg->x);
+            result.params.addElement(sec.beg->y);
+            result.params.addElement(sec.end->x);
+            result.params.addElement(sec.end->y);
+        }
+        catch (const std::runtime_error&) {
+            try {
+                auto& circ = m_circleIDs.findByKey(id);
+                result.et = ET_CIRCLE;
+                result.params.addElement(circ.center->x);
+                result.params.addElement(circ.center->y);
+                result.params.addElement(circ.R);
+            }
+            catch (const std::runtime_error&) {
+                throw std::runtime_error("Element not found");
+            }
+        }
+    }
+
+    return result;
+}
+
+
 void Paint::paint() {
     for (auto point = m_pointStorage.begin(); point != m_pointStorage.end(); ++point) {
         c_bmpPainter.drawPoint(*point, false);
@@ -229,6 +266,7 @@ void Paint::makeMyCircleEqual(const ElementData& ed, ElementData& changing) {
 	changing.radius = ed.radius;
 }
 */
+
 
 
 void Paint::changeBMP(const BMPfile& file)
