@@ -58,53 +58,53 @@ void Paint::paint() {
         c_bmpPainter.drawSection(*section, false);
     }
 }
-/*
+
 void Paint::saveToFile(const char* file) {
     std::ofstream fout;
     fout.open(file);
     if (!(fout.is_open())) {
         throw "We can't open file";
     }
-    fout << m_pointStorage.getSize();
+    fout << m_pointStorage.getSize();//выводим одрес массива точек
     point prm;
     for(auto pos=m_pointIDs.begin(); pos!=m_pointIDs.end(); ++pos){
-        fout<<(*pos).first.id();
+        fout<<(*pos).first;//выводим айди точки
         prm=*((*pos).second);
-        fout<<prm.x;
+        fout<<prm.x;//её координаты
         fout<<prm.y;
     }
     fout << "\n";
-    fout << m_sectionStorage.getSize();
+    fout << m_sectionStorage.getSize();//выводим количество отрезков
     section sct;
     bool end=false;
     for (auto pos=m_sectionIDs.begin(); pos!=m_sectionIDs.end(); ++pos) {
         end=false;
-        fout<<(*pos).first().id();
-        sct=*((*pos).second());
-        for(auto pos=m_pointIDs.begin(); pos!=m_pointIDs.end() && !(end); ++pos){
+        fout<<(*pos).first;//выводим айди отрезка
+        sct=*((*pos).second);
+        for(auto pos=m_pointIDs.begin(); pos!=m_pointIDs.end() && !(end); ++pos){//ищем айди начала
             if(&(*((*pos).second))==sct.beg){
-                fout<<(*pos).first.id();
+                fout<<(*pos).first;
                 end=true;
             }
         }
-        for(auto pos=m_pointIDs.begin(); pos!=m_pointIDs.end() && !(end); ++pos){
+        for(auto pos=m_pointIDs.begin(); pos!=m_pointIDs.end() && !(end); ++pos){//ищем айди конца через адрес
             if(&(*((*pos).second))==sct.end){
-                fout<<(*pos).first.id();
+                fout<<(*pos).first;
                 end=true;
             }
         }
     }
     fout << "\n";
-    fout << m_circleStorage.getSize();
+    fout << m_circleStorage.getSize();//с кругами аналогично
     circle crc;
-    bool end=false;
-    for (auto pos=m_sectionIDs.begin(); pos!=m_sectionIDs.end(); ++pos) {
+    end=false;
+    for (auto pos=m_circleIDs.begin(); pos!=m_circleIDs.end(); ++pos) {
         end=false;
-        fout<<(*pos).first.id();
+        fout<<(*pos).first;
         crc=*((*pos).second);
         for(auto pos=m_pointIDs.begin(); pos!=m_pointIDs.end() && !(end); ++pos){
             if(&(*((*pos).second))==crc.center){
-                fout<<(*pos).first.id();
+                fout<<(*pos).first;
                 end=true;
             }
         }
@@ -120,61 +120,60 @@ void Paint::loadFromFile(const char* filename) {
     if (!(files.is_open())) {
         throw "We can't open file";
     }
-    m_pointIDs = Assoc<ID, List<point>::iterator>();
-    m_sectionIDs = Assoc<ID, List<section>::iterator>();
-    m_circleIDs = Assoc<ID, List<circle>::iterator>();
+    m_pointIDs = Assoc<ID, List<point>::iterator>();//опустошаем ассок
+    m_sectionIDs = Assoc<ID, List<section>::iterator>();//опустошаем ассок
+    m_circleIDs = Assoc<ID, List<circle>::iterator>();//опустошаем ассок
     size_t size=0;
-    files >> size;
+    files >> size;//читаем число точек
     point need;
     ID id;
     s_maxID = 0;
     List<point>::iterator point_iter;
-    m_pointStorage = List<point>(0);
+    m_pointStorage = List<point>(0);//опустошаем список точек
     for (size_t i = 0; i < size; ++i) {
-        files >> id;
+        files >> id;//читаем айди точки
         if (id > s_maxID) {
-            s_maxID = id;
+            s_maxID = id;//если больше максимального, то это максимальный
         }
-        files >> need;//нужно создать ввод для таких элементов
-        point_iter =m_pointStorage.addElement(need);
-        m_pointIDs.addPair(id, point_iter);
+        files >> need;//читаем точку
+        point_iter =m_pointStorage.addElement(need);//добавляем точку в список
+        m_pointIDs.addPair(id, point_iter);//добавляем запись в ассок о точке
     }
-    files >> size;
+    files >> size;//читаем количество отрезков
     section work;
     List<section>::iterator section_iter;
     m_sectionStorage = List<section>(0);
     ID beg_section;
     ID end_section;
     for (size_t i = 0; i < size; ++i) {
-        files >> id;
+        files >> id;//читаем айди отрезка
         if (id > s_maxID) {
-            s_maxID = id;
+            s_maxID = id;//если больше максимального, то это максимальный
         }
-        files >> beg_section;
-        files >> end_section;
-        work.beg=&(*m_pointIDs.findByKey(beg_section));
-        work.end=&(*m_pointIDs.findByKey(end_section));
-        section_iter = m_sectionStorage.addElement(work);
-        m_sectionIDs.addPair(id, section_iter);
+        files >> beg_section;//читаем айди точки начала отрезка
+        files >> end_section;//читаем айди точки конца отрезка
+        work.beg=&(*m_pointIDs.findByKey(beg_section));//ищем в ассок для точек по айди
+        work.end=&(*m_pointIDs.findByKey(end_section));//ищем в ассок для точек по айди
+        section_iter = m_sectionStorage.addElement(work);//добавляем отрезок в список
+        m_sectionIDs.addPair(id, section_iter);//делаем запись об отрезке
     }
-    files >> size;
+    files >> size;//читаем число кругов
     circle worker;
     List<circle>::iterator circle_iter;
     m_circleStorage = List<circle>(0);
     ID center;
     for (size_t i = 0; i < size; ++i) {
-        files >> id;
+        files >> id;//читаем айди круга
         if (id > s_maxID) {
             s_maxID = id;
         }
-        files >> center;
-        worker.center=&(*m_pointIDs.findByKey(center));
-        files >> worker.R;
-        circle_iter = m_circleStorage.addElement(worker);
-        m_circleIDs.addPair(id, circle_iter);
+        files >> center;//айди его центра
+        worker.center=&(*m_pointIDs.findByKey(center));//ищем его значение по айди и присваиваем
+        files >> worker.R;//радиус круга
+        circle_iter = m_circleStorage.addElement(worker);//добавление в список
+        m_circleIDs.addPair(id, circle_iter);//добавление записи
     }
 }
-*/
 
 void Paint::exportToBMP(const char* file) {
     paint();
@@ -239,8 +238,4 @@ void Paint::changeBMP(const BMPfile& file)
 void Paint::changeBMP(const char* filename)
 {
     c_bmpPainter = BMPpainter(BMPfile(filename));
-}
-
-bool operator==(const Paint& left, const Paint& right){
-
 }

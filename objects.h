@@ -12,6 +12,7 @@ bool operator>(const ID& left, const ID& right);
 bool operator<(const ID& left, const ID& right);
 bool operator==(const ID& left, const ID& right);
 std::ifstream& operator>> (std::ifstream& in, ID& x);
+std::ofstream& operator<< (std::ofstream& out, ID& x);
 
 struct rectangle {
         double x_1;

@@ -34,6 +34,11 @@ std::ifstream& operator>> (std::ifstream& in, ID& x) {
     return in;
 }
 
+std::ofstream& operator<< (std::ofstream& out, ID& x){
+    out<<x.id;
+    return out;
+}
+
 std::ifstream& operator>> (std::ifstream& in, point& x) {
     in >> x.x;
     in >> x.y;

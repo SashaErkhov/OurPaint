@@ -63,8 +63,6 @@ public:
     void changeBMP(const char* filename);
 
     void paint();
-
-    bool operator==(const Paint& left, const Paint& right);
 };
 
 #endif
