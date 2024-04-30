@@ -21,7 +21,6 @@ bool operator<(const ID& left, const ID& right) {
     }
     return false;
 }
-
 bool operator==(const ID& left, const ID& right) {
     if (left.id == right.id) {
         return true;
