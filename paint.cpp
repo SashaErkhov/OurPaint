@@ -67,16 +67,11 @@ ElementData Paint::getElementInfo(ID id) {
             result.params.addElement(sec.end->y);
         }
         catch (const std::runtime_error&) {
-            try {
-                auto& circ = m_circleIDs.findByKey(id);
-                result.et = ET_CIRCLE;
-                result.params.addElement(circ.center->x);
-                result.params.addElement(circ.center->y);
-                result.params.addElement(circ.R);
-            }
-            catch (const std::runtime_error&) {
-                throw std::runtime_error("Element not found");
-            }
+            auto& circ = m_circleIDs.findByKey(id);
+            result.et = ET_CIRCLE;
+            result.params.addElement(circ.center->x);
+            result.params.addElement(circ.center->y);
+            result.params.addElement(circ.R);
         }
     }
 
