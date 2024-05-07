@@ -7,9 +7,47 @@
 #include <fstream>
 
 ElementData::ElementData(){
-    params=Arry<double>();
+    params = Arry<double>();
 }
+RequirementData::RequirementData(){
+    objects = Arry<ID>();
+    params = 0;
 
+}
+ID Paint::addRequirement(const RequirementData &rd) {
+    if (rd.req == ET_POINTSECTIONDIST){
+        ReqPointSegDist requirement(&(*(m_pointIDs.findByKey(rd.objects[0]))), &(*(m_sectionIDs.findByKey(rd.objects[1]))), rd.params);
+        Arry<PARAMID> params = requirement.getParams();
+        Arry<double> paramValues(params.getSize());
+        paramValues.addElement((*(m_pointIDs.findByKey(rd.objects[0]))).x);
+        paramValues.addElement((*(m_pointIDs.findByKey(rd.objects[0]))).y);
+        paramValues.addElement((*(m_sectionIDs.findByKey(rd.objects[1]))).beg->x);
+        paramValues.addElement((*(m_sectionIDs.findByKey(rd.objects[1]))).beg->y);
+        paramValues.addElement((*(m_sectionIDs.findByKey(rd.objects[1]))).end->x);
+        paramValues.addElement((*(m_sectionIDs.findByKey(rd.objects[1]))).end->y);
+        Arry<double> derivatives(params.getSize());
+        int k = 0;
+        for(auto it = params.begin(); it!= params.end(); ++it, ++k){
+            derivatives[k] = requirement.getDerivative(*it);
+        }
+        double alpha = 10e-10;
+        double e = requirement.getError();
+        while (e > 10e-10){
+            alpha = e/(1+e);
+            for(int i = 0; i < paramValues.getSize(); ++i){
+                paramValues[i] += derivatives[i] * alpha;
+            }
+            (*(m_pointIDs.findByKey(rd.objects[0]))).x = paramValues[0];
+            (*(m_pointIDs.findByKey(rd.objects[0]))).y = paramValues[1];
+            (*(m_sectionIDs.findByKey(rd.objects[1]))).beg->x = paramValues[2];
+            (*(m_sectionIDs.findByKey(rd.objects[1]))).beg->y = paramValues[3];
+            (*(m_sectionIDs.findByKey(rd.objects[1]))).end->x = paramValues[4];
+            (*(m_sectionIDs.findByKey(rd.objects[1]))).end->y = paramValues[5];
+            e = requirement.getError();
+        }
+    }
+    return ID{-1};
+}
 ID Paint::addElement(const ElementData& ed) {
     if (ed.et == ET_POINT) {
         point tmp;
@@ -242,4 +280,35 @@ void Paint::changeBMP(const BMPfile& file)
 void Paint::changeBMP(const char* filename)
 {
     c_bmpPainter = BMPpainter(BMPfile(filename));
+}
+
+double ReqPointSegDist::getError() {
+    if (m_s->beg->x == m_s->end->x) {
+        return std::abs(m_p->x - m_s->beg->x) - d;
+    }
+    if (m_s->beg->y == m_s->end->y) {
+        return std::abs(m_p->y - m_s->beg->y) - d;
+    }
+    double A = -(m_s->end->x -m_s->beg->x) / (m_s->end->y - m_s->beg->y);
+    double B = 1;
+    double C = -(A * m_s->beg->x + B * m_s->beg->y);
+    double e = (A * m_p->x + B * m_p->y + C)/ sqrt(A*A+B*B);
+    return e;
+}
+
+Arry<PARAMID> ReqPointSegDist::getParams() {
+    Arry<PARAMID> res;
+    res.addElement(&(m_p->x));
+    res.addElement(&(m_p->y));
+    res.addElement(&(m_s->beg->x));
+    res.addElement(&(m_s->beg->y));
+    res.addElement(&(m_s->end->x));
+    res.addElement(&(m_s->end->y));
+    return res;
+}
+
+ReqPointSegDist::ReqPointSegDist(point *p, section *s, double dist) {
+    m_p = p;
+    m_s = s;
+    d = dist;
 }
