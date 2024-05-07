@@ -1,4 +1,9 @@
 cmake_minimum_required(VERSION 3.14)
+SET(CMAKE_MAKE_PROGRAM "D:/program/Msys2/usr/bin/make.exe")
+SET(CMAKE_C_COMPILER_WORKS 1)
+SET(CMAKE_CXX_COMPILER_WORKS 1)
+SET(CMAKE_C_COMPILER D:/program/Msys2/mingw64/bin/gcc.exe)
+SET(CMAKE_CXX_COMPILER D:/program/gcc/bin/g++.exe)
 project(ourpaintest)
 
 # GoogleTest requires at least C++14
@@ -15,8 +20,8 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 enable_testing()
-set(SOURCES ../paint.cpp )
-include_directories(.. , ../additions , ../PVM13.02.24/code)
+set(SOURCES ../paint.cpp ../objects.cpp ../BMPpainter.cpp ../BMPfile/code/BMPfile.cpp)
+include_directories(.. , ../additions , ../BMPfile/code)
 add_executable(
   ourpaintest
   test.cpp

@@ -84,7 +84,7 @@ int main()
             char fileName[256];
             std::cin >> fileName;
             try {
-//                screen.saveToFile(fileName);
+                screen.saveToFile(fileName);
                 std::cout << "Saved to " << fileName << " SUCCESS!" << std::endl;
             }
             catch (std::exception& e) {

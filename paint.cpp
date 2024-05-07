@@ -173,6 +173,7 @@ void Paint::loadFromFile(const char* filename) {
         circle_iter = m_circleStorage.addElement(worker);//добавление в список
         m_circleIDs.addPair(id, circle_iter);//добавление записи
     }
+    files.close();
 }
 
 void Paint::exportToBMP(const char* file) {
