@@ -6,78 +6,87 @@
 #include "objects.h"
 #include <fstream>
 
-ElementData::ElementData(){
-    params=Arry<double>();
+ElementData::ElementData() {
+    params = Arry<double>();
 }
+RequirementData::RequirementData() {
+    objects = Arry<ID>();
+    params = 0;
 
+}
+ID Paint::addRequirement(const RequirementData& rd) {
+    if (rd.req == ET_POINTSECTIONDIST) {
+        ReqPointSegDist requirement(&(*(m_pointIDs.findByKey(rd.objects[0]))), &(*(m_sectionIDs.findByKey(rd.objects[1]))), rd.params);
+        Arry<PARAMID> params = requirement.getParams();
+        Arry<double> paramValues(params.getSize());
+        paramValues.addElement((*(m_pointIDs.findByKey(rd.objects[0]))).x);
+        paramValues.addElement((*(m_pointIDs.findByKey(rd.objects[0]))).y);
+        paramValues.addElement((*(m_sectionIDs.findByKey(rd.objects[1]))).beg->x);
+        paramValues.addElement((*(m_sectionIDs.findByKey(rd.objects[1]))).beg->y);
+        paramValues.addElement((*(m_sectionIDs.findByKey(rd.objects[1]))).end->x);
+        paramValues.addElement((*(m_sectionIDs.findByKey(rd.objects[1]))).end->y);
+        Arry<double> derivatives(params.getSize());
+        int k = 0;
+        for (auto it = params.begin(); it != params.end(); ++it, ++k) {
+            derivatives[k] = requirement.getDerivative(*it);
+        }
+        double alpha = 10e-10;
+        double e = requirement.getError();
+        while (e > 10e-10) {
+            alpha = e / (1 + e);
+            for (int i = 0; i < paramValues.getSize(); ++i) {
+                paramValues[i] += derivatives[i] * alpha;
+            }
+            (*(m_pointIDs.findByKey(rd.objects[0]))).x = paramValues[0];
+            (*(m_pointIDs.findByKey(rd.objects[0]))).y = paramValues[1];
+            (*(m_sectionIDs.findByKey(rd.objects[1]))).beg->x = paramValues[2];
+            (*(m_sectionIDs.findByKey(rd.objects[1]))).beg->y = paramValues[3];
+            (*(m_sectionIDs.findByKey(rd.objects[1]))).end->x = paramValues[4];
+            (*(m_sectionIDs.findByKey(rd.objects[1]))).end->y = paramValues[5];
+            e = requirement.getError();
+        }
+    }
+    return ID{ -1 };
+}
 ID Paint::addElement(const ElementData& ed) {
     if (ed.et == ET_POINT) {
         point tmp;
         tmp.x = ed.params[0];
         tmp.y = ed.params[1];
-        m_pointIDs.addPair(++s_maxID.id,m_pointStorage.addElement(tmp));
+        m_pointIDs.addPair(++s_maxID.id, m_pointStorage.addElement(tmp));
         return s_maxID;
     }
     if (ed.et == ET_SECTION) {
         point tmp1;
         tmp1.x = ed.params[0];
-        tmp1.y = ed.params[1];        
-        m_pointIDs.addPair(++s_maxID.id,m_pointStorage.addElement(tmp1));
+        tmp1.y = ed.params[1];
+        auto beg = m_pointStorage.addElement(tmp1);
+        m_pointIDs.addPair(++s_maxID.id, beg);
         point tmp2;
         tmp2.x = ed.params[2];
         tmp2.y = ed.params[3];
-        m_pointIDs.addPair(++s_maxID.id,m_pointStorage.addElement(tmp2));
+        auto end = m_pointStorage.addElement(tmp2);
+        m_pointIDs.addPair(++s_maxID.id, end);
         section tmp;
-        tmp.beg = &tmp1;
-        tmp.end = &tmp2;
-        m_sectionIDs.addPair(++s_maxID.id,m_sectionStorage.addElement(tmp));
+        tmp.beg = &(*beg);
+        tmp.end = &(*end);
+        m_sectionIDs.addPair(++s_maxID.id, m_sectionStorage.addElement(tmp));
         return s_maxID;
     }
     if (ed.et == ET_CIRCLE) {
         point center;
         center.x = ed.params[0];
         center.y = ed.params[1];
-        m_pointIDs.addPair(++s_maxID.id,m_pointStorage.addElement(center));
+        auto cent = m_pointStorage.addElement(center);
+        m_pointIDs.addPair(++s_maxID.id, cent);
         circle tmp;
-        tmp.center = &center;
+        tmp.center = &(*cent);
         tmp.R = ed.params[2];
-        m_circleIDs.addPair(++s_maxID.id,m_circleStorage.addElement(tmp));
+        m_circleIDs.addPair(++s_maxID.id, m_circleStorage.addElement(tmp));
         return s_maxID;
     }
     return ID{ -1 };
 }
-
-
-ElementData Paint::getElementInfo(ID id) {
-    ElementData result;
-
-    try {
-        auto& pt = m_pointIDs.findByKey(id);
-        result.et = ET_POINT;
-        result.params.addElement(pt.x);
-        result.params.addElement(pt.y);
-    }
-    catch (const std::runtime_error&) {
-        try {
-            auto& sec = m_sectionIDs.findByKey(id);
-            result.et = ET_SECTION;
-            result.params.addElement(sec.beg->x);
-            result.params.addElement(sec.beg->y);
-            result.params.addElement(sec.end->x);
-            result.params.addElement(sec.end->y);
-        }
-        catch (const std::runtime_error&) {
-            auto& circ = m_circleIDs.findByKey(id);
-            result.et = ET_CIRCLE;
-            result.params.addElement(circ.center->x);
-            result.params.addElement(circ.center->y);
-            result.params.addElement(circ.R);
-        }
-    }
-
-    return result;
-}
-
 
 void Paint::paint() {
     for (auto point = m_pointStorage.begin(); point != m_pointStorage.end(); ++point) {
@@ -219,49 +228,48 @@ void Paint::exportToBMP(const char* file) {
 }
 /*
 void Paint::makeMySectionOrt(const ElementData& ed, ElementData& changing){
-	if (ed.et != ET_SECTION or changing.et != ET_SECTION) {
-		throw "Some of the elements is not section!";
-	}
-	//изменяем changing так, чтобы он был ортогонален с ed(cкорее всего, поворотом одной из точек)
+    if (ed.et != ET_SECTION or changing.et != ET_SECTION) {
+        throw "Some of the elements is not section!";
+    }
+    //изменяем changing так, чтобы он был ортогонален с ed(cкорее всего, поворотом одной из точек)
 }
 void Paint::makeMySectionEqual(const ElementData& ed, ElementData& changing) {
-	if (ed.et != ET_SECTION or changing.et != ET_SECTION) {
-		throw "Some of the elements is not section!";
-	}
-	//изменяем changing так, чтобы его длина была равна длине ed (cкорее всего, поворотом одной из точек)
-	//например поменяем Y второй точки
-	double len2 = pow(ed.point1.x - ed.point2.x, 2) + pow(ed.point1.x - ed.point2.x, 2)
-	changing.point1.y = sqrt(len2-pow(changing.point1.x -changing.point2.x, 2))+ changing.point1.y
+    if (ed.et != ET_SECTION or changing.et != ET_SECTION) {
+        throw "Some of the elements is not section!";
+    }
+    //изменяем changing так, чтобы его длина была равна длине ed (cкорее всего, поворотом одной из точек)
+    //например поменяем Y второй точки
+    double len2 = pow(ed.point1.x - ed.point2.x, 2) + pow(ed.point1.x - ed.point2.x, 2)
+    changing.point1.y = sqrt(len2-pow(changing.point1.x -changing.point2.x, 2))+ changing.point1.y
 }
 void Paint::makeMySectionParallel(const ElementData& ed, ElementData& changing) {
-	if (ed.et != ET_SECTION or changing.et != ET_SECTION) {
-		throw "Some of the elements is not section!";
-	}
-	//изменяем changing так, чтобы он стал параллелен ed
+    if (ed.et != ET_SECTION or changing.et != ET_SECTION) {
+        throw "Some of the elements is not section!";
+    }
+    //изменяем changing так, чтобы он стал параллелен ed
 }
 void Paint::makeMySectionVertical(ElementData& changing) {
-	if (changing.et != ET_SECTION) {
-		throw "The element is not section!";
-	}
-	//отрезок становится строго вертикальным
-	changing.point2.x=changing.point1.x; - чтобы были равны X координаты точек
+    if (changing.et != ET_SECTION) {
+        throw "The element is not section!";
+    }
+    //отрезок становится строго вертикальным
+    changing.point2.x=changing.point1.x; - чтобы были равны X координаты точек
 }
 void Paint::makeMySectionHorizontal(ElementData& changing) {
-	if (changing.et != ET_SECTION) {
-		throw "The element is not section!";
-	}
-	//отрезок становится строго горизонтальным2
-	changing.point2.y=changing.point1.y; - чтобы были равны Y координаты точек
+    if (changing.et != ET_SECTION) {
+        throw "The element is not section!";
+    }
+    //отрезок становится строго горизонтальным2
+    changing.point2.y=changing.point1.y; - чтобы были равны Y координаты точек
 }
 void Paint::makeMyCircleEqual(const ElementData& ed, ElementData& changing) {
-	if (ed.et != ET_CIRCLE or changing.et != ET_CIRCLE) {
-		throw "Some of the elements is not Circle!";
-	}
-	//окружности становятся одинакового размера
-	changing.radius = ed.radius;
+    if (ed.et != ET_CIRCLE or changing.et != ET_CIRCLE) {
+        throw "Some of the elements is not Circle!";
+    }
+    //окружности становятся одинакового размера
+    changing.radius = ed.radius;
 }
 */
-
 
 
 void Paint::changeBMP(const BMPfile& file)
@@ -274,6 +282,97 @@ void Paint::changeBMP(const char* filename)
     c_bmpPainter = BMPpainter(BMPfile(filename));
 }
 
-bool operator==(const Paint& left, const Paint& right){
-
+double ReqPointSegDist::getError() {
+    if (m_s->beg->x == m_s->end->x) {
+        return std::abs(m_p->x - m_s->beg->x) - d;
+    }
+    if (m_s->beg->y == m_s->end->y) {
+        return std::abs(m_p->y - m_s->beg->y) - d;
+    }
+    double A = -(m_s->end->x - m_s->beg->x) / (m_s->end->y - m_s->beg->y);
+    double B = 1;
+    double C = -(A * m_s->beg->x + B * m_s->beg->y);
+    double e = (A * m_p->x + B * m_p->y + C) / sqrt(A * A + B * B);
+    return e;
 }
+
+Arry<PARAMID> ReqPointSegDist::getParams() {
+    Arry<PARAMID> res;
+    res.addElement(&(m_p->x));
+    res.addElement(&(m_p->y));
+    res.addElement(&(m_s->beg->x));
+    res.addElement(&(m_s->beg->y));
+    res.addElement(&(m_s->end->x));
+    res.addElement(&(m_s->end->y));
+    return res;
+}
+
+ReqPointSegDist::ReqPointSegDist(point* p, section* s, double dist) {
+    m_p = p;
+    m_s = s;
+    d = dist;
+}
+
+double ReqPointSegDist::getDerivative(PARAMID param) {
+    double x0 = m_pt->x;
+    double y0 = m_pt->y;
+
+    double x1 = m_sect->beg->x;
+    double y1 = m_sect->beg->y;
+
+    double x2 = m_sect->end->x;
+    double y2 = m_sect->end->y;
+
+    if (param == &m_pt->x) { // x0
+        double num = (-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
+        double den = sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2)), 2))
+            * sqrt(pow(-x1 + x2, 2) + pow(-y1 + y2, 2));
+
+        return num / den;
+    }
+    else if (param == &m_pt->y) { // y0
+        double num = (x1 - x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
+        double den = sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2)), 2))
+            * sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+
+        return num / den;
+    }
+    else if (param == &m_sect->beg->x) { // x1
+        double num1 = (-x1 + x2) * sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2)), 2));
+        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
+        double num2 = (y0 - y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
+        double den2 = sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 +
+            x0 * (-y1 + y2)), 2)) * sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+
+        return num1 / den1 + num2 / den2;
+    }
+    else if (param == &m_sect->beg->x) { // y1
+        double num1 = (-y1 + y2) * sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2)), 2));
+        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
+        double num2 = (-x0 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
+        double den2 = sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 +
+            x0 * (-y1 + y2)), 2)) * sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+
+        return num1 / den1 + num2 / den2;
+    }
+    else if (param == &m_sect->end->x) { // x2
+        double num1 = -(-x1 + x2) * sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2)), 2));
+        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
+        double num2 = (-y0 + y1) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
+        double den2 = sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 +
+            x0 * (-y1 + y2)), 2)) * sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+
+        return num1 / den1 + num2 / den2;
+    }
+    else if (param == &m_sect->end->x) { // y2
+        double num1 = -(-y1 + y2) * sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2)), 2));
+        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
+        double num2 = (x0 - x1) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
+        double den2 = sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 +
+            x0 * (-y1 + y2)), 2)) * sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+
+        return num1 / den1 + num2 / den2;
+    }
+
+    return 0;
+};
