@@ -93,23 +93,32 @@ class Paint {
 public:
     Paint() : s_maxID(0), c_bmpPainter(), m_pointIDs(), m_sectionIDs(), m_circleIDs(), m_pointStorage(),
         m_sectionStorage(), m_circleStorage() {}//default constructor
+        
     // Добавление элементов с указанием их типа и необходимого набора параметров
-    ID addElement(const ElementData& ed);
+    ID addElement(const ElementData &ed);
+    
     // Добавление требованием
-    ID addRequirement(const RequirementData& rd);
+    ID addRequirement(const RequirementData &rd);
 
     // Получение информации об объекте    
     ElementData getElementInfo(ID id);
+    
     RequirementData getRequirementInfo(ID id);
+    
     // Сохранение данных в файл
-    void saveToFile(const char* filename);
+    void saveToFile(const char *filename);
+    
     // Экспорт в BMP файл
-    void exportToBMP(const char* file);
+    void exportToBMP(const char *file);
+    
     // Загрузка данных из файла
-    void loadFromFile(const char* file);
+    void loadFromFile(const char *file);
+    
     // Задает фон(изменяет filename файл)
     void changeBMP(const BMPfile& file);
+    
     void changeBMP(const char* filename);
+    
     void paint();
 };
 

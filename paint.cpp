@@ -6,16 +6,15 @@
 #include "objects.h"
 #include <fstream>
 
-ElementData::ElementData() {
+ElementData::ElementData(){
     params = Arry<double>();
 }
-RequirementData::RequirementData() {
+RequirementData::RequirementData(){
     objects = Arry<ID>();
     params = 0;
-
 }
-ID Paint::addRequirement(const RequirementData& rd) {
-    if (rd.req == ET_POINTSECTIONDIST) {
+ID Paint::addRequirement(const RequirementData &rd) {
+    if (rd.req == ET_POINTSECTIONDIST){
         ReqPointSegDist requirement(&(*(m_pointIDs.findByKey(rd.objects[0]))), &(*(m_sectionIDs.findByKey(rd.objects[1]))), rd.params);
         Arry<PARAMID> params = requirement.getParams();
         Arry<double> paramValues(params.getSize());
@@ -32,9 +31,9 @@ ID Paint::addRequirement(const RequirementData& rd) {
         }
         double alpha = 10e-10;
         double e = requirement.getError();
-        while (e > 10e-10) {
-            alpha = e / (1 + e);
-            for (int i = 0; i < paramValues.getSize(); ++i) {
+        while (e > 10e-10){
+            alpha = e/(1+e);
+            for(int i = 0; i < paramValues.getSize(); ++i){
                 paramValues[i] += derivatives[i] * alpha;
             }
             (*(m_pointIDs.findByKey(rd.objects[0]))).x = paramValues[0];
@@ -66,11 +65,11 @@ ID Paint::addElement(const ElementData& ed) {
         tmp2.x = ed.params[2];
         tmp2.y = ed.params[3];
         auto end = m_pointStorage.addElement(tmp2);
-        m_pointIDs.addPair(++s_maxID.id, end);
+        m_pointIDs.addPair(++s_maxID.id,end);
         section tmp;
         tmp.beg = &(*beg);
         tmp.end = &(*end);
-        m_sectionIDs.addPair(++s_maxID.id, m_sectionStorage.addElement(tmp));
+        m_sectionIDs.addPair(++s_maxID.id,m_sectionStorage.addElement(tmp));
         return s_maxID;
     }
     if (ed.et == ET_CIRCLE) {
@@ -289,10 +288,10 @@ double ReqPointSegDist::getError() {
     if (m_s->beg->y == m_s->end->y) {
         return std::abs(m_p->y - m_s->beg->y) - d;
     }
-    double A = -(m_s->end->x - m_s->beg->x) / (m_s->end->y - m_s->beg->y);
+    double A = -(m_s->end->x -m_s->beg->x) / (m_s->end->y - m_s->beg->y);
     double B = 1;
     double C = -(A * m_s->beg->x + B * m_s->beg->y);
-    double e = (A * m_p->x + B * m_p->y + C) / sqrt(A * A + B * B);
+    double e = (A * m_p->x + B * m_p->y + C)/ sqrt(A*A+B*B);
     return e;
 }
 
@@ -307,7 +306,7 @@ Arry<PARAMID> ReqPointSegDist::getParams() {
     return res;
 }
 
-ReqPointSegDist::ReqPointSegDist(point* p, section* s, double dist) {
+ReqPointSegDist::ReqPointSegDist(point *p, section *s, double dist) {
     m_p = p;
     m_s = s;
     d = dist;
