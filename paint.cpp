@@ -15,7 +15,30 @@ RequirementData::RequirementData(){
 }
 ID Paint::addRequirement(const RequirementData &rd) {
     if (rd.req == ET_POINTSECTIONDIST){
-        ReqPointSegDist requirement(&(*(m_pointIDs.findByKey(rd.objects[0]))), &(*(m_sectionIDs.findByKey(rd.objects[1]))), rd.params);
+        point* p_it = nullptr;
+        section *s_it = nullptr;
+        try {
+            p_it =  &(*(m_pointIDs.findByKey(rd.objects[0])));
+        }
+        catch (...){
+            s_it =  &(*(m_sectionIDs.findByKey(rd.objects[0])));
+        }
+        if (p_it != nullptr){
+            try {
+                s_it =  &(*(m_sectionIDs.findByKey(rd.objects[1])));
+            }
+            catch (...){
+                throw std::invalid_argument("No such section or point");
+            }
+        }else if (s_it!= nullptr){
+            try {
+                p_it =  &(*(m_pointIDs.findByKey(rd.objects[1])));
+            }
+            catch (...){
+                throw std::invalid_argument("No such point or section");
+            }
+        }
+        ReqPointSegDist requirement(p_it, s_it, rd.params);
         Arry<PARAMID> params = requirement.getParams();
         Arry<double> paramValues(params.getSize());
         paramValues.addElement((*(m_pointIDs.findByKey(rd.objects[0]))).x);

@@ -75,13 +75,21 @@ TEST(SimpleTests, PointSegDistTest){
     s.params.addElement(200);
     s.params.addElement(200);
     ID sect = screen.addElement(s);
+    ElementData e = screen.getElementInfo(pt);
+    EXPECT_EQ(e.params[0], 10);
+    EXPECT_EQ(e.params[1], 10);
+    e = screen.getElementInfo(sect);
+    EXPECT_EQ(e.params[0], 100);
+    EXPECT_EQ(e.params[1], 100);
+    EXPECT_EQ(e.params[2], 200);
+    EXPECT_EQ(e.params[3], 200);
     RequirementData r;
     r.req = ET_POINTSECTIONDIST;
     r.objects.addElement(pt);
     r.objects.addElement(pt);
     r.params = 10;
     screen.addRequirement(r);
-    ElementData e = screen.getElementInfo(sect);
-    EXPECT_NE(e.params[0], 10);
-    EXPECT_NE(e.params[1], 10);
+    ElementData ex = screen.getElementInfo(sect);
+    EXPECT_NE(ex.params[0], 10);
+    EXPECT_NE(ex.params[1], 10);
 }
