@@ -12,7 +12,6 @@ ElementData::ElementData(){
 RequirementData::RequirementData(){
     objects = Arry<ID>();
     params = 0;
-
 }
 ID Paint::addRequirement(const RequirementData &rd) {
     if (rd.req == ET_POINTSECTIONDIST){
@@ -27,7 +26,7 @@ ID Paint::addRequirement(const RequirementData &rd) {
         paramValues.addElement((*(m_sectionIDs.findByKey(rd.objects[1]))).end->y);
         Arry<double> derivatives(params.getSize());
         int k = 0;
-        for(auto it = params.begin(); it!= params.end(); ++it, ++k){
+        for (auto it = params.begin(); it != params.end(); ++it, ++k) {
             derivatives[k] = requirement.getDerivative(*it);
         }
         double alpha = 10e-10;
@@ -46,14 +45,14 @@ ID Paint::addRequirement(const RequirementData &rd) {
             e = requirement.getError();
         }
     }
-    return ID{-1};
+    return ID{ -1 };
 }
 ID Paint::addElement(const ElementData& ed) {
     if (ed.et == ET_POINT) {
         point tmp;
         tmp.x = ed.params[0];
         tmp.y = ed.params[1];
-        m_pointIDs.addPair(++s_maxID.id,m_pointStorage.addElement(tmp));
+        m_pointIDs.addPair(++s_maxID.id, m_pointStorage.addElement(tmp));
         return s_maxID;
     }
     if (ed.et == ET_SECTION) {
@@ -82,7 +81,7 @@ ID Paint::addElement(const ElementData& ed) {
         circle tmp;
         tmp.center = &(*cent);
         tmp.R = ed.params[2];
-        m_circleIDs.addPair(++s_maxID.id,m_circleStorage.addElement(tmp));
+        m_circleIDs.addPair(++s_maxID.id, m_circleStorage.addElement(tmp));
         return s_maxID;
     }
     return ID{ -1 };
@@ -228,46 +227,46 @@ void Paint::exportToBMP(const char* file) {
 }
 /*
 void Paint::makeMySectionOrt(const ElementData& ed, ElementData& changing){
-	if (ed.et != ET_SECTION or changing.et != ET_SECTION) {
-		throw "Some of the elements is not section!";
-	}
-	//изменяем changing так, чтобы он был ортогонален с ed(cкорее всего, поворотом одной из точек)
+    if (ed.et != ET_SECTION or changing.et != ET_SECTION) {
+        throw "Some of the elements is not section!";
+    }
+    //изменяем changing так, чтобы он был ортогонален с ed(cкорее всего, поворотом одной из точек)
 }
 void Paint::makeMySectionEqual(const ElementData& ed, ElementData& changing) {
-	if (ed.et != ET_SECTION or changing.et != ET_SECTION) {
-		throw "Some of the elements is not section!";
-	}
-	//изменяем changing так, чтобы его длина была равна длине ed (cкорее всего, поворотом одной из точек)
-	//например поменяем Y второй точки
-	double len2 = pow(ed.point1.x - ed.point2.x, 2) + pow(ed.point1.x - ed.point2.x, 2)
-	changing.point1.y = sqrt(len2-pow(changing.point1.x -changing.point2.x, 2))+ changing.point1.y
+    if (ed.et != ET_SECTION or changing.et != ET_SECTION) {
+        throw "Some of the elements is not section!";
+    }
+    //изменяем changing так, чтобы его длина была равна длине ed (cкорее всего, поворотом одной из точек)
+    //например поменяем Y второй точки
+    double len2 = pow(ed.point1.x - ed.point2.x, 2) + pow(ed.point1.x - ed.point2.x, 2)
+    changing.point1.y = sqrt(len2-pow(changing.point1.x -changing.point2.x, 2))+ changing.point1.y
 }
 void Paint::makeMySectionParallel(const ElementData& ed, ElementData& changing) {
-	if (ed.et != ET_SECTION or changing.et != ET_SECTION) {
-		throw "Some of the elements is not section!";
-	}
-	//изменяем changing так, чтобы он стал параллелен ed
+    if (ed.et != ET_SECTION or changing.et != ET_SECTION) {
+        throw "Some of the elements is not section!";
+    }
+    //изменяем changing так, чтобы он стал параллелен ed
 }
 void Paint::makeMySectionVertical(ElementData& changing) {
-	if (changing.et != ET_SECTION) {
-		throw "The element is not section!";
-	}
-	//отрезок становится строго вертикальным
-	changing.point2.x=changing.point1.x; - чтобы были равны X координаты точек
+    if (changing.et != ET_SECTION) {
+        throw "The element is not section!";
+    }
+    //отрезок становится строго вертикальным
+    changing.point2.x=changing.point1.x; - чтобы были равны X координаты точек
 }
 void Paint::makeMySectionHorizontal(ElementData& changing) {
-	if (changing.et != ET_SECTION) {
-		throw "The element is not section!";
-	}
-	//отрезок становится строго горизонтальным2
-	changing.point2.y=changing.point1.y; - чтобы были равны Y координаты точек
+    if (changing.et != ET_SECTION) {
+        throw "The element is not section!";
+    }
+    //отрезок становится строго горизонтальным2
+    changing.point2.y=changing.point1.y; - чтобы были равны Y координаты точек
 }
 void Paint::makeMyCircleEqual(const ElementData& ed, ElementData& changing) {
-	if (ed.et != ET_CIRCLE or changing.et != ET_CIRCLE) {
-		throw "Some of the elements is not Circle!";
-	}
-	//окружности становятся одинакового размера
-	changing.radius = ed.radius;
+    if (ed.et != ET_CIRCLE or changing.et != ET_CIRCLE) {
+        throw "Some of the elements is not Circle!";
+    }
+    //окружности становятся одинакового размера
+    changing.radius = ed.radius;
 }
 */
 
@@ -312,3 +311,67 @@ ReqPointSegDist::ReqPointSegDist(point *p, section *s, double dist) {
     m_s = s;
     d = dist;
 }
+
+double ReqPointSegDist::getDerivative(PARAMID param) {
+    double x0 = m_p->x;
+    double y0 = m_p->y;
+
+    double x1 = m_s->beg->x;
+    double y1 = m_s->beg->y;
+
+    double x2 = m_s->end->x;
+    double y2 = m_s->end->y;
+
+    if (param == &m_p->x) { // x0
+        double num = (-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
+        double den = sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2)), 2))
+            * sqrt(pow(-x1 + x2, 2) + pow(-y1 + y2, 2));
+
+        return num / den;
+    }
+    else if (param == &m_p->y) { // y0
+        double num = (x1 - x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
+        double den = sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2)), 2))
+            * sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+
+        return num / den;
+    }
+    else if (param == &m_s->beg->x) { // x1
+        double num1 = (-x1 + x2) * sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2)), 2));
+        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
+        double num2 = (y0 - y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
+        double den2 = sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 +
+            x0 * (-y1 + y2)), 2)) * sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+
+        return num1 / den1 + num2 / den2;
+    }
+    else if (param == &m_s->beg->x) { // y1
+        double num1 = (-y1 + y2) * sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2)), 2));
+        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
+        double num2 = (-x0 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
+        double den2 = sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 +
+            x0 * (-y1 + y2)), 2)) * sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+
+        return num1 / den1 + num2 / den2;
+    }
+    else if (param == &m_s->end->x) { // x2
+        double num1 = -(-x1 + x2) * sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2)), 2));
+        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
+        double num2 = (-y0 + y1) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
+        double den2 = sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 +
+            x0 * (-y1 + y2)), 2)) * sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+
+        return num1 / den1 + num2 / den2;
+    }
+    else if (param == &m_s->end->x) { // y2
+        double num1 = -(-y1 + y2) * sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2)), 2));
+        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
+        double num2 = (x0 - x1) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
+        double den2 = sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 +
+            x0 * (-y1 + y2)), 2)) * sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+
+        return num1 / den1 + num2 / den2;
+    }
+
+    return 0;
+};

@@ -41,17 +41,17 @@ struct ElementData {
 
 #define PARAMID double*
 
-struct IReq{
+struct IReq {
     virtual double getError() = 0;
     virtual Arry<PARAMID> getParams() = 0;
     virtual double getDerivative(PARAMID p) = 0;
 };
-class ReqPointSegDist: public IReq{
+class ReqPointSegDist : public IReq {
     point* m_p;
     section* m_s;
     double d;
 public:
-    ReqPointSegDist(point* p, section* s,double dist);
+    ReqPointSegDist(point* p, section* s, double dist);
     double getError();
     Arry<PARAMID> getParams();
     double getDerivative(PARAMID p);
@@ -91,24 +91,33 @@ class Paint {
 
 public:
     Paint() : s_maxID(0), c_bmpPainter(), m_pointIDs(), m_sectionIDs(), m_circleIDs(), m_pointStorage(),
-              m_sectionStorage(), m_circleStorage() {}//default constructor
+        m_sectionStorage(), m_circleStorage() {}//default constructor
+        
     // Добавление элементов с указанием их типа и необходимого набора параметров
     ID addElement(const ElementData &ed);
+    
     // Добавление требованием
     ID addRequirement(const RequirementData &rd);
 
     // Получение информации об объекте    
     ElementData getElementInfo(ID id);
+    
     RequirementData getRequirementInfo(ID id);
+    
     // Сохранение данных в файл
     void saveToFile(const char *filename);
+    
     // Экспорт в BMP файл
     void exportToBMP(const char *file);
+    
     // Загрузка данных из файла
     void loadFromFile(const char *file);
+    
     // Задает фон(изменяет filename файл)
     void changeBMP(const BMPfile& file);
+    
     void changeBMP(const char* filename);
+    
     void paint();
 };
 
