@@ -313,30 +313,30 @@ ReqPointSegDist::ReqPointSegDist(point *p, section *s, double dist) {
 }
 
 double ReqPointSegDist::getDerivative(PARAMID param) {
-    double x0 = m_pt->x;
-    double y0 = m_pt->y;
+    double x0 = m_p->x;
+    double y0 = m_p->y;
 
-    double x1 = m_sect->beg->x;
-    double y1 = m_sect->beg->y;
+    double x1 = m_s->beg->x;
+    double y1 = m_s->beg->y;
 
-    double x2 = m_sect->end->x;
-    double y2 = m_sect->end->y;
+    double x2 = m_s->end->x;
+    double y2 = m_s->end->y;
 
-    if (param == &m_pt->x) { // x0
+    if (param == &m_p->x) { // x0
         double num = (-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
         double den = sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2)), 2))
             * sqrt(pow(-x1 + x2, 2) + pow(-y1 + y2, 2));
 
         return num / den;
     }
-    else if (param == &m_pt->y) { // y0
+    else if (param == &m_p->y) { // y0
         double num = (x1 - x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
         double den = sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2)), 2))
             * sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
 
         return num / den;
     }
-    else if (param == &m_sect->beg->x) { // x1
+    else if (param == &m_s->beg->x) { // x1
         double num1 = (-x1 + x2) * sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2)), 2));
         double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
         double num2 = (y0 - y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
@@ -345,7 +345,7 @@ double ReqPointSegDist::getDerivative(PARAMID param) {
 
         return num1 / den1 + num2 / den2;
     }
-    else if (param == &m_sect->beg->x) { // y1
+    else if (param == &m_s->beg->x) { // y1
         double num1 = (-y1 + y2) * sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2)), 2));
         double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
         double num2 = (-x0 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
@@ -354,7 +354,7 @@ double ReqPointSegDist::getDerivative(PARAMID param) {
 
         return num1 / den1 + num2 / den2;
     }
-    else if (param == &m_sect->end->x) { // x2
+    else if (param == &m_s->end->x) { // x2
         double num1 = -(-x1 + x2) * sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2)), 2));
         double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
         double num2 = (-y0 + y1) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
@@ -363,7 +363,7 @@ double ReqPointSegDist::getDerivative(PARAMID param) {
 
         return num1 / den1 + num2 / den2;
     }
-    else if (param == &m_sect->end->x) { // y2
+    else if (param == &m_s->end->x) { // y2
         double num1 = -(-y1 + y2) * sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2)), 2));
         double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
         double num2 = (x0 - x1) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
