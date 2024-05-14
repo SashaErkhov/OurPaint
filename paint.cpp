@@ -65,49 +65,73 @@ void Paint::saveToFile(const char* file) {
     if (!(fout.is_open())) {
         throw "We can't open file";
     }
-    fout << m_pointStorage.getSize();//выводим одрес массива точек
+    fout << m_pointStorage.getSize()<< " ";//выводим одрес массива точек
     point prm;
     for(auto pos=m_pointIDs.begin(); pos!=m_pointIDs.end(); ++pos){
-        fout<<(*pos).first;//выводим айди точки
+        if(pos!=m_pointIDs.begin()){
+            fout<<" ";
+        }
+        fout<<(*pos).first<<" ";//выводим айди точки
         prm=*((*pos).second);
-        fout<<prm.x;//её координаты
+        fout<<prm.x<<" ";//её координаты
         fout<<prm.y;
     }
     fout << "\n";
-    fout << m_sectionStorage.getSize();//выводим количество отрезков
+    fout << m_sectionStorage.getSize()<<" ";//выводим количество отрезков
     section sct;
     bool end=false;
     for (auto pos=m_sectionIDs.begin(); pos!=m_sectionIDs.end(); ++pos) {
+        if(pos!=m_sectionIDs.begin()){
+            fout<<" ";
+        }
         end=false;
-        fout<<(*pos).first;//выводим айди отрезка
-        sct=*((*pos).second);
-        for(auto pos=m_pointIDs.begin(); pos!=m_pointIDs.end() && !(end); ++pos){//ищем айди начала
-            if(&(*((*pos).second))==sct.beg){
-                fout<<(*pos).first;
+        fout<<(*pos).first<<" ";//выводим айди отрезка
+        std::cout << (*((*pos).second)).beg->x << " " << (*((*pos).second)).beg->y << std::endl;
+        std::cout << (*((*pos).second)).end->x << " " << (*((*pos).second)).end->y << std::endl;
+        sct=(*((*pos).second));
+        std::cout << sct.beg->x << " " << sct.beg->y << std::endl;
+        for(auto posr=m_pointIDs.begin(); posr!=m_pointIDs.end() && !(end); ++posr){//ищем айди начала
+            std::cout << (*((*posr).second)).x << " " << (*((*posr).second)).y << std::endl;
+            std::cout << ((&(*((*posr).second)))==sct.beg) << std::endl;
+            if((&(*((*posr).second)))==sct.beg){
+                fout<<(*posr).first.id<<" ";
                 end=true;
             }
         }
-        for(auto pos=m_pointIDs.begin(); pos!=m_pointIDs.end() && !(end); ++pos){//ищем айди конца через адрес
-            if(&(*((*pos).second))==sct.end){
-                fout<<(*pos).first;
+        std::cout << "--------" << std::endl;
+        end=false;
+        std::cout << sct.end->x << " " << sct.end->y << std::endl;
+        for(auto posr=m_pointIDs.begin(); posr!=m_pointIDs.end() && !(end); ++posr){//ищем айди конца через адрес
+            std::cout << (*((*posr).second)).x << " " << (*((*posr).second)).y << std::endl;
+            std::cout << ((&(*((*posr).second)))==sct.end) << std::endl;
+            if((&(*((*posr).second)))==sct.end){
+                fout<<(*posr).first.id;
                 end=true;
             }
         }
+        std::cout << "--------" << std::endl;
     }
     fout << "\n";
-    fout << m_circleStorage.getSize();//с кругами аналогично
+    fout << m_circleStorage.getSize() << " ";//с кругами аналогично
     circle crc;
     end=false;
     for (auto pos=m_circleIDs.begin(); pos!=m_circleIDs.end(); ++pos) {
+        if(pos!=m_circleIDs.begin()){
+            fout<<" ";
+        }
         end=false;
-        fout<<(*pos).first;
+        fout<<(*pos).first<<" ";
         crc=*((*pos).second);
-        for(auto pos=m_pointIDs.begin(); pos!=m_pointIDs.end() && !(end); ++pos){
-            if(&(*((*pos).second))==crc.center){
-                fout<<(*pos).first;
+        std::cout << crc.center->x << " " << crc.center->y << std::endl;
+        for(auto posc=m_pointIDs.begin(); posc!=m_pointIDs.end() && !(end); ++posc){
+            std::cout << (*((*posc).second)).x << " " << (*((*posc).second)).y << std::endl;
+            std::cout << ((&(*((*posc).second)))==crc.center) << std::endl;
+            if((&(*((*posc).second)))==crc.center){
+                fout<<(*posc).first.id<<" ";
                 end=true;
             }
         }
+        std::cout << "--------" << std::endl;
         fout<<crc.R;
     }
     fout.close();
@@ -239,4 +263,33 @@ void Paint::changeBMP(const BMPfile& file)
 void Paint::changeBMP(const char* filename)
 {
     c_bmpPainter = BMPpainter(BMPfile(filename));
+}
+
+ElementData Paint::getElementInfo(ID id){
+    List<point>::iterator poi;
+    List<section>::iterator sec;
+    List<circle>::iterator cir;
+    ElementData ret;
+    try{
+        poi=m_pointIDs.findByKey(id);
+        ret.et=ET_POINT;
+        ret.params.addElement((*poi).x);
+        ret.params.addElement((*poi).y);
+    }catch(std::runtime_error){
+      try{
+        sec=m_sectionIDs.findByKey(id);
+        ret.et=ET_SECTION;
+        ret.params.addElement((*((*sec).beg)).x);
+        ret.params.addElement((*((*sec).beg)).y);
+        ret.params.addElement((*((*sec).end)).x);
+        ret.params.addElement((*((*sec).end)).y);
+      }catch(std::runtime_error){
+        cir=m_circleIDs.findByKey(id);
+        ret.et=ET_SECTION;
+        ret.params.addElement((*((*cir).center)).x);
+        ret.params.addElement((*((*cir).center)).y);
+        ret.params.addElement((*cir).R);
+      }
+    }
+    return ret;
 }
