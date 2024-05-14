@@ -14,6 +14,43 @@ RequirementData::RequirementData(){
     params = 0;
 }
 ID Paint::addRequirement(const RequirementData &rd) {
+    if (rd.req == ET_POINTONPOINT){
+        point* p1_it = nullptr;
+        point* p2_it = nullptr;
+        try {
+            p1_it =  &(*(m_pointIDs.findByKey(rd.objects[0])));
+            p2_it =  &(*(m_pointIDs.findByKey(rd.objects[1])));
+        } catch (...){
+            throw std::invalid_argument("No such points");
+        }
+        ReqPointOnPoint requirement(p1_it,p2_it);
+        Arry<PARAMID> params;
+        params = requirement.getParams();
+        Arry<double> values;
+        values.addElement(p1_it->x);
+        values.addElement(p1_it->y);
+        values.addElement(p2_it->x);
+        values.addElement(p2_it->y);
+        Arry<double> derivatives(params.getSize());
+        int k = 0;
+        for (auto it = params.begin(); it != params.end(); ++it, ++k) {
+            derivatives[k] = requirement.getDerivative(*it);
+        }
+        double alpha = 10e-10;
+        double e = requirement.getError();
+        while (e > 10e-10){
+            alpha = e/(1+e);
+            for(int i = 0; i < values.getSize(); ++i){
+                values[i] += derivatives[i] * alpha;
+            }
+            (p1_it)->x = values[0];
+            (p1_it)->y = values[1];
+            (p2_it)->x = values[2];
+            (p2_it)->y = values[3];
+            e = requirement.getError();
+        }
+
+    }
     if (rd.req == ET_POINTSECTIONDIST){
         point* p_it = nullptr;
         section *s_it = nullptr;
@@ -41,12 +78,12 @@ ID Paint::addRequirement(const RequirementData &rd) {
         ReqPointSegDist requirement(p_it, s_it, rd.params);
         Arry<PARAMID> params = requirement.getParams();
         Arry<double> paramValues(params.getSize());
-        paramValues.addElement((*(m_pointIDs.findByKey(rd.objects[0]))).x);
-        paramValues.addElement((*(m_pointIDs.findByKey(rd.objects[0]))).y);
-        paramValues.addElement((*(m_sectionIDs.findByKey(rd.objects[1]))).beg->x);
-        paramValues.addElement((*(m_sectionIDs.findByKey(rd.objects[1]))).beg->y);
-        paramValues.addElement((*(m_sectionIDs.findByKey(rd.objects[1]))).end->x);
-        paramValues.addElement((*(m_sectionIDs.findByKey(rd.objects[1]))).end->y);
+        paramValues.addElement(p_it->x);
+        paramValues.addElement(p_it->y);
+        paramValues.addElement(s_it->beg->x);
+        paramValues.addElement(s_it->beg->y);
+        paramValues.addElement(s_it->end->x);
+        paramValues.addElement(s_it->end->y);
         Arry<double> derivatives(params.getSize());
         int k = 0;
         for (auto it = params.begin(); it != params.end(); ++it, ++k) {
@@ -59,12 +96,12 @@ ID Paint::addRequirement(const RequirementData &rd) {
             for(int i = 0; i < paramValues.getSize(); ++i){
                 paramValues[i] += derivatives[i] * alpha;
             }
-            (*(m_pointIDs.findByKey(rd.objects[0]))).x = paramValues[0];
-            (*(m_pointIDs.findByKey(rd.objects[0]))).y = paramValues[1];
-            (*(m_sectionIDs.findByKey(rd.objects[1]))).beg->x = paramValues[2];
-            (*(m_sectionIDs.findByKey(rd.objects[1]))).beg->y = paramValues[3];
-            (*(m_sectionIDs.findByKey(rd.objects[1]))).end->x = paramValues[4];
-            (*(m_sectionIDs.findByKey(rd.objects[1]))).end->y = paramValues[5];
+            (p_it)->x = paramValues[0];
+            (p_it)->y = paramValues[1];
+            (s_it)->beg->x = paramValues[2];
+            (s_it)->beg->y = paramValues[3];
+            (s_it)->end->x = paramValues[4];
+            (s_it)->end->y = paramValues[5];
             e = requirement.getError();
         }
     }
@@ -429,3 +466,19 @@ double ReqPointSegDist::getDerivative(PARAMID param) {
     return 0;
 };
 
+ReqPointOnPoint::ReqPointOnPoint(point* p1, point* p2){
+    m_p1 = p1;
+    m_p2 = p2;
+}
+double ReqPointOnPoint::getError(){
+    return sqrt((m_p2->x-m_p1->x)*(m_p2->x-m_p1->x) + (m_p2->y-m_p1->y)*(m_p2->y-m_p1->y));
+}
+Arry<PARAMID> ReqPointOnPoint::getParams() {
+    Arry<PARAMID> res;
+    res.addElement(&(m_p1->x));
+    res.addElement(&(m_p1->y));
+    res.addElement(&(m_p2->x));
+    res.addElement(&(m_p2->y));
+    return res;
+}
+double ReqPointOnPoint::getDerivative(double *p) {}

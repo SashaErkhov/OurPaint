@@ -56,6 +56,15 @@ public:
     Arry<PARAMID> getParams();
     double getDerivative(PARAMID p);
 };
+class ReqPointOnPoint: public IReq {
+    point* m_p1;
+    point* m_p2;
+public:
+    ReqPointOnPoint(point* p1, point* p2);
+    double getError();
+    Arry<PARAMID> getParams();
+    double getDerivative(PARAMID p);
+};
 /* EXAMPLE
 ReqPointSegDist req;
 Arry<PARAMID> params = req.getParams();
