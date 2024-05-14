@@ -1,21 +1,22 @@
 #include <gtest/gtest.h>
-#include "paint.h"
+#include "../paint.h"
 
 TEST(PaintTest, AddingElems){
   Paint paint;
   // Заполним параметры добавляемого элемента
-  Arry<double> params;
-  params.addElement(1.0);
-  params.addElement(2.0);
+  ElementData ed;
+  ed.et = ET_POINT;
+  ed.params.addElement(1.0);
+  ed.params.addElement(2.0);
   // Добавим элемент
-  ID pointid = paint.addElement(ET_POINT,params);
+  ID pointid = paint.addElement(ed);
   // Проверка???  
-  ElementData ed = paint.getElementInfo(pointid);
-  ASSERT_EQ(ed.et,ET_POINT);
+  ElementData e = paint.getElementInfo(pointid);
+  ASSERT_EQ(ed.et, ET_POINT);
   ASSERT_EQ(ed.params.getElement(0),1.0);
   ASSERT_EQ(ed.params.getElement(1),2.0); 
 }
-
+/*
 TEST(PaintTest, save_and_load){
   Paint paint;
   ElementData in;
@@ -58,4 +59,29 @@ TEST(PaintTest, save_and_load){
   Paint road;
   road.loadFromFile("piculi.pt");
   EXPECT_EQ(road, paint);
+}*/
+
+TEST(SimpleTests, PointSegDistTest){
+    Paint screen;
+    ElementData p;
+    p.et = ET_POINT;
+    p.params.addElement(10);
+    p.params.addElement(10);
+    ID pt = screen.addElement(p);
+    ElementData s;
+    s.et = ET_SECTION;
+    s.params.addElement(100);
+    s.params.addElement(100);
+    s.params.addElement(200);
+    s.params.addElement(200);
+    ID sect = screen.addElement(s);
+    RequirementData r;
+    r.req = ET_POINTSECTIONDIST;
+    r.objects.addElement(pt);
+    r.objects.addElement(pt);
+    r.params = 10;
+    screen.addRequirement(r);
+    ElementData e = screen.getElementInfo(sect);
+    EXPECT_NE(e.params[0], 10);
+    EXPECT_NE(e.params[1], 10);
 }

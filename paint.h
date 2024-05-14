@@ -56,7 +56,6 @@ public:
     Arry<PARAMID> getParams();
     double getDerivative(PARAMID p);
 };
-
 /* EXAMPLE
 ReqPointSegDist req;
 Arry<PARAMID> params = req.getParams();

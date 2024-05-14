@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(ourpaintest)
+project(ourpainttest)
 
 # GoogleTest requires at least C++14
 set(CMAKE_CXX_STANDARD 14)
@@ -15,17 +15,19 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 enable_testing()
-set(SOURCES ../paint.cpp )
-include_directories(.. , ../additions , ../PVM13.02.24/code)
+set(SOURCES ../paint.cpp ../objects.cpp ../BMPpainter.cpp)
+include_directories(../additions)
+include_directories(../BMPfile/code)
+add_subdirectory(../BMPfile build)
 add_executable(
-  ourpaintest
+  ourpainttest
   test.cpp
   ${SOURCES}
 )
 target_link_libraries(
-  ourpaintest
+  ourpainttest bitmap
   GTest::gtest_main
 )
 
 include(GoogleTest)
-gtest_discover_tests(ourpaintest)
+gtest_discover_tests(ourpainttest)
