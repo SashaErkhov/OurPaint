@@ -292,7 +292,7 @@ double ReqPointSegDist::getError() {
     double A = -(m_s->end->x -m_s->beg->x) / (m_s->end->y - m_s->beg->y);
     double B = 1;
     double C = -(A * m_s->beg->x + B * m_s->beg->y);
-    double e = (A * m_p->x + B * m_p->y + C)/ sqrt(A*A+B*B);
+    double e = (A * m_p->x + B * m_p->y + C)/ sqrt(A*A+B*B) - d;
     return e;
 }
 
