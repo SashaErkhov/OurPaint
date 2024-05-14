@@ -87,6 +87,36 @@ ID Paint::addElement(const ElementData& ed) {
     return ID{ -1 };
 }
 
+ElementData Paint::getElementInfo(ID id) {
+    ElementData result;
+
+    try {
+        auto p = m_pointIDs.findByKey(id);
+        result.et = ET_POINT;
+        result.params.addElement((*p).x);
+        result.params.addElement((*p).y);
+    }
+    catch (const std::runtime_error&) {
+        try {
+            auto sec = m_sectionIDs.findByKey(id);
+            result.et = ET_SECTION;
+            result.params.addElement((*sec).beg->x);
+            result.params.addElement((*sec).beg->y);
+            result.params.addElement((*sec).end->x);
+            result.params.addElement((*sec).end->y);
+        }
+        catch (const std::runtime_error&) {
+            auto circ = m_circleIDs.findByKey(id);
+            result.et = ET_CIRCLE;
+            result.params.addElement((*circ).center->x);
+            result.params.addElement((*circ).center->y);
+            result.params.addElement((*circ).R);
+        }
+    }
+
+    return result;
+}
+
 void Paint::paint() {
     for (auto point = m_pointStorage.begin(); point != m_pointStorage.end(); ++point) {
         c_bmpPainter.drawPoint(*point, false);
@@ -375,3 +405,4 @@ double ReqPointSegDist::getDerivative(PARAMID param) {
 
     return 0;
 };
+
