@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 project(ourpaint)
-add_executable(ourpaint main.cpp paint.cpp BMPpainter.cpp objects.cpp)
+add_executable(ourpaint main.cpp paint.cpp BMPpainter.cpp objects.cpp "Matrix/Matrix.h")
 include_directories(additions)
 include_directories(BMPfile/code)
 add_subdirectory(BMPfile)
