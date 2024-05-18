@@ -14,39 +14,135 @@ RequirementData::RequirementData(){
     params = 0;
 }
 ID Paint::addRequirement(const RequirementData &rd) {
-    if (rd.req == ET_POINTSECTIONDIST){
-        ReqPointSegDist requirement(&(*(m_pointIDs.findByKey(rd.objects[0]))), &(*(m_sectionIDs.findByKey(rd.objects[1]))), rd.params);
-        Arry<PARAMID> params = requirement.getParams();
-        Arry<double> paramValues(params.getSize());
-        paramValues.addElement((*(m_pointIDs.findByKey(rd.objects[0]))).x);
-        paramValues.addElement((*(m_pointIDs.findByKey(rd.objects[0]))).y);
-        paramValues.addElement((*(m_sectionIDs.findByKey(rd.objects[1]))).beg->x);
-        paramValues.addElement((*(m_sectionIDs.findByKey(rd.objects[1]))).beg->y);
-        paramValues.addElement((*(m_sectionIDs.findByKey(rd.objects[1]))).end->x);
-        paramValues.addElement((*(m_sectionIDs.findByKey(rd.objects[1]))).end->y);
-        Arry<double> derivatives(params.getSize());
+    if (rd.req == ET_POINTONPOINT) {
+        point *p1_it = nullptr;
+        point *p2_it = nullptr;
+        try {
+            p1_it = &(*(m_pointIDs.findByKey(rd.objects[0])));
+            p2_it = &(*(m_pointIDs.findByKey(rd.objects[1])));
+        } catch (...) {
+            throw std::invalid_argument("No such points");
+        }
+        ReqPointOnPoint requirement(p1_it, p2_it);
+        Arry<PARAMID> params;
+        params = requirement.getParams();
+        Arry<double> values;
+        values.addElement(p1_it->x);
+        values.addElement(p1_it->y);
+        values.addElement(p2_it->x);
+        values.addElement(p2_it->y);
+        Arry<double> derivatives;
         int k = 0;
         for (auto it = params.begin(); it != params.end(); ++it, ++k) {
             derivatives[k] = requirement.getDerivative(*it);
         }
         double alpha = 10e-10;
         double e = requirement.getError();
-        while (e > 10e-10){
-            alpha = e/(1+e);
-            for(int i = 0; i < paramValues.getSize(); ++i){
-                paramValues[i] += derivatives[i] * alpha;
+        while (e > 10e-10) {
+            alpha = e / (1 + e);
+            for (int i = 0; i < values.getSize(); ++i) {
+                values[i] += derivatives[i] * alpha;
             }
-            (*(m_pointIDs.findByKey(rd.objects[0]))).x = paramValues[0];
-            (*(m_pointIDs.findByKey(rd.objects[0]))).y = paramValues[1];
-            (*(m_sectionIDs.findByKey(rd.objects[1]))).beg->x = paramValues[2];
-            (*(m_sectionIDs.findByKey(rd.objects[1]))).beg->y = paramValues[3];
-            (*(m_sectionIDs.findByKey(rd.objects[1]))).end->x = paramValues[4];
-            (*(m_sectionIDs.findByKey(rd.objects[1]))).end->y = paramValues[5];
+            (p1_it)->x = values[0];
+            (p1_it)->y = values[1];
+            (p2_it)->x = values[2];
+            (p2_it)->y = values[3];
             e = requirement.getError();
         }
+
     }
-    return ID{ -1 };
+    if (rd.req == ET_POINTSECTIONDIST) {
+        point *p_it = nullptr;
+        section *s_it = nullptr;
+        try {
+            p_it = &(*(m_pointIDs.findByKey(rd.objects[0])));
+        }
+        catch (...) {
+            s_it = &(*(m_sectionIDs.findByKey(rd.objects[0])));
+        }
+        if (p_it != nullptr) {
+            try {
+                s_it = &(*(m_sectionIDs.findByKey(rd.objects[1])));
+            }
+            catch (...) {
+                throw std::invalid_argument("No such section or point");
+            }
+        } else if (s_it != nullptr) {
+            try {
+                p_it = &(*(m_pointIDs.findByKey(rd.objects[1])));
+            }
+            catch (...) {
+                throw std::invalid_argument("No such point or section");
+            }
+        }
+        IReq *requirement = new ReqPointSegDist(p_it, s_it, rd.params);
+        Arry<PARAMID> params = requirement->getParams();
+        Arry<double> paramValues;
+        paramValues.addElement(p_it->x);
+        paramValues.addElement(p_it->y);
+        paramValues.addElement(s_it->beg->x);
+        paramValues.addElement(s_it->beg->y);
+        paramValues.addElement(s_it->end->x);
+        paramValues.addElement(s_it->end->y);
+        Arry<double> derivatives;
+        int k = 0;
+        for (auto it = params.begin(); it != params.end(); ++it, ++k) {
+            derivatives.addElement(requirement->getDerivative(*it));
+        }
+        double alpha;
+        double e = requirement->getError();
+        //TODO for matrix
+        /*
+        if (m_reqStorage.getSize() == 1){
+            IReq* requirement1 = m_reqStorage.getElement(0);
+            Arry<PARAMID> params1 = requirement1->getParams();
+            Matrix<double> dotParam(1, 2);
+            dotParam.set(0, 0, paramValues[0]);
+            dotParam.set(0, 1, paramValues[1]);
+            Arry<double> derivatives1;
+            int k1 = 0;
+            for (auto it = params1.begin(); it!= params1.end(); ++it, ++k1) {
+                derivatives1.addElement(requirement1->getDerivative(*it));
+            }
+            Matrix<double> neededDerivatives(2, 2);
+            neededDerivatives.set(0, 0, derivatives[0]);
+            neededDerivatives.set(0, 1, derivatives[1]);
+            neededDerivatives.set(1, 0, derivatives1[0]);
+            neededDerivatives.set(1, 1, derivatives1[1]);
+            neededDerivatives.inv();
+            double e1 = requirement1->getError();
+            Matrix<double> errors(2, 1);
+            errors.set(0, 0, e);
+            errors.set(1, 0, e1);
+            while (e1 > 10e-10 && e > 10e-10) {
+                dotParam = dotParam - neededDerivatives * errors;
+                e1 = requirement1->getError();
+                e = requirement->getError();
+                errors.set(0, 0, e);
+                errors.set(1, 0, e1);
+            }
+            m_reqIDs.addPair(s_maxID.id, m_reqStorage.addElement(requirement));
+            return ++s_maxID.id;
+        }*/
+        while (e > 10e-10) {
+            alpha = e / (1 + e);
+            for (int i = 0; i < paramValues.getSize(); ++i) {
+                paramValues[i] -= derivatives[i] * alpha;
+            }
+            (p_it)->x = paramValues[0];
+            (p_it)->y = paramValues[1];
+            (s_it)->beg->x = paramValues[2];
+            (s_it)->beg->y = paramValues[3];
+            (s_it)->end->x = paramValues[4];
+            (s_it)->end->y = paramValues[5];
+            e = requirement->getError();
+        }
+        m_reqIDs.addPair(s_maxID.id, m_reqStorage.addElement(requirement));
+        return ++s_maxID.id;
+    }
+    return ID{-1};
 }
+
 ID Paint::addElement(const ElementData& ed) {
     if (ed.et == ET_POINT) {
         point tmp;
@@ -116,7 +212,17 @@ ElementData Paint::getElementInfo(ID id) {
 
     return result;
 }
-
+RequirementData Paint::getRequirementInfo(ID id) {
+    RequirementData result;
+    auto req = m_reqIDs.findByKey(id);
+    Arry<PARAMID> paramIDs = (*req)->getParams();
+    Arry<double> params;
+    for (auto paramID = paramIDs.begin(); paramID!= paramIDs.end(); ++paramID) {
+        params.addElement(*(*paramID));
+    }
+    result.params = params;
+    return result;
+}
 void Paint::paint() {
     for (auto point = m_pointStorage.begin(); point != m_pointStorage.end(); ++point) {
         c_bmpPainter.drawPoint(*point, false);
@@ -321,7 +427,7 @@ double ReqPointSegDist::getError() {
     double A = -(m_s->end->x -m_s->beg->x) / (m_s->end->y - m_s->beg->y);
     double B = 1;
     double C = -(A * m_s->beg->x + B * m_s->beg->y);
-    double e = (A * m_p->x + B * m_p->y + C)/ sqrt(A*A+B*B) - d;
+    double e = std::abs(A * m_p->x + B * m_p->y + C)/ sqrt(A*A+B*B) - d;
     return e;
 }
 
@@ -340,6 +446,7 @@ ReqPointSegDist::ReqPointSegDist(point *p, section *s, double dist) {
     m_p = p;
     m_s = s;
     d = dist;
+
 }
 
 double ReqPointSegDist::getDerivative(PARAMID param) {
@@ -353,52 +460,46 @@ double ReqPointSegDist::getDerivative(PARAMID param) {
     double y2 = m_s->end->y;
 
     if (param == &m_p->x) { // x0
-        double num = (-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
-        double den = sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2)), 2))
-            * sqrt(pow(-x1 + x2, 2) + pow(-y1 + y2, 2));
+        double num = -y1 + y2;
+        double den = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
 
         return num / den;
     }
     else if (param == &m_p->y) { // y0
-        double num = (x1 - x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
-        double den = sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2)), 2))
-            * sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+        double num = x1 - x2;
+        double den = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
 
         return num / den;
     }
     else if (param == &m_s->beg->x) { // x1
-        double num1 = (-x1 + x2) * sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2)), 2));
+        double num1 = (-x1 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
         double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
-        double num2 = (y0 - y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
-        double den2 = sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 +
-            x0 * (-y1 + y2)), 2)) * sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+        double num2 = y0 - y2;
+        double den2 = sqrt(((-x1 + x2), 2) + ((-y1 + y2), 2));
 
         return num1 / den1 + num2 / den2;
     }
-    else if (param == &m_s->beg->x) { // y1
-        double num1 = (-y1 + y2) * sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2)), 2));
+    else if (param == &m_s->beg->y) { // y1
+        double num1 = (-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
         double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
-        double num2 = (-x0 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
-        double den2 = sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 +
-            x0 * (-y1 + y2)), 2)) * sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+        double num2 = -x0 + x2;
+        double den2 = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
 
         return num1 / den1 + num2 / den2;
     }
     else if (param == &m_s->end->x) { // x2
-        double num1 = -(-x1 + x2) * sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2)), 2));
+        double num1 = -(-x1 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
         double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
-        double num2 = (-y0 + y1) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
-        double den2 = sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 +
-            x0 * (-y1 + y2)), 2)) * sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+        double num2 = -y0 + y1;
+        double den2 = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
 
         return num1 / den1 + num2 / den2;
     }
-    else if (param == &m_s->end->x) { // y2
-        double num1 = -(-y1 + y2) * sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2)), 2));
+    else if (param == &m_s->end->y) { // y2
+        double num1 = -(-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
         double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
-        double num2 = (x0 - x1) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
-        double den2 = sqrt(pow((-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 +
-            x0 * (-y1 + y2)), 2)) * sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+        double num2 = x0 - x1;
+        double den2 = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
 
         return num1 / den1 + num2 / den2;
     }
@@ -406,3 +507,19 @@ double ReqPointSegDist::getDerivative(PARAMID param) {
     return 0;
 };
 
+ReqPointOnPoint::ReqPointOnPoint(point* p1, point* p2){
+    m_p1 = p1;
+    m_p2 = p2;
+}
+double ReqPointOnPoint::getError(){
+    return sqrt((m_p2->x-m_p1->x)*(m_p2->x-m_p1->x) + (m_p2->y-m_p1->y)*(m_p2->y-m_p1->y));
+}
+Arry<PARAMID> ReqPointOnPoint::getParams() {
+    Arry<PARAMID> res;
+    res.addElement(&(m_p1->x));
+    res.addElement(&(m_p1->y));
+    res.addElement(&(m_p2->x));
+    res.addElement(&(m_p2->y));
+    return res;
+}
+double ReqPointOnPoint::getDerivative(double *p) {}

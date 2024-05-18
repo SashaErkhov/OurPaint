@@ -60,7 +60,39 @@ TEST(PaintTest, save_and_load){
   road.loadFromFile("piculi.pt");
   EXPECT_EQ(road, paint);
 }*/
-
+TEST(SimpleTests, GetElementInfo){
+    Paint screen;
+    ElementData p;
+    p.et = ET_POINT;
+    p.params.addElement(10);
+    p.params.addElement(10);
+    ID pt = screen.addElement(p);
+    ElementData e = screen.getElementInfo(pt);
+    EXPECT_EQ(e.params[0], 10);
+    EXPECT_EQ(e.params[1], 10);
+    ElementData s;
+    s.et = ET_SECTION;
+    s.params.addElement(100);
+    s.params.addElement(100);
+    s.params.addElement(200);
+    s.params.addElement(200);
+    ID sect = screen.addElement(s);
+    ElementData s1 = screen.getElementInfo(pt);
+    EXPECT_EQ(s1.params[0], 100);
+    EXPECT_EQ(s1.params[1], 100);
+    EXPECT_EQ(s1.params[2], 200);
+    EXPECT_EQ(s1.params[3], 200);
+    ElementData c;
+    c.et = ET_CIRCLE;
+    c.params.addElement(10);
+    c.params.addElement(10);
+    c.params.addElement(10);
+    ID circ = screen.addElement(c);
+    ElementData m = screen.getElementInfo(circ);
+    EXPECT_EQ(m.params[0], 10);
+    EXPECT_EQ(m.params[1], 10);
+    EXPECT_EQ(m.params[2], 10);
+}
 TEST(SimpleTests, PointSegDistTest){
     Paint screen;
     ElementData p;
@@ -75,13 +107,21 @@ TEST(SimpleTests, PointSegDistTest){
     s.params.addElement(200);
     s.params.addElement(200);
     ID sect = screen.addElement(s);
+    ElementData e = screen.getElementInfo(pt);
+    EXPECT_EQ(e.params[0], 10);
+    EXPECT_EQ(e.params[1], 10);
+    e = screen.getElementInfo(sect);
+    EXPECT_EQ(e.params[0], 100);
+    EXPECT_EQ(e.params[1], 100);
+    EXPECT_EQ(e.params[2], 200);
+    EXPECT_EQ(e.params[3], 200);
     RequirementData r;
     r.req = ET_POINTSECTIONDIST;
     r.objects.addElement(pt);
-    r.objects.addElement(pt);
+    r.objects.addElement(sect);
     r.params = 10;
     screen.addRequirement(r);
-    ElementData e = screen.getElementInfo(sect);
-    EXPECT_NE(e.params[0], 10);
-    EXPECT_NE(e.params[1], 10);
+    ElementData ex = screen.getElementInfo(sect);
+    EXPECT_NE(ex.params[0], 10);
+    EXPECT_NE(ex.params[1], 10);
 }
