@@ -14,16 +14,16 @@ RequirementData::RequirementData(){
     params = 0;
 }
 ID Paint::addRequirement(const RequirementData &rd) {
-    if (rd.req == ET_POINTONPOINT){
-        point* p1_it = nullptr;
-        point* p2_it = nullptr;
+    if (rd.req == ET_POINTONPOINT) {
+        point *p1_it = nullptr;
+        point *p2_it = nullptr;
         try {
-            p1_it =  &(*(m_pointIDs.findByKey(rd.objects[0])));
-            p2_it =  &(*(m_pointIDs.findByKey(rd.objects[1])));
-        } catch (...){
+            p1_it = &(*(m_pointIDs.findByKey(rd.objects[0])));
+            p2_it = &(*(m_pointIDs.findByKey(rd.objects[1])));
+        } catch (...) {
             throw std::invalid_argument("No such points");
         }
-        ReqPointOnPoint requirement(p1_it,p2_it);
+        ReqPointOnPoint requirement(p1_it, p2_it);
         Arry<PARAMID> params;
         params = requirement.getParams();
         Arry<double> values;
@@ -31,16 +31,16 @@ ID Paint::addRequirement(const RequirementData &rd) {
         values.addElement(p1_it->y);
         values.addElement(p2_it->x);
         values.addElement(p2_it->y);
-        Arry<double> derivatives(params.getSize());
+        Arry<double> derivatives;
         int k = 0;
         for (auto it = params.begin(); it != params.end(); ++it, ++k) {
             derivatives[k] = requirement.getDerivative(*it);
         }
         double alpha = 10e-10;
         double e = requirement.getError();
-        while (e > 10e-10){
-            alpha = e/(1+e);
-            for(int i = 0; i < values.getSize(); ++i){
+        while (e > 10e-10) {
+            alpha = e / (1 + e);
+            for (int i = 0; i < values.getSize(); ++i) {
                 values[i] += derivatives[i] * alpha;
             }
             (p1_it)->x = values[0];
@@ -51,50 +51,50 @@ ID Paint::addRequirement(const RequirementData &rd) {
         }
 
     }
-    if (rd.req == ET_POINTSECTIONDIST){
-        point* p_it = nullptr;
+    if (rd.req == ET_POINTSECTIONDIST) {
+        point *p_it = nullptr;
         section *s_it = nullptr;
         try {
-            p_it =  &(*(m_pointIDs.findByKey(rd.objects[0])));
+            p_it = &(*(m_pointIDs.findByKey(rd.objects[0])));
         }
-        catch (...){
-            s_it =  &(*(m_sectionIDs.findByKey(rd.objects[0])));
+        catch (...) {
+            s_it = &(*(m_sectionIDs.findByKey(rd.objects[0])));
         }
-        if (p_it != nullptr){
+        if (p_it != nullptr) {
             try {
-                s_it =  &(*(m_sectionIDs.findByKey(rd.objects[1])));
+                s_it = &(*(m_sectionIDs.findByKey(rd.objects[1])));
             }
-            catch (...){
+            catch (...) {
                 throw std::invalid_argument("No such section or point");
             }
-        }else if (s_it!= nullptr){
+        } else if (s_it != nullptr) {
             try {
-                p_it =  &(*(m_pointIDs.findByKey(rd.objects[1])));
+                p_it = &(*(m_pointIDs.findByKey(rd.objects[1])));
             }
-            catch (...){
+            catch (...) {
                 throw std::invalid_argument("No such point or section");
             }
         }
-        ReqPointSegDist requirement(p_it, s_it, rd.params);
-        Arry<PARAMID> params = requirement.getParams();
-        Arry<double> paramValues(params.getSize());
+        IReq *requirement = new ReqPointSegDist(p_it, s_it, rd.params);
+        Arry<PARAMID> params = requirement->getParams();
+        Arry<double> paramValues;
         paramValues.addElement(p_it->x);
         paramValues.addElement(p_it->y);
         paramValues.addElement(s_it->beg->x);
         paramValues.addElement(s_it->beg->y);
         paramValues.addElement(s_it->end->x);
         paramValues.addElement(s_it->end->y);
-        Arry<double> derivatives(params.getSize());
+        Arry<double> derivatives;
         int k = 0;
         for (auto it = params.begin(); it != params.end(); ++it, ++k) {
-            derivatives[k] = requirement.getDerivative(*it);
+            derivatives.addElement(requirement->getDerivative(*it));
         }
-        double alpha = 10e-10;
-        double e = requirement.getError();
-        while (e > 10e-10){
-            alpha = e/(1+e);
-            for(int i = 0; i < paramValues.getSize(); ++i){
-                paramValues[i] += derivatives[i] * alpha;
+        double alpha;
+        double e = requirement->getError();
+        while (e > 10e-10) {
+            alpha = e / (1 + e);
+            for (int i = 0; i < paramValues.getSize(); ++i) {
+                paramValues[i] -= derivatives[i] * alpha;
             }
             (p_it)->x = paramValues[0];
             (p_it)->y = paramValues[1];
@@ -102,11 +102,14 @@ ID Paint::addRequirement(const RequirementData &rd) {
             (s_it)->beg->y = paramValues[3];
             (s_it)->end->x = paramValues[4];
             (s_it)->end->y = paramValues[5];
-            e = requirement.getError();
+            e = requirement->getError();
         }
+        m_reqIDs.addPair(s_maxID.id, m_reqStorage.addElement(requirement));
+        return ++s_maxID.id;
     }
-    return ID{ -1 };
+    return ID{-1};
 }
+
 ID Paint::addElement(const ElementData& ed) {
     if (ed.et == ET_POINT) {
         point tmp;
@@ -432,7 +435,7 @@ double ReqPointSegDist::getDerivative(PARAMID param) {
 
         return num1 / den1 + num2 / den2;
     }
-    else if (param == &m_s->beg->x) { // y1
+    else if (param == &m_s->beg->y) { // y1
         double num1 = (-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
         double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
         double num2 = -x0 + x2;
@@ -448,7 +451,7 @@ double ReqPointSegDist::getDerivative(PARAMID param) {
 
         return num1 / den1 + num2 / den2;
     }
-    else if (param == &m_s->end->x) { // y2
+    else if (param == &m_s->end->y) { // y2
         double num1 = -(-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
         double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
         double num2 = x0 - x1;
