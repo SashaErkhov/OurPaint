@@ -9,6 +9,7 @@
 #include <cmath>
 #include "BMPpainter.h"
 #include "Assoc.h"
+#include "functions.h"
 
 enum Element {
     ET_POINT, ET_SECTION, ET_CIRCLE
@@ -42,6 +43,10 @@ struct ElementData {
 #define PARAMID double*
 
 struct IReq {
+protected:
+    Arry<ID> objects;
+    Requirement req;
+public:
     virtual double getError() = 0;
     virtual Arry<PARAMID> getParams() = 0;
     virtual double getDerivative(PARAMID p) = 0;
@@ -85,9 +90,9 @@ class Paint {
     Assoc<ID, List<point>::iterator> m_pointIDs;
     Assoc<ID, List<section>::iterator> m_sectionIDs;
     Assoc<ID, List<circle>::iterator> m_circleIDs;
-    Assoc<ID, List<RequirementData>::iterator> m_reqIDs;
+    Assoc<ID, List<IReq*>::iterator> m_reqIDs;
     ID s_maxID;
-    List<RequirementData> m_reqStorage;
+    List<IReq*> m_reqStorage;
     List<point> m_pointStorage;
     List<section> m_sectionStorage;
     List<circle> m_circleStorage;

@@ -91,6 +91,39 @@ ID Paint::addRequirement(const RequirementData &rd) {
         }
         double alpha;
         double e = requirement->getError();
+        //TODO for matrix
+        /*
+        if (m_reqStorage.getSize() == 1){
+            IReq* requirement1 = m_reqStorage.getElement(0);
+            Arry<PARAMID> params1 = requirement1->getParams();
+            Matrix<double> dotParam(1, 2);
+            dotParam.set(0, 0, paramValues[0]);
+            dotParam.set(0, 1, paramValues[1]);
+            Arry<double> derivatives1;
+            int k1 = 0;
+            for (auto it = params1.begin(); it!= params1.end(); ++it, ++k1) {
+                derivatives1.addElement(requirement1->getDerivative(*it));
+            }
+            Matrix<double> neededDerivatives(2, 2);
+            neededDerivatives.set(0, 0, derivatives[0]);
+            neededDerivatives.set(0, 1, derivatives[1]);
+            neededDerivatives.set(1, 0, derivatives1[0]);
+            neededDerivatives.set(1, 1, derivatives1[1]);
+            neededDerivatives.inv();
+            double e1 = requirement1->getError();
+            Matrix<double> errors(2, 1);
+            errors.set(0, 0, e);
+            errors.set(1, 0, e1);
+            while (e1 > 10e-10 && e > 10e-10) {
+                dotParam = dotParam - neededDerivatives * errors;
+                e1 = requirement1->getError();
+                e = requirement->getError();
+                errors.set(0, 0, e);
+                errors.set(1, 0, e1);
+            }
+            m_reqIDs.addPair(s_maxID.id, m_reqStorage.addElement(requirement));
+            return ++s_maxID.id;
+        }*/
         while (e > 10e-10) {
             alpha = e / (1 + e);
             for (int i = 0; i < paramValues.getSize(); ++i) {
@@ -179,7 +212,17 @@ ElementData Paint::getElementInfo(ID id) {
 
     return result;
 }
-
+RequirementData Paint::getRequirementInfo(ID id) {
+    RequirementData result;
+    auto req = m_reqIDs.findByKey(id);
+    Arry<PARAMID> paramIDs = (*req)->getParams();
+    Arry<double> params;
+    for (auto paramID = paramIDs.begin(); paramID!= paramIDs.end(); ++paramID) {
+        params.addElement(*(*paramID));
+    }
+    result.params = params;
+    return result;
+}
 void Paint::paint() {
     for (auto point = m_pointStorage.begin(); point != m_pointStorage.end(); ++point) {
         c_bmpPainter.drawPoint(*point, false);
@@ -403,6 +446,7 @@ ReqPointSegDist::ReqPointSegDist(point *p, section *s, double dist) {
     m_p = p;
     m_s = s;
     d = dist;
+
 }
 
 double ReqPointSegDist::getDerivative(PARAMID param) {
