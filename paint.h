@@ -9,7 +9,6 @@
 #include <cmath>
 #include "BMPpainter.h"
 #include "Assoc.h"
-#include "functions.h"
 
 enum Element {
     ET_POINT, ET_SECTION, ET_CIRCLE
@@ -31,7 +30,7 @@ enum Requirement {
 struct RequirementData {
     Requirement req;
     Arry<ID> objects;
-    double params;
+    Arry<double> params;
     RequirementData();
 };
 struct ElementData {
@@ -57,9 +56,9 @@ class ReqPointSegDist : public IReq {
     double d;
 public:
     ReqPointSegDist(point* p, section* s, double dist);
-    double getError();
-    Arry<PARAMID> getParams();
-    double getDerivative(PARAMID p);
+    double getError() override;
+    Arry<PARAMID> getParams() override;
+    double getDerivative(PARAMID p) override;
 };
 class ReqPointOnPoint: public IReq {
     point* m_p1;

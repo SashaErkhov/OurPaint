@@ -33,6 +33,9 @@ int main()
             std::cout << "save file_name.db \t- \tload the information about objects to file_name.db like a table" << std::endl;
             std::cout << "load <bmp/db> file_name.<bmp/db> \t- \tload the information about objects from file_name.db if db or"
                 "just load the image from file_name.bmp" << std::endl;
+            std::cout << "addreq <instruction> <objects> <param> \t- \tdo something with objects \n"
+                         "                 Types of instructions:\n                 '1' - Take 2 args: one point, and one section and distant that you want between them on <param>.\n"
+                         "                 '2' - Take 2 point(they may be on figure) and set it on each other <param> can be empty"<< std::endl;
             std::cout << "q \t- \tQuit" << std::endl;
             std::cout << "help \t- \tHelp that show you commands to use" << std::endl;
         }
@@ -97,7 +100,7 @@ int main()
             std::cin >> fileResolution >> fileName;
             try {
                 if (strcmp(fileResolution, "db") == 0) {
- //                   screen.loadFromFile(fileName);
+ // unsecure                  screen.loadFromFile(fileName);
                 }
                 if (strcmp(fileResolution, "bmp") == 0) {
                     screen.changeBMP(fileName);
@@ -106,6 +109,33 @@ int main()
             }
             catch (...) {
                 std::cout << "Loaded from " << fileName << " FAILED!" << std::endl;
+            }
+        }
+        if (strcmp(command, "addreq")  ==  0)  {
+            char req;
+            RequirementData reqData;
+            ID p1;
+            ID s1;
+            Requirement type;
+            double parameters;
+            std::cin  >> req;
+            switch  (req)  {
+                case '1':
+                    type = ET_POINTSECTIONDIST;
+                    std::cin >> p1.id;
+                    std::cin >> s1.id;
+                    std::cin  >> parameters;
+                    reqData.req = type;
+                    reqData.objects.addElement(p1);
+                    reqData.objects.addElement(s1);
+                    reqData.params.addElement(parameters);
+                    screen.addRequirement(reqData);
+                    break;
+                case '2': // TODO do it for point on point
+                    break;
+                default:
+                    std::cout << "Unknown requirement. Please read types of instructions by help command" << std::endl;
+                    break;
             }
         }
     }

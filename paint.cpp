@@ -11,9 +11,10 @@ ElementData::ElementData(){
 }
 RequirementData::RequirementData(){
     objects = Arry<ID>();
-    params = 0;
+    params = Arry<double>();
 }
 ID Paint::addRequirement(const RequirementData &rd) {
+    c_bmpPainter = BMPpainter();
     if (rd.req == ET_POINTONPOINT) {
         point *p1_it = nullptr;
         point *p2_it = nullptr;
@@ -38,7 +39,7 @@ ID Paint::addRequirement(const RequirementData &rd) {
         }
         double alpha = 10e-10;
         double e = requirement.getError();
-        while (e > 10e-10) {
+        while (e > 10) {
             alpha = e / (1 + e);
             for (int i = 0; i < values.getSize(); ++i) {
                 values[i] += derivatives[i] * alpha;
@@ -75,7 +76,7 @@ ID Paint::addRequirement(const RequirementData &rd) {
                 throw std::invalid_argument("No such point or section");
             }
         }
-        IReq *requirement = new ReqPointSegDist(p_it, s_it, rd.params);
+        IReq *requirement = new ReqPointSegDist(p_it, s_it, rd.params[0]);
         Arry<PARAMID> params = requirement->getParams();
         Arry<double> paramValues;
         paramValues.addElement(p_it->x);
@@ -124,8 +125,8 @@ ID Paint::addRequirement(const RequirementData &rd) {
             m_reqIDs.addPair(s_maxID.id, m_reqStorage.addElement(requirement));
             return ++s_maxID.id;
         }*/
-        while (e > 10e-10) {
-            alpha = e / (1 + e);
+        while (e > 10e-1) {
+            alpha = 10e-5;
             for (int i = 0; i < paramValues.getSize(); ++i) {
                 paramValues[i] -= derivatives[i] * alpha;
             }
@@ -418,17 +419,11 @@ void Paint::changeBMP(const char* filename)
 }
 
 double ReqPointSegDist::getError() {
-    if (m_s->beg->x == m_s->end->x) {
-        return std::abs(m_p->x - m_s->beg->x) - d;
-    }
-    if (m_s->beg->y == m_s->end->y) {
-        return std::abs(m_p->y - m_s->beg->y) - d;
-    }
-    double A = -(m_s->end->x -m_s->beg->x) / (m_s->end->y - m_s->beg->y);
-    double B = 1;
-    double C = -(A * m_s->beg->x + B * m_s->beg->y);
-    double e = std::abs(A * m_p->x + B * m_p->y + C)/ sqrt(A*A+B*B) - d;
-    return e;
+    double A = m_s->end->y -m_s->beg->y;
+    double B = m_s->end->x -m_s->beg->x;
+    double C = -m_s->beg->x*A +m_s->beg->y * B;
+    double e = std::abs(A * m_p->x + B * m_p->y + C/ sqrt(A*A+B*B)) - d;
+    return std::abs(e);
 }
 
 Arry<PARAMID> ReqPointSegDist::getParams() {
