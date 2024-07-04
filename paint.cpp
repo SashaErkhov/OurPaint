@@ -24,9 +24,9 @@ ID Paint::addRequirement(const RequirementData &rd) {
         } catch (...) {
             throw std::invalid_argument("No such points");
         }
-        ReqPointOnPoint requirement(p1_it, p2_it);
+        IReq *requirement = new ReqPointOnPoint(p1_it, p2_it);
         Arry<PARAMID> params;
-        params = requirement.getParams();
+        params = requirement->getParams();
         Arry<double> values;
         values.addElement(p1_it->x);
         values.addElement(p1_it->y);
@@ -35,10 +35,10 @@ ID Paint::addRequirement(const RequirementData &rd) {
         Arry<double> derivatives;
         int k = 0;
         for (auto it = params.begin(); it != params.end(); ++it, ++k) {
-            derivatives[k] = requirement.getDerivative(*it);
+            derivatives[k] = requirement->getDerivative(*it);
         }
         double alpha = 10e-10;
-        double e = requirement.getError();
+        double e = requirement->getError();
         while (e > 10) {
             alpha = e / (1 + e);
             for (int i = 0; i < values.getSize(); ++i) {
@@ -48,9 +48,10 @@ ID Paint::addRequirement(const RequirementData &rd) {
             (p1_it)->y = values[1];
             (p2_it)->x = values[2];
             (p2_it)->y = values[3];
-            e = requirement.getError();
+            e = requirement->getError();
         }
-
+        m_reqIDs.addPair(s_maxID.id, m_reqStorage.addElement(requirement));
+        return ++s_maxID.id;
     }
     if (rd.req == ET_POINTSECTIONDIST) {
         point *p_it = nullptr;
@@ -93,38 +94,37 @@ ID Paint::addRequirement(const RequirementData &rd) {
         double alpha;
         double e = requirement->getError();
         //TODO for matrix
-        /*
         if (m_reqStorage.getSize() == 1){
             IReq* requirement1 = m_reqStorage.getElement(0);
             Arry<PARAMID> params1 = requirement1->getParams();
             Matrix<double> dotParam(1, 2);
-            dotParam.set(0, 0, paramValues[0]);
-            dotParam.set(0, 1, paramValues[1]);
+            dotParam.setElement(0, 0, paramValues[0]);
+            dotParam.setElement(0, 1, paramValues[1]);
             Arry<double> derivatives1;
             int k1 = 0;
             for (auto it = params1.begin(); it!= params1.end(); ++it, ++k1) {
                 derivatives1.addElement(requirement1->getDerivative(*it));
             }
             Matrix<double> neededDerivatives(2, 2);
-            neededDerivatives.set(0, 0, derivatives[0]);
-            neededDerivatives.set(0, 1, derivatives[1]);
-            neededDerivatives.set(1, 0, derivatives1[0]);
-            neededDerivatives.set(1, 1, derivatives1[1]);
-            neededDerivatives.inv();
+            neededDerivatives.setElement(0, 0, derivatives[0]);
+            neededDerivatives.setElement(0, 1, derivatives[1]);
+            neededDerivatives.setElement(1, 0, derivatives1[0]);
+            neededDerivatives.setElement(1, 1, derivatives1[1]);
+            neededDerivatives.invMatrix();
             double e1 = requirement1->getError();
             Matrix<double> errors(2, 1);
-            errors.set(0, 0, e);
-            errors.set(1, 0, e1);
+            errors.setElement(0, 0, e);
+            errors.setElement(1, 0, e1);
             while (e1 > 10e-10 && e > 10e-10) {
                 dotParam = dotParam - neededDerivatives * errors;
                 e1 = requirement1->getError();
                 e = requirement->getError();
-                errors.set(0, 0, e);
-                errors.set(1, 0, e1);
+                errors.setElement(0, 0, e);
+                errors.setElement(1, 0, e1);
             }
             m_reqIDs.addPair(s_maxID.id, m_reqStorage.addElement(requirement));
             return ++s_maxID.id;
-        }*/
+        }
         while (e > 10e-1) {
             alpha = 10e-5;
             for (int i = 0; i < paramValues.getSize(); ++i) {

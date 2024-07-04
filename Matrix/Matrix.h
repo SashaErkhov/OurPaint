@@ -4,24 +4,87 @@
 #include <iostream>
 
 ///////////////////////////// general purpose functions
-
+template <typename T>
 class Matrix
 {
 public:
     Matrix(unsigned int rowsI, unsigned int colsI) : rows(rowsI), cols(colsI) {
-        matrix = new double* [rows];
+        matrix = new T* [rows];
         for (size_t i = 0; i < rows; i++) {
-            matrix[i] = new double[cols];
+            matrix[i] = new T[cols];
             for (size_t j = 0; j < cols; j++) {
                 matrix[i][j] = 0.0;
             }
         }
     }
+    Matrix &operator*=(const Matrix &other) {
+        if (rows == 1 && cols == 1){
+            Matrix newMatrix(other.rows, other.cols);
+            for (int i = 0; i < other.rows; i++) {
+                for (int j = 0; j < other.cols; j++) {
+                    newMatrix.matrix[i][j] = matrix[0][0] * other.matrix[i][j];
+                }
+            }
+            matrix = newMatrix.matrix;
+            rows = other.rows;
+            cols = other.cols;
+            return *this;
+        }
+        if (other.rows == 1 && other.cols == 1){
+            for (int i = 0; i < other.rows; i++) {
+                for (int j = 0; j < other.cols; j++) {
+                    matrix[i][j] *= other.matrix[0][0];
+                }
+            }
+            return *this;
+        }
+        if (cols != other.rows) {
+            throw std::invalid_argument("Matrices must have the same size");
+        }
+        Matrix newMatrix(rows, other.cols);
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < other.cols; j++) {
+                newMatrix.matrix[i][j] = 0;
+                for (int k = 0; k < other.rows; k++) {
+                    newMatrix.matrix[i][j] += matrix[i][k] * other.matrix[k][j];
+                }
+            }
+        }
+        matrix = newMatrix.matrix;
+        rows = newMatrix.rows;
+        cols = newMatrix.cols;
+        return *this;
+    }
+    //some operators for computing
+    Matrix &operator+=(const Matrix &other) {
+        if (rows != other.rows || cols != other.cols) {
+            throw std::invalid_argument("Matrices must have the same size");
+        }
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                matrix[i][j] += other.matrix[i][j];
+            }
+        }
+        return *this;
+    }
+
+    Matrix &operator-=(const Matrix &other) {
+        if (rows != other.rows || cols != other.cols) {
+            throw std::invalid_argument("Matrices must have the same size");
+        }
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                matrix[i][j] -= other.matrix[i][j];
+            }
+        }
+        return *this;
+    }
+    //------------------------------------------------------------------------------
 
     Matrix(const Matrix& other) : rows(other.rows), cols(other.cols) {
-        matrix = new double* [rows];
+        matrix = new T* [rows];
         for (size_t i = 0; i < rows; i++) {
-            matrix[i] = new double[cols];
+            matrix[i] = new T[cols];
             for (size_t j = 0; j < cols; j++) {
                 matrix[i][j] = other.matrix[i][j];
             }
@@ -38,9 +101,9 @@ public:
             rows = other.rows;
             cols = other.cols;
 
-            matrix = new double* [rows];
+            matrix = new T* [rows];
             for (size_t i = 0; i < rows; i++) {
-                matrix[i] = new double[cols];
+                matrix[i] = new T[cols];
                 for (size_t j = 0; j < cols; j++) {
                     matrix[i][j] = other.matrix[i][j];
                 }
@@ -58,9 +121,10 @@ public:
         }
         delete[] matrix;
     }
-
+    [[nodiscard]] inline unsigned int rows_size()  const  {return rows;}
+    [[nodiscard]] inline unsigned int cols_size()  const   {return cols;}
     // Method to set elements in the matrix
-    void setElement(unsigned int rowI, unsigned int colI, double value) {
+    void setElement(unsigned int rowI, unsigned int colI, T value) {
         if (rowI >= rows || colI >= cols) {
             throw std::out_of_range("Index out of range");
         }
@@ -68,7 +132,7 @@ public:
     }
 
     // Method to get elements from the matrix
-    double getElement(unsigned int rowI, unsigned int colI) const {
+    T getElement(unsigned int rowI, unsigned int colI) const {
         if (rowI >= rows || colI >= cols) {
             throw std::out_of_range("Index out of range");
         }
@@ -80,14 +144,14 @@ public:
             throw std::invalid_argument("Inverse can only be computed for square matrices.");
         }
 
-        double determinant = det(matrix, rows);
+        T determinant = det(matrix, rows);
         if (determinant == 0) {
             throw std::runtime_error("Matrix is singular and cannot be inverted.");
         }
 
-        double** invMat = new double* [rows];
+        T** invMat = new T* [rows];
         for (size_t i = 0; i < rows; ++i) {
-            invMat[i] = new double[cols];
+            invMat[i] = new T[cols];
         }
 
         inverseMatrix(matrix, invMat, rows);
@@ -105,7 +169,7 @@ public:
     }
 
 private:
-    double** matrix;
+    T** matrix;
     unsigned int rows;
     unsigned int cols;
 
@@ -122,7 +186,7 @@ private:
     }
 
     // Function to free matrix memory
-    void freeMatrix(double** matrix, int size) {
+    void freeMatrix(T** matrix, int size) {
         for (size_t i = 0; i < size; ++i) {
             delete[] matrix[i];
         }
@@ -132,11 +196,11 @@ private:
     ///////////////////////////// functions for computing coefficients of the characteristic polynomial
 
     // Function to multiply two matrices
-    double** um(double** a, double** b, int size) {
-        double** c = new double* [size];
+    T** um(T** a, T** b, int size) {
+        T** c = new T* [size];
         for (int i = 0; i < size; i++)
         {
-            c[i] = new double[size];
+            c[i] = new T[size];
             for (int j = 0; j < size; j++)
             {
                 c[i][j] = 0;
@@ -149,19 +213,19 @@ private:
     }
 
     // precomputing matrix to the highest required power and saving it
-    void precomputePowers(double** matrix, int size, double*** powers, int maxExp) {
-        powers[0] = new double* [size];
+    void precomputePowers(T** matrix, int size, T*** powers, int maxExp) {
+        powers[0] = new T* [size];
         for (int i = 0; i < size; ++i) {
-            powers[0][i] = new double[size];
+            powers[0][i] = new T[size];
             for (int j = 0; j < size; ++j) {
                 powers[0][i][j] = 0.0; // Filling with zeros
             }
             powers[0][i][i] = 1.0; // Setting ones on the diagonal
         }
 
-        powers[1] = new double* [size];
+        powers[1] = new T* [size];
         for (int i = 0; i < size; ++i) {
-            powers[1][i] = new double[size];
+            powers[1][i] = new T[size];
             for (int j = 0; j < size; ++j) {
                 powers[1][i][j] = matrix[i][j]; // Original matrix for power 1
             }
@@ -173,8 +237,8 @@ private:
     }
 
     // trace of a matrix raised to a power
-    double trace(double*** powers, int size, int n) {
-        double sum = 0;
+    T trace(T*** powers, int size, int n) {
+        T sum = 0;
         for (int i = 0; i < size; ++i) {
             sum += powers[n][i][i];
         }
@@ -182,7 +246,7 @@ private:
     }
 
     // coefficients of the characteristic polynomial with index k
-    double coef(double*** powers, int N, int k, double* coefCache, bool* isComputed) {
+    T coef(T*** powers, int N, int k, T* coefCache, bool* isComputed) {
         if (k == 0) {
             return 1.0;
         }
@@ -191,7 +255,7 @@ private:
             return coefCache[k];
         }
 
-        double result = -trace(powers, N, k);
+        T result = -trace(powers, N, k);
         for (int i = 1; i < k; ++i) {
             result -= coef(powers, N, i, coefCache, isComputed) * trace(powers, N, k - i);
         }
@@ -208,7 +272,7 @@ private:
     ///////////////////////////// functions for computing the inverse matrix
 
     // Calculating the inverse matrix
-    void inverseMatrix(double** matrix, double** inverse, int size) {
+    void inverseMatrix(T** matrix, T** inverse, int size) {
         // Creating an identity matrix
         for (size_t i = 0; i < size; ++i) {
             for (size_t j = 0; j < size; ++j) {
@@ -234,7 +298,7 @@ private:
             }
 
             // Normalizing the row so that element matrix[i][i] equals 1
-            double factor = matrix[i][i];
+            T factor = matrix[i][i];
             for (size_t j = 0; j < size; ++j) {
                 matrix[i][j] /= factor;
                 inverse[i][j] /= factor;
@@ -256,18 +320,18 @@ private:
     ///////////////////////////// functions for computing the determinant
 
     // determinant by Gauss method
-    double det(double** matrix, int s) {
+    T det(T** matrix, int s) {
         // Creating a copy of the matrix
-        double** tempMatrix = new double* [s];
+        T** tempMatrix = new T* [s];
         for (size_t i = 0; i < s; ++i) {
-            tempMatrix[i] = new double[s];
+            tempMatrix[i] = new T[s];
             for (size_t j = 0; j < s; ++j) {
                 tempMatrix[i][j] = matrix[i][j];
             }
         }
 
-        double d = 1;
-        double eps = 1e-10;
+        T d = 1;
+        T eps = 1e-10;
         for (size_t i = 0; i < s; ++i) {
             if (tempMatrix[i][i] < eps && tempMatrix[i][i] > -eps) {
                 int k;
@@ -275,7 +339,7 @@ private:
                     if (tempMatrix[k][i] != 0) {
                         // Swapping rows
                         for (size_t j = 0; j < s; ++j) {
-                            double temp = tempMatrix[i][j];
+                            T temp = tempMatrix[i][j];
                             tempMatrix[i][j] = tempMatrix[k][j];
                             tempMatrix[k][j] = temp;
                         }
@@ -291,7 +355,7 @@ private:
             }
             // Reducing matrix to upper triangular form
             for (size_t k = i + 1; k < s; ++k) {
-                double factor = tempMatrix[k][i] / tempMatrix[i][i];
+                T factor = tempMatrix[k][i] / tempMatrix[i][i];
                 for (size_t j = i; j < s; ++j) {
                     tempMatrix[k][j] -= factor * tempMatrix[i][j];
                 }
@@ -304,5 +368,29 @@ private:
         return d;
     }
 };
+template <typename T>
+Matrix<T> operator*(const Matrix<T> &matrix1, const Matrix<T> &matrix2) {
+    Matrix result(matrix1);
+    return result *= matrix2;
+}
+
+template <typename T>
+Matrix<T> operator+(const Matrix<T> &matrix1, const Matrix<T> &matrix2) {
+    if (matrix1.rows_size() != matrix2.rows_size() ||
+        matrix1.cols_size() != matrix2.cols_size()) {
+        throw std::invalid_argument("Matrices have different sizes");
+    }
+    Matrix result(matrix1);
+    return result += matrix2;
+}
+template <typename T>
+Matrix<T> operator-(const Matrix<T> &matrix1, const Matrix<T> &matrix2) {
+    if (matrix1.rows_size() != matrix2.rows_size() ||
+        matrix1.cols_size() != matrix2.cols_size()) {
+        throw std::invalid_argument("Matrices have different sizes");
+    }
+    Matrix result(matrix1);
+    return result -= matrix2;
+}
 
 #endif // MATRIX

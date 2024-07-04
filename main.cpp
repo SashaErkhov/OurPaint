@@ -28,6 +28,7 @@ int main()
             std::cout << "point x y \t-\t Draw point at (x,y)" << std::endl;
             std::cout << "section x1 y1 x2 y2 \t-\t Draw section between two points (x1,y1) and (x2,y2)" << std::endl;
             std::cout << "cirle x y r \t-\t Draw circle with radius r and center at (x,y)" << std::endl;
+            std::cout << "getelement ID  \t-\t Get info about element with ID" << std::endl;
             std::cout << "clear \t- \tClears the screen" << std::endl;
             std::cout << "export file_name.bmp \t- \tExports the image to file_name.bmp" << std::endl;
             std::cout << "save file_name.db \t- \tload the information about objects to file_name.db like a table" << std::endl;
@@ -109,6 +110,28 @@ int main()
             }
             catch (...) {
                 std::cout << "Loaded from " << fileName << " FAILED!" << std::endl;
+            }
+        }
+        if (strcmp(command, "getelement")==0){
+            ID id;
+            std::cin >> id.id;
+            ElementData element = screen.getElementInfo(id);
+            switch   (element.et)   {
+                case ET_SECTION:
+                    std::cout   <<  "TYPE: SECTION" <<std::endl;
+                    std::cout << "START POINT: (" << element.params.getElement(0)  <<  ",  "  << element.params.getElement(1)  <<  ")"  << std::endl;
+                    std::cout  <<  "END POINT:  ("  << element.params.getElement(2)  <<  ",   "  << element.params.getElement(3)  <<  ")"  << std::endl;
+                    break;
+                case ET_POINT:
+                    std::cout  << "TYPE: POINT" << std::endl;
+                    std::cout   << "X: " << element.params.getElement(0) << std::endl;
+                    std::cout   <<  "Y:  "  << element.params.getElement(1)  << std::endl;
+                    break;
+                case ET_CIRCLE:
+                    std::cout   <<  "TYPE: CIRCLE"  << std::endl;
+                    std::cout << "CENTER: (" << element.params.getElement(0)  << ",  "  << element.params.getElement(1)  << ")"  << std::endl;
+                    std::cout   <<   "RADIUS:   "   << element.params.getElement(2)   << std::endl;
+                    break;
             }
         }
         if (strcmp(command, "addreq")  ==  0)  {

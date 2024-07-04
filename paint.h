@@ -9,6 +9,7 @@
 #include <cmath>
 #include "BMPpainter.h"
 #include "Assoc.h"
+#include "./Matrix/Matrix.h"
 
 enum Element {
     ET_POINT, ET_SECTION, ET_CIRCLE
