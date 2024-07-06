@@ -85,7 +85,7 @@ paramValues += (-alpha* derivatives);
 double e = req.getError();
 // В зависимоти от величины ошибки продолжить или остановиться */
 
-//c_ - класс, v_- переменная, s_структура, m_ - контейнеры(списки, массивы и другие)
+//c_ - класс, v_- переменная, s_структура, m_ - контейнеры(списки, массивы и другие) f_ - приватный метод класса
 class Paint {
     Assoc<ID, List<point>::iterator> m_pointIDs;
     Assoc<ID, List<section>::iterator> m_sectionIDs;
@@ -97,6 +97,7 @@ class Paint {
     List<section> m_sectionStorage;
     List<circle> m_circleStorage;
     BMPpainter c_bmpPainter;
+    rectangle s_allFigures;
     /*
     * TODO
     * All methods (addElement, getElementInfo, etc.) must be adapted to work with the new data structure,
@@ -105,7 +106,12 @@ class Paint {
 
 public:
     Paint() : s_maxID(0), c_bmpPainter(), m_pointIDs(), m_sectionIDs(), m_circleIDs(), m_pointStorage(),
-        m_sectionStorage(), m_circleStorage() {}//default constructor
+        m_sectionStorage(), m_circleStorage() {
+        s_allFigures.x_1 = -10;
+        s_allFigures.x_2 = 10;
+        s_allFigures.y_1 = -10;
+        s_allFigures.y_2 = 10;
+    } //default constructor
         
     // Добавление элементов с указанием их типа и необходимого набора параметров
     ID addElement(const ElementData &ed);

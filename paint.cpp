@@ -149,6 +149,7 @@ ID Paint::addElement(const ElementData& ed) {
         point tmp;
         tmp.x = ed.params[0];
         tmp.y = ed.params[1];
+        s_allFigures = s_allFigures || tmp.rect();
         m_pointIDs.addPair(++s_maxID.id, m_pointStorage.addElement(tmp));
         return s_maxID;
     }
@@ -166,6 +167,7 @@ ID Paint::addElement(const ElementData& ed) {
         section tmp;
         tmp.beg = &(*beg);
         tmp.end = &(*end);
+        s_allFigures = s_allFigures || tmp.rect();
         m_sectionIDs.addPair(++s_maxID.id,m_sectionStorage.addElement(tmp));
         return s_maxID;
     }
@@ -178,6 +180,7 @@ ID Paint::addElement(const ElementData& ed) {
         circle tmp;
         tmp.center = &(*cent);
         tmp.R = ed.params[2];
+        s_allFigures = s_allFigures || tmp.rect();
         m_circleIDs.addPair(++s_maxID.id, m_circleStorage.addElement(tmp));
         return s_maxID;
     }
@@ -225,6 +228,7 @@ RequirementData Paint::getRequirementInfo(ID id) {
     return result;
 }
 void Paint::paint() {
+    c_bmpPainter.changeSize(s_allFigures);
     for (auto point = m_pointStorage.begin(); point != m_pointStorage.end(); ++point) {
         c_bmpPainter.drawPoint(*point, false);
     }
