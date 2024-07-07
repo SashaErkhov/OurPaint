@@ -125,7 +125,7 @@ ID Paint::addRequirement(const RequirementData &rd) {
             m_reqIDs.addPair(s_maxID.id, m_reqStorage.addElement(requirement));
             return ++s_maxID.id;
         }
-        while (e > 10e-1) {
+        while (e > 10e-2) {
             alpha = 10e-5;
             for (int i = 0; i < paramValues.getSize(); ++i) {
                 paramValues[i] -= derivatives[i] * alpha;
@@ -138,6 +138,8 @@ ID Paint::addRequirement(const RequirementData &rd) {
             (s_it)->end->y = paramValues[5];
             e = requirement->getError();
         }
+        s_allFigures = s_allFigures || p_it->rect();
+        s_allFigures = s_allFigures || s_it->rect();
         m_reqIDs.addPair(s_maxID.id, m_reqStorage.addElement(requirement));
         return ++s_maxID.id;
     }
@@ -425,8 +427,8 @@ void Paint::changeBMP(const char* filename)
 double ReqPointSegDist::getError() {
     double A = m_s->end->y -m_s->beg->y;
     double B = m_s->end->x -m_s->beg->x;
-    double C = -m_s->beg->x*A +m_s->beg->y * B;
-    double e = std::abs(A * m_p->x + B * m_p->y + C/ sqrt(A*A+B*B)) - d;
+    double C = m_s->end->x * m_s->beg->y - m_s->beg->x * m_s->end->y;
+    double e = std::abs(A * m_p->x - B * m_p->y + C) / sqrt(A*A+B*B) - d;
     return std::abs(e);
 }
 
