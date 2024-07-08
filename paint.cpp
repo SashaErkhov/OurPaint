@@ -35,14 +35,13 @@ ID Paint::addRequirement(const RequirementData &rd) {
         Arry<double> derivatives;
         int k = 0;
         for (auto it = params.begin(); it != params.end(); ++it, ++k) {
-            derivatives[k] = requirement->getDerivative(*it);
+            derivatives.addElement(requirement->getDerivative(*it));
         }
-        double alpha = 10e-10;
+        double alpha = 10e-6;
         double e = requirement->getError();
-        while (e > 10) {
-            alpha = e / (1 + e);
+        while (e > 10e-5) {
             for (int i = 0; i < values.getSize(); ++i) {
-                values[i] += derivatives[i] * alpha;
+                values[i] -= derivatives[i] * alpha;
             }
             (p1_it)->x = values[0];
             (p1_it)->y = values[1];
@@ -523,4 +522,19 @@ Arry<PARAMID> ReqPointOnPoint::getParams() {
     res.addElement(&(m_p2->y));
     return res;
 }
-double ReqPointOnPoint::getDerivative(double *p) {}
+double ReqPointOnPoint::getDerivative(PARAMID p) {
+    double dx = m_p1->x - m_p2->x;
+    double dy = m_p1->y - m_p2->y;
+    double d = getError();
+    if (p == &(m_p1->x)) {
+        return dx / d;
+    } else if (p == &(m_p1->y)) {
+        return dy / d;
+    } else if (p == &(m_p2->x)) {
+        return -dx / d;
+    } else if (p == &(m_p2->y)) {
+        return -dy / d;
+    } else {
+        return 0;
+    }
+}

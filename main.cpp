@@ -137,24 +137,31 @@ int main()
         if (strcmp(command, "addreq")  ==  0)  {
             char req;
             RequirementData reqData;
-            ID p1;
-            ID s1;
+            ID obj1;
+            ID obj2;
             Requirement type;
             double parameters;
             std::cin  >> req;
             switch  (req)  {
                 case '1':
                     type = ET_POINTSECTIONDIST;
-                    std::cin >> p1.id;
-                    std::cin >> s1.id;
+                    std::cin >> obj1.id;
+                    std::cin >> obj2.id;
                     std::cin  >> parameters;
                     reqData.req = type;
-                    reqData.objects.addElement(p1);
-                    reqData.objects.addElement(s1);
+                    reqData.objects.addElement(obj1);
+                    reqData.objects.addElement(obj2);
                     reqData.params.addElement(parameters);
                     screen.addRequirement(reqData);
                     break;
-                case '2': // TODO do it for point on point
+                case '2':
+                    type = ET_POINTONPOINT;
+                    std::cin >> obj1.id;
+                    std::cin >> obj2.id;
+                    reqData.req = type;
+                    reqData.objects.addElement(obj1);
+                    reqData.objects.addElement(obj2);
+                    screen.addRequirement(reqData);
                     break;
                 default:
                     std::cout << "Unknown requirement. Please read types of instructions by help command" << std::endl;
