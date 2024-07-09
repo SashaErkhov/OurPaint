@@ -15,7 +15,7 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 enable_testing()
-set(SOURCES ../paint.cpp ../objects.cpp ../BMPpainter.cpp)
+set(SOURCES ../painter/paint.cpp ../painter/objects.cpp ../painter/BMPpainter.cpp)
 include_directories(../additions)
 include_directories(../BMPfile/code)
 add_subdirectory(../BMPfile build)

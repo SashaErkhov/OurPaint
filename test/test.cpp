@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../paint.h"
+#include "../painter/paint.h"
 
 TEST(PaintTest, AddingElems){
   Paint paint;

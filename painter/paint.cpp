@@ -15,6 +15,43 @@ RequirementData::RequirementData(){
 }
 ID Paint::addRequirement(const RequirementData &rd) {
     c_bmpPainter = BMPpainter();
+    if (rd.req == ET_POINTPOINTDIST){
+        point *p1_it = nullptr;
+        point *p2_it = nullptr;
+        try {
+            p1_it = &(*(m_pointIDs.findByKey(rd.objects[0])));
+            p2_it = &(*(m_pointIDs.findByKey(rd.objects[1])));
+        } catch (...) {
+            throw std::invalid_argument("No such points");
+        }
+        IReq *requirement = new ReqPointPointDist(p1_it, p2_it,rd.params[0]);
+        Arry<PARAMID> params;
+        params = requirement->getParams();
+        Arry<double> values;
+        values.addElement(p1_it->x);
+        values.addElement(p1_it->y);
+        values.addElement(p2_it->x);
+        values.addElement(p2_it->y);
+        Arry<double> derivatives;
+        int k = 0;
+        for (auto it = params.begin(); it != params.end(); ++it, ++k) {
+            derivatives.addElement(requirement->getDerivative(*it));
+        }
+        double alpha = 10e-6;
+        double e = requirement->getError();
+        while (e > 10e-5) {
+            for (int i = 0; i < values.getSize(); ++i) {
+                values[i] -= derivatives[i] * alpha;
+            }
+            (p1_it)->x = values[0];
+            (p1_it)->y = values[1];
+            (p2_it)->x = values[2];
+            (p2_it)->y = values[3];
+            e = requirement->getError();
+        }
+        m_reqIDs.addPair(s_maxID.id, m_reqStorage.addElement(requirement));
+        return ++s_maxID.id;
+    }
     if (rd.req == ET_POINTONPOINT) {
         point *p1_it = nullptr;
         point *p2_it = nullptr;
@@ -523,6 +560,42 @@ Arry<PARAMID> ReqPointOnPoint::getParams() {
     return res;
 }
 double ReqPointOnPoint::getDerivative(PARAMID p) {
+    double dx = m_p1->x - m_p2->x;
+    double dy = m_p1->y - m_p2->y;
+    double d = getError();
+    if (p == &(m_p1->x)) {
+        return dx / d;
+    } else if (p == &(m_p1->y)) {
+        return dy / d;
+    } else if (p == &(m_p2->x)) {
+        return -dx / d;
+    } else if (p == &(m_p2->y)) {
+        return -dy / d;
+    } else {
+        return 0;
+    }
+}
+
+ReqPointPointDist::ReqPointPointDist(point *p1, point *p2, double dist) {
+    m_p1 = p1;
+    m_p2 = p2;
+    v_dist = dist;
+}
+
+double ReqPointPointDist::getError() {
+    return std::abs(sqrt((m_p2->x-m_p1->x)*(m_p2->x-m_p1->x) + (m_p2->y-m_p1->y)*(m_p2->y-m_p1->y)) - v_dist);
+}
+
+Arry<PARAMID> ReqPointPointDist::getParams() {
+    Arry<PARAMID> res;
+    res.addElement(&(m_p1->x));
+    res.addElement(&(m_p1->y));
+    res.addElement(&(m_p2->x));
+    res.addElement(&(m_p2->y));
+    return res;
+}
+
+double ReqPointPointDist::getDerivative(double *p) {
     double dx = m_p1->x - m_p2->x;
     double dy = m_p1->y - m_p2->y;
     double d = getError();

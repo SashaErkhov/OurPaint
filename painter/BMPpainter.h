@@ -1,6 +1,6 @@
 #ifndef OURPAINT_BMPPAINTER_H
 #define OURPAINT_BMPPAINTER_H
-#include "./BMPfile/code/BMPfile.h"
+#include "BMPfile.h"
 #include "objects.h"
 #include <cmath>
 

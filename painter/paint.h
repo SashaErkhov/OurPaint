@@ -9,7 +9,7 @@
 #include <cmath>
 #include "BMPpainter.h"
 #include "Assoc.h"
-#include "./Matrix/Matrix.h"
+#include "../Matrix/Matrix.h"
 
 enum Element {
     ET_POINT, ET_SECTION, ET_CIRCLE
@@ -69,6 +69,16 @@ public:
     double getError();
     Arry<PARAMID> getParams();
     double getDerivative(PARAMID p);
+};
+class ReqPointPointDist: public IReq {
+    point* m_p1;
+    point* m_p2;
+    double v_dist;
+public:
+    ReqPointPointDist(point* p1, point* p2, double dist);
+    double getError() override;
+    Arry<PARAMID> getParams() override;
+    double getDerivative(PARAMID p) override;
 };
 /* EXAMPLE
 ReqPointSegDist req;
