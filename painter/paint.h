@@ -61,6 +61,15 @@ public:
     Arry<PARAMID> getParams() override;
     double getDerivative(PARAMID p) override;
 };
+class ReqPointOnSec : public IReq {
+    point* m_p;
+    section* m_s;
+public:
+    ReqPointOnSec(point* p, section* s);
+    double getError() override;
+    Arry<PARAMID> getParams() override;
+    double getDerivative(PARAMID param) override;
+};
 class ReqPointOnPoint: public IReq {
     point* m_p1;
     point* m_p2;

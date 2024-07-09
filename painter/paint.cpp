@@ -15,6 +15,63 @@ RequirementData::RequirementData(){
 }
 ID Paint::addRequirement(const RequirementData &rd) {
     c_bmpPainter = BMPpainter();
+    if (rd.req == ET_POINTONSECTION){
+        point *p_it = nullptr;
+        section *s_it = nullptr;
+        try {
+            p_it = &(*(m_pointIDs.findByKey(rd.objects[0])));
+        }
+        catch (...) {
+            s_it = &(*(m_sectionIDs.findByKey(rd.objects[0])));
+        }
+        if (p_it != nullptr) {
+            try {
+                s_it = &(*(m_sectionIDs.findByKey(rd.objects[1])));
+            }
+            catch (...) {
+                throw std::invalid_argument("No such section or point");
+            }
+        } else if (s_it != nullptr) {
+            try {
+                p_it = &(*(m_pointIDs.findByKey(rd.objects[1])));
+            }
+            catch (...) {
+                throw std::invalid_argument("No such point or section");
+            }
+        }
+        IReq *requirement = new ReqPointOnSec(p_it, s_it);
+        Arry<PARAMID> params = requirement->getParams();
+        Arry<double> paramValues;
+        paramValues.addElement(p_it->x);
+        paramValues.addElement(p_it->y);
+        paramValues.addElement(s_it->beg->x);
+        paramValues.addElement(s_it->beg->y);
+        paramValues.addElement(s_it->end->x);
+        paramValues.addElement(s_it->end->y);
+        Arry<double> derivatives;
+        int k = 0;
+        for (auto it = params.begin(); it != params.end(); ++it, ++k) {
+            derivatives.addElement(requirement->getDerivative(*it));
+        }
+        double alpha = 10e-5;
+        double e = requirement->getError();
+        while (e > 10e-2) {
+            for (int i = 0; i < paramValues.getSize(); ++i) {
+                paramValues[i] -= derivatives[i] * alpha;
+            }
+            (p_it)->x = paramValues[0];
+            (p_it)->y = paramValues[1];
+            (s_it)->beg->x = paramValues[2];
+            (s_it)->beg->y = paramValues[3];
+            (s_it)->end->x = paramValues[4];
+            (s_it)->end->y = paramValues[5];
+            e = requirement->getError();
+        }
+        s_allFigures = s_allFigures || p_it->rect();
+        s_allFigures = s_allFigures || s_it->rect();
+        m_reqIDs.addPair(s_maxID.id, m_reqStorage.addElement(requirement));
+        return ++s_maxID.id;
+    }
     if (rd.req == ET_POINTPOINTDIST){
         point *p1_it = nullptr;
         point *p2_it = nullptr;
@@ -49,6 +106,8 @@ ID Paint::addRequirement(const RequirementData &rd) {
             (p2_it)->y = values[3];
             e = requirement->getError();
         }
+        s_allFigures = s_allFigures || p1_it->rect();
+        s_allFigures = s_allFigures || p2_it->rect();
         m_reqIDs.addPair(s_maxID.id, m_reqStorage.addElement(requirement));
         return ++s_maxID.id;
     }
@@ -86,6 +145,8 @@ ID Paint::addRequirement(const RequirementData &rd) {
             (p2_it)->y = values[3];
             e = requirement->getError();
         }
+        s_allFigures = s_allFigures || p1_it->rect();
+        s_allFigures = s_allFigures || p2_it->rect();
         m_reqIDs.addPair(s_maxID.id, m_reqStorage.addElement(requirement));
         return ++s_maxID.id;
     }
@@ -158,6 +219,8 @@ ID Paint::addRequirement(const RequirementData &rd) {
                 errors.setElement(0, 0, e);
                 errors.setElement(1, 0, e1);
             }
+            s_allFigures = s_allFigures || p_it->rect();
+            s_allFigures = s_allFigures || s_it->rect();
             m_reqIDs.addPair(s_maxID.id, m_reqStorage.addElement(requirement));
             return ++s_maxID.id;
         }
@@ -611,3 +674,84 @@ double ReqPointPointDist::getDerivative(double *p) {
         return 0;
     }
 }
+
+ReqPointOnSec::ReqPointOnSec(point *p, section *s) {
+    m_p = p;
+    m_s = s;
+}
+
+double ReqPointOnSec::getError() {
+    double A = m_s->end->y - m_s->beg->y;
+    double B = m_s->end->x - m_s->beg->x;
+    double C = m_s->end->x * m_s->beg->y - m_s->beg->x * m_s->end->y;
+    double e = std::abs(A * m_p->x - B * m_p->y + C) / sqrt(A*A+B*B);
+    return e;
+}
+
+Arry<PARAMID> ReqPointOnSec::getParams() {
+    Arry<PARAMID> res;
+    res.addElement(&(m_p->x));
+    res.addElement(&(m_p->y));
+    res.addElement(&(m_s->beg->x));
+    res.addElement(&(m_s->beg->y));
+    res.addElement(&(m_s->end->x));
+    res.addElement(&(m_s->end->y));
+    return res;
+}
+
+double ReqPointOnSec::getDerivative(PARAMID param) {
+    double x0 = m_p->x;
+    double y0 = m_p->y;
+
+    double x1 = m_s->beg->x;
+    double y1 = m_s->beg->y;
+
+    double x2 = m_s->end->x;
+    double y2 = m_s->end->y;
+
+    if (param == &m_p->x) { // x0
+        double num = -y1 + y2;
+        double den = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+
+        return num / den;
+    }
+    else if (param == &m_p->y) { // y0
+        double num = x1 - x2;
+        double den = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+
+        return num / den;
+    }
+    else if (param == &m_s->beg->x) { // x1
+        double num1 = (-x1 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
+        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
+        double num2 = y0 - y2;
+        double den2 = sqrt(((-x1 + x2), 2) + ((-y1 + y2), 2));
+
+        return num1 / den1 + num2 / den2;
+    }
+    else if (param == &m_s->beg->y) { // y1
+        double num1 = (-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
+        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
+        double num2 = -x0 + x2;
+        double den2 = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+
+        return num1 / den1 + num2 / den2;
+    }
+    else if (param == &m_s->end->x) { // x2
+        double num1 = -(-x1 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
+        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
+        double num2 = -y0 + y1;
+        double den2 = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+
+        return num1 / den1 + num2 / den2;
+    }
+    else if (param == &m_s->end->y) { // y2
+        double num1 = -(-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
+        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
+        double num2 = x0 - x1;
+        double den2 = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+
+        return num1 / den1 + num2 / den2;
+    }
+
+    return 0;}

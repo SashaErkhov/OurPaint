@@ -175,6 +175,15 @@ int main()
                     reqData.params.addElement(parameters);
                     screen.addRequirement(reqData);
                     break;
+                case '4':
+                    type = ET_POINTONSECTION;
+                    std::cin >> obj1.id;
+                    std::cin >> obj2.id;
+                    reqData.req = type;
+                    reqData.objects.addElement(obj1);
+                    reqData.objects.addElement(obj2);
+                    screen.addRequirement(reqData);
+                    break;
                 default:
                     std::cout << "Unknown requirement. Please read types of instructions by help command" << std::endl;
                     break;
