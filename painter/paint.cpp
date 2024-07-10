@@ -15,6 +15,120 @@ RequirementData::RequirementData(){
 }
 ID Paint::addRequirement(const RequirementData &rd) {
     c_bmpPainter = BMPpainter();
+    if (rd.req == ET_SECTIONCIRCLEDIST){
+        circle *c_it = nullptr;
+        section *s_it = nullptr;
+        try {
+            c_it = &(*(m_circleIDs.findByKey(rd.objects[0])));
+        }
+        catch (...) {
+            s_it = &(*(m_sectionIDs.findByKey(rd.objects[0])));
+        }
+        if (c_it != nullptr) {
+            try {
+                s_it = &(*(m_sectionIDs.findByKey(rd.objects[1])));
+            }
+            catch (...) {
+                throw std::invalid_argument("No such section or circle");
+            }
+        } else if (s_it != nullptr) {
+            try {
+                c_it = &(*(m_circleIDs.findByKey(rd.objects[1])));
+            }
+            catch (...) {
+                throw std::invalid_argument("No such circle or section");
+            }
+        }
+        IReq *requirement = new ReqSecCircleDist(s_it,c_it, rd.params[0]);
+        Arry<PARAMID> params = requirement->getParams();
+        Arry<double> paramValues;
+        paramValues.addElement(c_it->center->x);
+        paramValues.addElement(c_it->center->y);
+        paramValues.addElement(s_it->beg->x);
+        paramValues.addElement(s_it->beg->y);
+        paramValues.addElement(s_it->end->x);
+        paramValues.addElement(s_it->end->y);
+        Arry<double> derivatives;
+        int k = 0;
+        for (auto it = params.begin(); it != params.end(); ++it, ++k) {
+            derivatives.addElement(requirement->getDerivative(*it));
+        }
+        double alpha = 10e-5;
+        double e = requirement->getError();
+        while (e > 10e-2) {
+            for (int i = 0; i < paramValues.getSize(); ++i) {
+                paramValues[i] -= derivatives[i] * alpha;
+            }
+            (c_it)->center->x = paramValues[0];
+            (c_it)->center->y = paramValues[1];
+            (s_it)->beg->x = paramValues[2];
+            (s_it)->beg->y = paramValues[3];
+            (s_it)->end->x = paramValues[4];
+            (s_it)->end->y = paramValues[5];
+            e = requirement->getError();
+        }
+        s_allFigures = s_allFigures || c_it->rect();
+        s_allFigures = s_allFigures || s_it->rect();
+        m_reqIDs.addPair(s_maxID.id, m_reqStorage.addElement(requirement));
+        return ++s_maxID.id;
+    }
+    if (rd.req == ET_SECTIONONCIRCLE){
+        circle *c_it = nullptr;
+        section *s_it = nullptr;
+        try {
+            c_it = &(*(m_circleIDs.findByKey(rd.objects[0])));
+        }
+        catch (...) {
+            s_it = &(*(m_sectionIDs.findByKey(rd.objects[0])));
+        }
+        if (c_it != nullptr) {
+            try {
+                s_it = &(*(m_sectionIDs.findByKey(rd.objects[1])));
+            }
+            catch (...) {
+                throw std::invalid_argument("No such section or circle");
+            }
+        } else if (s_it != nullptr) {
+            try {
+                c_it = &(*(m_circleIDs.findByKey(rd.objects[1])));
+            }
+            catch (...) {
+                throw std::invalid_argument("No such circle or section");
+            }
+        }
+        IReq *requirement = new ReqSecOnCircle(s_it,c_it);
+        Arry<PARAMID> params = requirement->getParams();
+        Arry<double> paramValues;
+        paramValues.addElement(c_it->center->x);
+        paramValues.addElement(c_it->center->y);
+        paramValues.addElement(s_it->beg->x);
+        paramValues.addElement(s_it->beg->y);
+        paramValues.addElement(s_it->end->x);
+        paramValues.addElement(s_it->end->y);
+        Arry<double> derivatives;
+        int k = 0;
+        for (auto it = params.begin(); it != params.end(); ++it, ++k) {
+            derivatives.addElement(requirement->getDerivative(*it));
+        }
+        double alpha = 10e-5;
+        double e = requirement->getError();
+        while (e > 10e-2) {
+            for (int i = 0; i < paramValues.getSize(); ++i) {
+                paramValues[i] -= derivatives[i] * alpha;
+            }
+            (c_it)->center->x = paramValues[0];
+            (c_it)->center->y = paramValues[1];
+            (s_it)->beg->x = paramValues[2];
+            (s_it)->beg->y = paramValues[3];
+            (s_it)->end->x = paramValues[4];
+            (s_it)->end->y = paramValues[5];
+            e = requirement->getError();
+        }
+        s_allFigures = s_allFigures || c_it->rect();
+        s_allFigures = s_allFigures || s_it->rect();
+        m_reqIDs.addPair(s_maxID.id, m_reqStorage.addElement(requirement));
+        return ++s_maxID.id;
+    }
     if (rd.req == ET_POINTONSECTION){
         point *p_it = nullptr;
         section *s_it = nullptr;
@@ -755,3 +869,168 @@ double ReqPointOnSec::getDerivative(PARAMID param) {
     }
 
     return 0;}
+
+ReqSecCircleDist::ReqSecCircleDist(section *s, circle *c, double dist) {
+    m_s = s;
+    m_c = c;
+    v_dist = dist;
+}
+double ReqSecCircleDist::getError() {
+    double A = m_s->end->y - m_s->beg->y;
+    double B = m_s->end->x - m_s->beg->x;
+    double C = m_s->end->x * m_s->beg->y - m_s->beg->x * m_s->end->y;
+    double e = std::abs(A * m_c->center->x - B * m_c->center->y + C) / sqrt(A*A+B*B) - (m_c->R + v_dist);
+    return std::abs(e);
+}
+
+Arry<PARAMID> ReqSecCircleDist::getParams() {
+    Arry<PARAMID> res;
+    res.addElement(&(m_c->center->x));
+    res.addElement(&(m_c->center->y));
+    res.addElement(&(m_s->beg->x));
+    res.addElement(&(m_s->beg->y));
+    res.addElement(&(m_s->end->x));
+    res.addElement(&(m_s->end->y));
+    return res;
+}
+
+double ReqSecCircleDist::getDerivative(PARAMID p) {
+    double x0 = m_c->center->x;
+    double y0 = m_c->center->y;
+
+    double x1 = m_s->beg->x;
+    double y1 = m_s->beg->y;
+
+    double x2 = m_s->end->x;
+    double y2 = m_s->end->y;
+
+    if (p == &m_c->center->x) { // x0
+        double num = -y1 + y2;
+        double den = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+
+        return num / den;
+    }
+    else if (p == &m_c->center->y) { // y0
+        double num = x1 - x2;
+        double den = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+
+        return num / den;
+    }
+    else if (p == &m_s->beg->x) { // x1
+        double num1 = (-x1 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
+        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
+        double num2 = y0 - y2;
+        double den2 = sqrt(((-x1 + x2), 2) + ((-y1 + y2), 2));
+
+        return num1 / den1 + num2 / den2;
+    }
+    else if (p == &m_s->beg->y) { // y1
+        double num1 = (-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
+        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
+        double num2 = -x0 + x2;
+        double den2 = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+
+        return num1 / den1 + num2 / den2;
+    }
+    else if (p == &m_s->end->x) { // x2
+        double num1 = -(-x1 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
+        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
+        double num2 = -y0 + y1;
+        double den2 = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+
+        return num1 / den1 + num2 / den2;
+    }
+    else if (p == &m_s->end->y) { // y2
+        double num1 = -(-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
+        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
+        double num2 = x0 - x1;
+        double den2 = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+
+        return num1 / den1 + num2 / den2;
+    }
+
+    return 0;
+}
+
+
+ReqSecOnCircle::ReqSecOnCircle(section *s, circle *c) {
+    m_s = s;
+    m_c = c;
+}
+
+double ReqSecOnCircle::getError() {
+    double A = m_s->end->y - m_s->beg->y;
+    double B = m_s->end->x - m_s->beg->x;
+    double C = m_s->end->x * m_s->beg->y - m_s->beg->x * m_s->end->y;
+    double e = std::abs(A * m_c->center->x - B * m_c->center->y + C) / sqrt(A*A+B*B) - (m_c->R);
+    return std::abs(e);
+}
+
+Arry<PARAMID> ReqSecOnCircle::getParams() {
+    Arry<PARAMID> res;
+    res.addElement(&(m_c->center->x));
+    res.addElement(&(m_c->center->y));
+    res.addElement(&(m_s->beg->x));
+    res.addElement(&(m_s->beg->y));
+    res.addElement(&(m_s->end->x));
+    res.addElement(&(m_s->end->y));
+    return res;
+}
+
+double ReqSecOnCircle::getDerivative(double *p) {
+    double x0 = m_c->center->x;
+    double y0 = m_c->center->y;
+
+    double x1 = m_s->beg->x;
+    double y1 = m_s->beg->y;
+
+    double x2 = m_s->end->x;
+    double y2 = m_s->end->y;
+
+    if (p == &m_c->center->x) { // x0
+        double num = -y1 + y2;
+        double den = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+
+        return num / den;
+    }
+    else if (p == &m_c->center->y) { // y0
+        double num = x1 - x2;
+        double den = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+
+        return num / den;
+    }
+    else if (p == &m_s->beg->x) { // x1
+        double num1 = (-x1 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
+        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
+        double num2 = y0 - y2;
+        double den2 = sqrt(((-x1 + x2), 2) + ((-y1 + y2), 2));
+
+        return num1 / den1 + num2 / den2;
+    }
+    else if (p == &m_s->beg->y) { // y1
+        double num1 = (-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
+        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
+        double num2 = -x0 + x2;
+        double den2 = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+
+        return num1 / den1 + num2 / den2;
+    }
+    else if (p == &m_s->end->x) { // x2
+        double num1 = -(-x1 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
+        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
+        double num2 = -y0 + y1;
+        double den2 = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+
+        return num1 / den1 + num2 / den2;
+    }
+    else if (p == &m_s->end->y) { // y2
+        double num1 = -(-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
+        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
+        double num2 = x0 - x1;
+        double den2 = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+
+        return num1 / den1 + num2 / den2;
+    }
+
+    return 0;
+}

@@ -89,6 +89,25 @@ public:
     Arry<PARAMID> getParams() override;
     double getDerivative(PARAMID p) override;
 };
+class ReqSecCircleDist: public IReq {
+    section* m_s;
+    circle* m_c;
+    double v_dist;
+public:
+    ReqSecCircleDist(section* m_s, circle* m_c, double dist);
+    double getError() override;
+    Arry<PARAMID> getParams() override;
+    double getDerivative(PARAMID p) override;
+};
+class ReqSecOnCircle: public IReq {
+    section* m_s;
+    circle* m_c;
+public:
+    ReqSecOnCircle(section* m_s, circle* m_c);
+    double getError() override;
+    Arry<PARAMID> getParams() override;
+    double getDerivative(PARAMID p) override;
+};
 /* EXAMPLE
 ReqPointSegDist req;
 Arry<PARAMID> params = req.getParams();

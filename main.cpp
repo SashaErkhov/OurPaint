@@ -36,8 +36,10 @@ int main()
                 "just load the image from file_name.bmp" << std::endl;
             std::cout << "addreq <instruction> <objects> <param> \t- \tdo something with objects \n"
                          "                 Types of instructions:\n                 '1' - Take 2 args: one point, and one section and distant that you want between them on <param>.\n"
-                         "                 '2' - Take 2 point(they may be on figure) and set it on each other <param> can be empty \n"
-                         "                 '3' - Take 2 point(they may be on figure) and set distance between them on <param>"<< std::endl;
+                         "                 '2' - Take 2 point(they may be on figure) and set it on each other(<param> can be empty)\n"
+                         "                 '3' - Take 2 point(they may be on figure) and set distance between them on <param> \n"
+                         "                 '4' - Take point and section and set it on each other(<param> can be empty)\n"
+                         "                 '5' - Take section and circle and set distance between them on <param> \n"<< std::endl;
             std::cout << "q \t- \tQuit" << std::endl;
             std::cout << "help \t- \tHelp that show you commands to use" << std::endl;
         }
@@ -177,6 +179,26 @@ int main()
                     break;
                 case '4':
                     type = ET_POINTONSECTION;
+                    std::cin >> obj1.id;
+                    std::cin >> obj2.id;
+                    reqData.req = type;
+                    reqData.objects.addElement(obj1);
+                    reqData.objects.addElement(obj2);
+                    screen.addRequirement(reqData);
+                    break;
+                case '5':
+                    type = ET_SECTIONCIRCLEDIST;
+                    std::cin >> obj1.id;
+                    std::cin >> obj2.id;
+                    std::cin >> parameters;
+                    reqData.req = type;
+                    reqData.objects.addElement(obj1);
+                    reqData.objects.addElement(obj2);
+                    reqData.params.addElement(parameters);
+                    screen.addRequirement(reqData);
+                    break;
+                case '6':
+                    type = ET_SECTIONONCIRCLE;
                     std::cin >> obj1.id;
                     std::cin >> obj2.id;
                     reqData.req = type;
