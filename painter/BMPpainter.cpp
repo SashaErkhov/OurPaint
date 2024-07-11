@@ -2,11 +2,7 @@
 #include <iostream>
 
 
-BMPpainter::BMPpainter(const BMPpainter &other){
-    c_file=other.c_file;
-    v_weight = other.v_weight;
-    v_height = other.v_height;
-}
+BMPpainter::BMPpainter(const BMPpainter &other): c_file(other.c_file), v_weight(other.v_weight), v_height(other.v_height){}
 
 BMPpainter& BMPpainter::operator=(const BMPpainter &other)
 {
@@ -18,10 +14,7 @@ BMPpainter& BMPpainter::operator=(const BMPpainter &other)
     return *this;
 }
 
-BMPpainter::BMPpainter(const BMPfile &file)
-{
-    this->c_file=file;
-}
+BMPpainter::BMPpainter(const BMPfile &file): c_file(file), v_height(file.getHeight()), v_weight(file.getWidth()){}
 /*
  * сделаем некоторые преобразования, чтобы центр СК всегда была в середине листа
  * x = v_height - y; y = v_weight + x
