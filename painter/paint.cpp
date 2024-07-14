@@ -59,8 +59,8 @@ ID Paint::addRequirement(const RequirementData &rd) {
         }
         s_allFigures = s_allFigures || c_it->rect();
         s_allFigures = s_allFigures || s_it->rect();
-        m_reqIDs.addPair(s_maxID.id, m_reqStorage.addElement(requirement));
-        return ++s_maxID.id;
+        m_reqIDs.addPair(++s_maxID.id, m_reqStorage.addElement(requirement));
+        return s_maxID.id;
     }
     if (rd.req == ET_SECTIONONCIRCLE){
         circle *c_it = nullptr;
@@ -116,8 +116,8 @@ ID Paint::addRequirement(const RequirementData &rd) {
         }
         s_allFigures = s_allFigures || c_it->rect();
         s_allFigures = s_allFigures || s_it->rect();
-        m_reqIDs.addPair(s_maxID.id, m_reqStorage.addElement(requirement));
-        return ++s_maxID.id;
+        m_reqIDs.addPair(++s_maxID.id, m_reqStorage.addElement(requirement));
+        return s_maxID.id;
     }
     if (rd.req == ET_POINTONSECTION){
         point *p_it = nullptr;
@@ -173,8 +173,8 @@ ID Paint::addRequirement(const RequirementData &rd) {
         }
         s_allFigures = s_allFigures || p_it->rect();
         s_allFigures = s_allFigures || s_it->rect();
-        m_reqIDs.addPair(s_maxID.id, m_reqStorage.addElement(requirement));
-        return ++s_maxID.id;
+        m_reqIDs.addPair(++s_maxID.id, m_reqStorage.addElement(requirement));
+        return s_maxID.id;
     }
     if (rd.req == ET_POINTPOINTDIST){
         point *p1_it = nullptr;
@@ -212,8 +212,8 @@ ID Paint::addRequirement(const RequirementData &rd) {
         }
         s_allFigures = s_allFigures || p1_it->rect();
         s_allFigures = s_allFigures || p2_it->rect();
-        m_reqIDs.addPair(s_maxID.id, m_reqStorage.addElement(requirement));
-        return ++s_maxID.id;
+        m_reqIDs.addPair(++s_maxID.id, m_reqStorage.addElement(requirement));
+        return s_maxID.id;
     }
     if (rd.req == ET_POINTONPOINT) {
         point *p1_it = nullptr;
@@ -251,8 +251,8 @@ ID Paint::addRequirement(const RequirementData &rd) {
         }
         s_allFigures = s_allFigures || p1_it->rect();
         s_allFigures = s_allFigures || p2_it->rect();
-        m_reqIDs.addPair(s_maxID.id, m_reqStorage.addElement(requirement));
-        return ++s_maxID.id;
+        m_reqIDs.addPair(++s_maxID.id, m_reqStorage.addElement(requirement));
+        return s_maxID.id;
     }
     if (rd.req == ET_POINTSECTIONDIST) {
         point *p_it = nullptr;
@@ -325,8 +325,8 @@ ID Paint::addRequirement(const RequirementData &rd) {
             }
             s_allFigures = s_allFigures || p_it->rect();
             s_allFigures = s_allFigures || s_it->rect();
-            m_reqIDs.addPair(s_maxID.id, m_reqStorage.addElement(requirement));
-            return ++s_maxID.id;
+            m_reqIDs.addPair(++s_maxID.id, m_reqStorage.addElement(requirement));
+            return s_maxID.id;
         }
         while (e > 10e-2) {
             alpha = 10e-5;
@@ -343,8 +343,8 @@ ID Paint::addRequirement(const RequirementData &rd) {
         }
         s_allFigures = s_allFigures || p_it->rect();
         s_allFigures = s_allFigures || s_it->rect();
-        m_reqIDs.addPair(s_maxID.id, m_reqStorage.addElement(requirement));
-        return ++s_maxID.id;
+        m_reqIDs.addPair(++s_maxID.id, m_reqStorage.addElement(requirement));
+        return s_maxID.id;
     }
     return ID{-1};
 }
@@ -625,5 +625,15 @@ void Paint::changeBMP(const BMPfile& file)
 void Paint::changeBMP(const char* filename)
 {
     c_bmpPainter = BMPpainter(BMPfile(filename));
+}
+
+
+
+void Paint::deleteRequirement(ID req) {
+    try {
+        m_reqStorage.remove(m_reqIDs.findByKey(req));
+    }catch(...){
+        std::cout << "no requirement with ID " << req.id << std::endl;
+    }
 }
 

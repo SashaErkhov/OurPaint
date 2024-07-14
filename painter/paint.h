@@ -67,9 +67,11 @@ public:
     
     // Задает фон(изменяет filename файл)
     void changeBMP(const BMPfile& file);
-    
     void changeBMP(const char* filename);
-    
+
+    void deleteElement(ID elem);
+    void deleteRequirement(ID req);
+
     void paint();
 };
 
