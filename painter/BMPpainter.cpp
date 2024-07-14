@@ -84,3 +84,11 @@ void BMPpainter::changeSize(const rectangle &allObjects) {
     v_height = newHeight * 2;
     v_weight = newWeight * 2;
 }
+
+unsigned long long BMPpainter::getHeight() {
+    return v_height;
+}
+
+unsigned long long BMPpainter::getWeight() {
+    return v_weight;
+}
