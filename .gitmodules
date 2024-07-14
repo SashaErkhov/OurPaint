@@ -4,3 +4,6 @@
 [submodule "BMPfile"]
 	path = BMPfile
 	url = https://github.com/SashaErkhov/BMPfile.git
+[submodule "UndoRedo"]
+	path = UndoRedo
+	url = https://github.com/Ardrass2/UndoRedo
