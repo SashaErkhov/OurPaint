@@ -16,11 +16,17 @@ struct ElementData {
     Arry<double> params;
     ElementData();
 };
-
+struct RequirementInfo{
+    Requirement s_req;
+    ID s_object1;
+    ID s_object2;
+    Arry<double> m_paramsBefore;
+    Arry<double> m_paramsAfter;
+};
 
 //c_ - класс, v_- переменная, s_структура, m_ - контейнеры(списки, массивы и другие) f_ - приватный метод класса
 class Paint {
-    UndoRedo<RequirementData> c_undoRedo;
+    UndoRedo<RequirementInfo> c_undoRedo;
     Assoc<ID, List<point>::iterator> m_pointIDs;
     Assoc<ID, List<section>::iterator> m_sectionIDs;
     Assoc<ID, List<circle>::iterator> m_circleIDs;
