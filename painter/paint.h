@@ -10,6 +10,7 @@
 #include "../Matrix/Matrix.h"
 #include "enums.h"
 #include "requirements.h"
+#include "UndoRedo.h"
 struct ElementData {
     Element et;
     Arry<double> params;
@@ -19,6 +20,7 @@ struct ElementData {
 
 //c_ - класс, v_- переменная, s_структура, m_ - контейнеры(списки, массивы и другие) f_ - приватный метод класса
 class Paint {
+    UndoRedo<RequirementData> c_undoRedo;
     Assoc<ID, List<point>::iterator> m_pointIDs;
     Assoc<ID, List<section>::iterator> m_sectionIDs;
     Assoc<ID, List<circle>::iterator> m_circleIDs;
