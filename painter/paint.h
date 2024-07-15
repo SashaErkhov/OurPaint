@@ -80,6 +80,9 @@ public:
     void deleteElement(ID elem);
     void deleteRequirement(ID req);
 
+    void undoReq();
+    void redoReq();
+
     void paint();
 };
 

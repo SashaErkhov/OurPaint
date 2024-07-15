@@ -211,5 +211,16 @@ int main()
                     break;
             }
         }
+        if (strcmp(command, "remr") == 0){
+            ID req;
+            std::cin >> req.id;
+            screen.deleteRequirement(req);
+        }
+        if (strcmp(command, "undo_req") == 0){
+            screen.undoReq();
+        }
+        if (strcmp(command, "redo_req") == 0){
+            screen.redoReq();
+        }
     }
 }

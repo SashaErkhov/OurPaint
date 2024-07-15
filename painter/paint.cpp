@@ -5,18 +5,23 @@ ElementData::ElementData(){
 }
 ID Paint::addRequirement(const RequirementData &rd) {
     c_bmpPainter = BMPpainter();
+    RequirementInfo info;
     if (rd.req == ET_SECTIONCIRCLEDIST){
         circle *c_it = nullptr;
         section *s_it = nullptr;
+        info.s_req = ET_SECTIONCIRCLEDIST;
         try {
             c_it = &(*(m_circleIDs.findByKey(rd.objects[0])));
+            info.s_object1 = rd.objects[0];
         }
         catch (...) {
             s_it = &(*(m_sectionIDs.findByKey(rd.objects[0])));
+            info.s_object2 = rd.objects[0];
         }
         if (c_it != nullptr) {
             try {
                 s_it = &(*(m_sectionIDs.findByKey(rd.objects[1])));
+                info.s_object2 = rd.objects[1];
             }
             catch (...) {
                 throw std::invalid_argument("No such section or circle");
@@ -24,6 +29,7 @@ ID Paint::addRequirement(const RequirementData &rd) {
         } else if (s_it != nullptr) {
             try {
                 c_it = &(*(m_circleIDs.findByKey(rd.objects[1])));
+                info.s_object1 = rd.objects[1];
             }
             catch (...) {
                 throw std::invalid_argument("No such circle or section");
@@ -39,6 +45,7 @@ ID Paint::addRequirement(const RequirementData &rd) {
         paramValues.addElement(s_it->end->x);
         paramValues.addElement(s_it->end->y);
         Arry<double> derivatives;
+        info.m_paramsBefore = paramValues;
         int k = 0;
         for (auto it = params.begin(); it != params.end(); ++it, ++k) {
             derivatives.addElement(requirement->getDerivative(*it));
@@ -57,6 +64,8 @@ ID Paint::addRequirement(const RequirementData &rd) {
             (s_it)->end->y = paramValues[5];
             e = requirement->getError();
         }
+        info.m_paramsAfter = paramValues;
+        c_undoRedo.add(info);
         s_allFigures = s_allFigures || c_it->rect();
         s_allFigures = s_allFigures || s_it->rect();
         m_reqIDs.addPair(++s_maxID.id, m_reqStorage.addElement(requirement));
@@ -637,3 +646,34 @@ void Paint::deleteRequirement(ID req) {
     }
 }
 
+void Paint::undoReq(){
+    RequirementInfo lastChange = c_undoRedo.undo();
+    if (lastChange.s_req == ET_SECTIONCIRCLEDIST){
+        circle *c_it = &(*(m_circleIDs.findByKey(lastChange.s_object1)));
+        section *s_it = &(*(m_sectionIDs.findByKey(lastChange.s_object2)));
+        c_it->center->x = lastChange.m_paramsBefore[0];
+        c_it->center->y = lastChange.m_paramsBefore[1];
+        s_it->beg->x = lastChange.m_paramsBefore[2];
+        s_it->beg->y = lastChange.m_paramsBefore[3];
+        s_it->end->x = lastChange.m_paramsBefore[4];
+        s_it->end->y = lastChange.m_paramsBefore[5];
+
+        s_allFigures = s_allFigures || c_it->rect();
+        s_allFigures = s_allFigures || s_it->rect();
+    }
+}
+void Paint::redoReq() {
+    RequirementInfo lastUndo = c_undoRedo.redo();
+    if (lastUndo.s_req == ET_SECTIONCIRCLEDIST){
+        circle *c_it = &(*(m_circleIDs.findByKey(lastUndo.s_object1)));
+        section *s_it = &(*(m_sectionIDs.findByKey(lastUndo.s_object2)));
+        c_it->center->x = lastUndo.m_paramsAfter[0];
+        c_it->center->y = lastUndo.m_paramsAfter[1];
+        s_it->beg->x = lastUndo.m_paramsAfter[2];
+        s_it->beg->y = lastUndo.m_paramsAfter[3];
+        s_it->end->x = lastUndo.m_paramsAfter[4];
+        s_it->end->y = lastUndo.m_paramsAfter[5];
+        s_allFigures = s_allFigures || c_it->rect();
+        s_allFigures = s_allFigures || s_it->rect();
+    }
+}
