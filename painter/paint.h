@@ -63,7 +63,7 @@ public:
     ElementData getElementInfo(ID id);
     
     RequirementData getRequirementInfo(ID id);
-    
+
     // Сохранение данных в файл
     void saveToFile(const char *filename);
     

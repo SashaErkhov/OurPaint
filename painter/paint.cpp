@@ -74,15 +74,19 @@ ID Paint::addRequirement(const RequirementData &rd) {
     if (rd.req == ET_SECTIONONCIRCLE){
         circle *c_it = nullptr;
         section *s_it = nullptr;
+        info.s_req = ET_SECTIONONCIRCLE;
         try {
             c_it = &(*(m_circleIDs.findByKey(rd.objects[0])));
+            info.s_object1 = rd.objects[0];
         }
         catch (...) {
             s_it = &(*(m_sectionIDs.findByKey(rd.objects[0])));
+            info.s_object2 = rd.objects[0];
         }
         if (c_it != nullptr) {
             try {
                 s_it = &(*(m_sectionIDs.findByKey(rd.objects[1])));
+                info.s_object2 = rd.objects[1];
             }
             catch (...) {
                 throw std::invalid_argument("No such section or circle");
@@ -90,6 +94,7 @@ ID Paint::addRequirement(const RequirementData &rd) {
         } else if (s_it != nullptr) {
             try {
                 c_it = &(*(m_circleIDs.findByKey(rd.objects[1])));
+                info.s_object1 = rd.objects[1];
             }
             catch (...) {
                 throw std::invalid_argument("No such circle or section");
@@ -104,6 +109,7 @@ ID Paint::addRequirement(const RequirementData &rd) {
         paramValues.addElement(s_it->beg->y);
         paramValues.addElement(s_it->end->x);
         paramValues.addElement(s_it->end->y);
+        info.m_paramsBefore = paramValues;
         Arry<double> derivatives;
         int k = 0;
         for (auto it = params.begin(); it != params.end(); ++it, ++k) {
@@ -123,6 +129,7 @@ ID Paint::addRequirement(const RequirementData &rd) {
             (s_it)->end->y = paramValues[5];
             e = requirement->getError();
         }
+        info.m_paramsAfter = paramValues;
         s_allFigures = s_allFigures || c_it->rect();
         s_allFigures = s_allFigures || s_it->rect();
         m_reqIDs.addPair(++s_maxID.id, m_reqStorage.addElement(requirement));
@@ -131,15 +138,19 @@ ID Paint::addRequirement(const RequirementData &rd) {
     if (rd.req == ET_POINTONSECTION){
         point *p_it = nullptr;
         section *s_it = nullptr;
+        info.s_req = ET_POINTONSECTION;
         try {
             p_it = &(*(m_pointIDs.findByKey(rd.objects[0])));
+            info.s_object1 = rd.objects[0];
         }
         catch (...) {
             s_it = &(*(m_sectionIDs.findByKey(rd.objects[0])));
+            info.s_object2 = rd.objects[0];
         }
         if (p_it != nullptr) {
             try {
                 s_it = &(*(m_sectionIDs.findByKey(rd.objects[1])));
+                info.s_object2 = rd.objects[1];
             }
             catch (...) {
                 throw std::invalid_argument("No such section or point");
@@ -147,6 +158,7 @@ ID Paint::addRequirement(const RequirementData &rd) {
         } else if (s_it != nullptr) {
             try {
                 p_it = &(*(m_pointIDs.findByKey(rd.objects[1])));
+                info.s_object1 = rd.objects[1];
             }
             catch (...) {
                 throw std::invalid_argument("No such point or section");
@@ -161,6 +173,7 @@ ID Paint::addRequirement(const RequirementData &rd) {
         paramValues.addElement(s_it->beg->y);
         paramValues.addElement(s_it->end->x);
         paramValues.addElement(s_it->end->y);
+        info.m_paramsBefore = paramValues;
         Arry<double> derivatives;
         int k = 0;
         for (auto it = params.begin(); it != params.end(); ++it, ++k) {
@@ -180,6 +193,7 @@ ID Paint::addRequirement(const RequirementData &rd) {
             (s_it)->end->y = paramValues[5];
             e = requirement->getError();
         }
+        info.m_paramsAfter = paramValues;
         s_allFigures = s_allFigures || p_it->rect();
         s_allFigures = s_allFigures || s_it->rect();
         m_reqIDs.addPair(++s_maxID.id, m_reqStorage.addElement(requirement));
@@ -191,6 +205,8 @@ ID Paint::addRequirement(const RequirementData &rd) {
         try {
             p1_it = &(*(m_pointIDs.findByKey(rd.objects[0])));
             p2_it = &(*(m_pointIDs.findByKey(rd.objects[1])));
+            info.s_object2 = rd.objects[1];
+            info.s_object1 = rd.objects[0];
         } catch (...) {
             throw std::invalid_argument("No such points");
         }
@@ -202,6 +218,7 @@ ID Paint::addRequirement(const RequirementData &rd) {
         values.addElement(p1_it->y);
         values.addElement(p2_it->x);
         values.addElement(p2_it->y);
+        info.m_paramsBefore = values;
         Arry<double> derivatives;
         int k = 0;
         for (auto it = params.begin(); it != params.end(); ++it, ++k) {
@@ -219,6 +236,7 @@ ID Paint::addRequirement(const RequirementData &rd) {
             (p2_it)->y = values[3];
             e = requirement->getError();
         }
+        info.m_paramsAfter = values;
         s_allFigures = s_allFigures || p1_it->rect();
         s_allFigures = s_allFigures || p2_it->rect();
         m_reqIDs.addPair(++s_maxID.id, m_reqStorage.addElement(requirement));
@@ -230,6 +248,8 @@ ID Paint::addRequirement(const RequirementData &rd) {
         try {
             p1_it = &(*(m_pointIDs.findByKey(rd.objects[0])));
             p2_it = &(*(m_pointIDs.findByKey(rd.objects[1])));
+            info.s_object2 = rd.objects[1];
+            info.s_object1 = rd.objects[0];
         } catch (...) {
             throw std::invalid_argument("No such points");
         }
@@ -241,6 +261,7 @@ ID Paint::addRequirement(const RequirementData &rd) {
         values.addElement(p1_it->y);
         values.addElement(p2_it->x);
         values.addElement(p2_it->y);
+        info.m_paramsBefore = values;
         Arry<double> derivatives;
         int k = 0;
         for (auto it = params.begin(); it != params.end(); ++it, ++k) {
@@ -258,6 +279,7 @@ ID Paint::addRequirement(const RequirementData &rd) {
             (p2_it)->y = values[3];
             e = requirement->getError();
         }
+        info.m_paramsAfter = values;
         s_allFigures = s_allFigures || p1_it->rect();
         s_allFigures = s_allFigures || p2_it->rect();
         m_reqIDs.addPair(++s_maxID.id, m_reqStorage.addElement(requirement));
@@ -266,15 +288,19 @@ ID Paint::addRequirement(const RequirementData &rd) {
     if (rd.req == ET_POINTSECTIONDIST) {
         point *p_it = nullptr;
         section *s_it = nullptr;
+        info.s_req = ET_POINTSECTIONDIST;
         try {
             p_it = &(*(m_pointIDs.findByKey(rd.objects[0])));
+            info.s_object1 = rd.objects[0];
         }
         catch (...) {
             s_it = &(*(m_sectionIDs.findByKey(rd.objects[0])));
+            info.s_object2 = rd.objects[0];
         }
         if (p_it != nullptr) {
             try {
                 s_it = &(*(m_sectionIDs.findByKey(rd.objects[1])));
+                info.s_object2 = rd.objects[1];
             }
             catch (...) {
                 throw std::invalid_argument("No such section or point");
@@ -282,6 +308,7 @@ ID Paint::addRequirement(const RequirementData &rd) {
         } else if (s_it != nullptr) {
             try {
                 p_it = &(*(m_pointIDs.findByKey(rd.objects[1])));
+                info.s_object1 = rd.objects[1];
             }
             catch (...) {
                 throw std::invalid_argument("No such point or section");
@@ -296,6 +323,7 @@ ID Paint::addRequirement(const RequirementData &rd) {
         paramValues.addElement(s_it->beg->y);
         paramValues.addElement(s_it->end->x);
         paramValues.addElement(s_it->end->y);
+        info.m_paramsBefore = paramValues;
         Arry<double> derivatives;
         int k = 0;
         for (auto it = params.begin(); it != params.end(); ++it, ++k) {
@@ -350,6 +378,7 @@ ID Paint::addRequirement(const RequirementData &rd) {
             (s_it)->end->y = paramValues[5];
             e = requirement->getError();
         }
+        info.m_paramsAfter = paramValues;
         s_allFigures = s_allFigures || p_it->rect();
         s_allFigures = s_allFigures || s_it->rect();
         m_reqIDs.addPair(++s_maxID.id, m_reqStorage.addElement(requirement));
@@ -648,7 +677,7 @@ void Paint::deleteRequirement(ID req) {
 
 void Paint::undoReq(){
     RequirementInfo lastChange = c_undoRedo.undo();
-    if (lastChange.s_req == ET_SECTIONCIRCLEDIST){
+    if (lastChange.s_req == ET_SECTIONCIRCLEDIST || lastChange.s_req == ET_SECTIONONCIRCLE){
         circle *c_it = &(*(m_circleIDs.findByKey(lastChange.s_object1)));
         section *s_it = &(*(m_sectionIDs.findByKey(lastChange.s_object2)));
         c_it->center->x = lastChange.m_paramsBefore[0];
@@ -661,10 +690,33 @@ void Paint::undoReq(){
         s_allFigures = s_allFigures || c_it->rect();
         s_allFigures = s_allFigures || s_it->rect();
     }
+    if (lastChange.s_req == ET_POINTONSECTION || lastChange.s_req == ET_POINTSECTIONDIST){
+        point* p_it = &(*(m_pointIDs.findByKey(lastChange.s_object1)));
+        section* s_it = &(*(m_sectionIDs.findByKey(lastChange.s_object2)));
+        p_it->x = lastChange.m_paramsBefore[0];
+        p_it->y = lastChange.m_paramsBefore[1];
+        s_it->beg->x = lastChange.m_paramsBefore[2];
+        s_it->beg->y = lastChange.m_paramsBefore[3];
+        s_it->end->x = lastChange.m_paramsBefore[4];
+        s_it->end->y = lastChange.m_paramsBefore[5];
+
+        s_allFigures = s_allFigures || p_it->rect();
+        s_allFigures = s_allFigures || s_it->rect();
+    }
+    if (lastChange.s_req == ET_POINTPOINTDIST || lastChange.s_req == ET_POINTONPOINT){
+        point* p1_it = &(*(m_pointIDs.findByKey(lastChange.s_object1)));
+        point* p2_it = &(*(m_pointIDs.findByKey(lastChange.s_object2)));
+        p1_it->x = lastChange.m_paramsBefore[0];
+        p1_it->y = lastChange.m_paramsBefore[1];
+        p2_it->x = lastChange.m_paramsBefore[2];
+        p2_it->y = lastChange.m_paramsBefore[3];
+        s_allFigures = s_allFigures || p1_it->rect();
+        s_allFigures = s_allFigures || p2_it->rect();
+    }
 }
 void Paint::redoReq() {
     RequirementInfo lastUndo = c_undoRedo.redo();
-    if (lastUndo.s_req == ET_SECTIONCIRCLEDIST){
+    if (lastUndo.s_req == ET_SECTIONCIRCLEDIST || lastUndo.s_req == ET_SECTIONONCIRCLE){
         circle *c_it = &(*(m_circleIDs.findByKey(lastUndo.s_object1)));
         section *s_it = &(*(m_sectionIDs.findByKey(lastUndo.s_object2)));
         c_it->center->x = lastUndo.m_paramsAfter[0];
@@ -675,5 +727,28 @@ void Paint::redoReq() {
         s_it->end->y = lastUndo.m_paramsAfter[5];
         s_allFigures = s_allFigures || c_it->rect();
         s_allFigures = s_allFigures || s_it->rect();
+    }
+    if (lastUndo.s_req == ET_POINTONSECTION || lastUndo.s_req == ET_POINTSECTIONDIST){
+        point* p_it = &(*(m_pointIDs.findByKey(lastUndo.s_object1)));
+        section* s_it = &(*(m_sectionIDs.findByKey(lastUndo.s_object2)));
+        p_it->x = lastUndo.m_paramsAfter[0];
+        p_it->y = lastUndo.m_paramsAfter[1];
+        s_it->beg->x = lastUndo.m_paramsAfter[2];
+        s_it->beg->y = lastUndo.m_paramsAfter[3];
+        s_it->end->x = lastUndo.m_paramsAfter[4];
+        s_it->end->y = lastUndo.m_paramsAfter[5];
+
+        s_allFigures = s_allFigures || p_it->rect();
+        s_allFigures = s_allFigures || s_it->rect();
+    }
+    if (lastUndo.s_req == ET_POINTPOINTDIST || lastUndo.s_req == ET_POINTONPOINT){
+        point* p1_it = &(*(m_pointIDs.findByKey(lastUndo.s_object1)));
+        point* p2_it = &(*(m_pointIDs.findByKey(lastUndo.s_object2)));
+        p1_it->x = lastUndo.m_paramsAfter[0];
+        p1_it->y = lastUndo.m_paramsAfter[1];
+        p2_it->x = lastUndo.m_paramsAfter[2];
+        p2_it->y = lastUndo.m_paramsAfter[3];
+        s_allFigures = s_allFigures || p1_it->rect();
+        s_allFigures = s_allFigures || p2_it->rect();
     }
 }
