@@ -825,15 +825,7 @@ void Paint::undo() {
             }
         }
     }
-    if (lastChange.s_req == ET_POINTONSECTION || lastChange.s_req == ET_POINTSECTIONDIST){
-        point* p_it = &(*(m_pointIDs.findByKey(lastChange.s_object1)));
-        section* s_it = &(*(m_sectionIDs.findByKey(lastChange.s_object2)));
-        p_it->x = lastChange.m_paramsBefore[0];
-        p_it->y = lastChange.m_paramsBefore[1];
-        s_it->beg->x = lastChange.m_paramsBefore[2];
-        s_it->beg->y = lastChange.m_paramsBefore[3];
-        s_it->end->x = lastChange.m_paramsBefore[4];
-        s_it->end->y = lastChange.m_paramsBefore[5];
+}
 
 void Paint::redo() {
     ActionsInfo info = c_undoRedo.undo();
