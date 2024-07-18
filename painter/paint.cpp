@@ -781,20 +781,49 @@ void Paint::deleteRequirement(ID req) {
     }
 }
 
-void Paint::undoReq(){
-    RequirementInfo lastChange = c_undoRedo.undo();
-    if (lastChange.s_req == ET_SECTIONCIRCLEDIST || lastChange.s_req == ET_SECTIONONCIRCLE){
-        circle *c_it = &(*(m_circleIDs.findByKey(lastChange.s_object1)));
-        section *s_it = &(*(m_sectionIDs.findByKey(lastChange.s_object2)));
-        c_it->center->x = lastChange.m_paramsBefore[0];
-        c_it->center->y = lastChange.m_paramsBefore[1];
-        s_it->beg->x = lastChange.m_paramsBefore[2];
-        s_it->beg->y = lastChange.m_paramsBefore[3];
-        s_it->end->x = lastChange.m_paramsBefore[4];
-        s_it->end->y = lastChange.m_paramsBefore[5];
-
-        s_allFigures = s_allFigures || c_it->rect();
-        s_allFigures = s_allFigures || s_it->rect();
+void Paint::undo() {
+    ActionsInfo info = c_undoRedo.undo();
+    point *p = nullptr;
+    section *s = nullptr;
+    circle *c = nullptr;
+    if (info.m_objects.getSize() == 1) {
+        try {
+            m_pointStorage.remove(m_pointIDs[info.m_objects[0]]);
+        } catch (...) {
+            try {
+                m_sectionStorage.remove(m_sectionIDs[info.m_objects[0]]);
+            } catch (...) {
+                try {
+                    m_circleStorage.remove(m_circleIDs[info.m_objects[0]]);
+                } catch (...) {
+                    std::cout << "No ID to undo" << std::endl;
+                }
+            }
+        }
+    }
+    for (int i = 0; i < info.m_objects.getSize(); ++i) {
+        try {
+            p = &(*m_pointIDs[info.m_objects[i]]);
+            p->x = info.m_paramsBefore[i][0];
+            p->y = info.m_paramsBefore[i][1];
+        } catch (...) {
+            try {
+                s = &(*m_sectionIDs[info.m_objects[i]]);
+                s->beg->x = info.m_paramsBefore[i][0];
+                s->beg->y = info.m_paramsBefore[i][1];
+                s->end->x = info.m_paramsBefore[i][2];
+                s->end->y = info.m_paramsBefore[i][3];
+            } catch (...) {
+                try {
+                    c = &(*m_circleIDs[info.m_objects[i]]);
+                    c->center->x = info.m_paramsBefore[i][0];
+                    c->center->y = info.m_paramsBefore[i][1];
+                } catch (...) {
+                    std::cout << "No ID to undo" << std::endl;
+                    break;
+                }
+            }
+        }
     }
     if (lastChange.s_req == ET_POINTONSECTION || lastChange.s_req == ET_POINTSECTIONDIST){
         point* p_it = &(*(m_pointIDs.findByKey(lastChange.s_object1)));
@@ -806,33 +835,36 @@ void Paint::undoReq(){
         s_it->end->x = lastChange.m_paramsBefore[4];
         s_it->end->y = lastChange.m_paramsBefore[5];
 
-        s_allFigures = s_allFigures || p_it->rect();
-        s_allFigures = s_allFigures || s_it->rect();
-    }
-    if (lastChange.s_req == ET_POINTPOINTDIST || lastChange.s_req == ET_POINTONPOINT){
-        point* p1_it = &(*(m_pointIDs.findByKey(lastChange.s_object1)));
-        point* p2_it = &(*(m_pointIDs.findByKey(lastChange.s_object2)));
-        p1_it->x = lastChange.m_paramsBefore[0];
-        p1_it->y = lastChange.m_paramsBefore[1];
-        p2_it->x = lastChange.m_paramsBefore[2];
-        p2_it->y = lastChange.m_paramsBefore[3];
-        s_allFigures = s_allFigures || p1_it->rect();
-        s_allFigures = s_allFigures || p2_it->rect();
-    }
-}
-void Paint::redoReq() {
-    RequirementInfo lastUndo = c_undoRedo.redo();
-    if (lastUndo.s_req == ET_SECTIONCIRCLEDIST || lastUndo.s_req == ET_SECTIONONCIRCLE){
-        circle *c_it = &(*(m_circleIDs.findByKey(lastUndo.s_object1)));
-        section *s_it = &(*(m_sectionIDs.findByKey(lastUndo.s_object2)));
-        c_it->center->x = lastUndo.m_paramsAfter[0];
-        c_it->center->y = lastUndo.m_paramsAfter[1];
-        s_it->beg->x = lastUndo.m_paramsAfter[2];
-        s_it->beg->y = lastUndo.m_paramsAfter[3];
-        s_it->end->x = lastUndo.m_paramsAfter[4];
-        s_it->end->y = lastUndo.m_paramsAfter[5];
-        s_allFigures = s_allFigures || c_it->rect();
-        s_allFigures = s_allFigures || s_it->rect();
+void Paint::redo() {
+    ActionsInfo info = c_undoRedo.undo();
+    point *p = nullptr;
+    section *s = nullptr;
+    circle *c = nullptr;
+    if (info.m_objects.getSize() == 1) {
+        try {
+            p = new point;
+            p->x = info.m_paramsAfter[0][0];
+            p->y = info.m_paramsAfter[0][1];
+            m_pointIDs[info.m_objects[0]] =m_pointStorage.addElement(*p);
+        } catch (...) {
+            try {
+                s = new section;
+                s->beg->x = info.m_paramsAfter[0][0];
+                s->beg->y = info.m_paramsAfter[0][1];
+                s->end->x = info.m_paramsAfter[0][2];
+                s->end->y = info.m_paramsAfter[0][3];
+                m_sectionIDs[info.m_objects[0]] = m_sectionStorage.addElement(*s);
+            } catch (...) {
+                try {
+                    c = new circle;
+                    c->center->x = info.m_paramsAfter[0][0];
+                    c->center->y = info.m_paramsAfter[0][1];\
+                    m_circleIDs[info.m_objects[0]] = m_circleStorage.addElement(*c);
+                } catch (...) {
+                    std::cout << "No ID to undo" << std::endl;
+                }
+            }
+        }
     }
     for (int i = 0; i < info.m_objects.getSize(); ++i) {
         try {
