@@ -5,37 +5,36 @@ ElementData::ElementData(){
 }
 ID Paint::addRequirement(const RequirementData &rd) {
     c_bmpPainter = BMPpainter();
-    RequirementInfo info;
-    if (rd.req == ET_SECTIONCIRCLEDIST){
+    ActionsInfo info;
+    if (rd.req == ET_SECTIONCIRCLEDIST) {
         circle *c_it = nullptr;
         section *s_it = nullptr;
-        info.s_req = ET_SECTIONCIRCLEDIST;
         try {
-            c_it = &(*(m_circleIDs.findByKey(rd.objects[0])));
-            info.s_object1 = rd.objects[0];
+            c_it = &(*(m_circleIDs[rd.objects[0]]));
+            info.m_objects.addElement(rd.objects[0]);
+            info.m_objects.addElement(rd.objects[1]);
         }
         catch (...) {
-            s_it = &(*(m_sectionIDs.findByKey(rd.objects[0])));
-            info.s_object2 = rd.objects[0];
+            s_it = &(*(m_sectionIDs[rd.objects[0]]));
+            info.m_objects.addElement(rd.objects[1]);
+            info.m_objects.addElement(rd.objects[0]);
         }
         if (c_it != nullptr) {
             try {
-                s_it = &(*(m_sectionIDs.findByKey(rd.objects[1])));
-                info.s_object2 = rd.objects[1];
+                s_it = &(*(m_sectionIDs[rd.objects[1]]));
             }
             catch (...) {
                 throw std::invalid_argument("No such section or circle");
             }
         } else if (s_it != nullptr) {
             try {
-                c_it = &(*(m_circleIDs.findByKey(rd.objects[1])));
-                info.s_object1 = rd.objects[1];
+                c_it = &(*(m_circleIDs[rd.objects[1]]));
             }
             catch (...) {
                 throw std::invalid_argument("No such circle or section");
             }
         }
-        IReq *requirement = new ReqSecCircleDist(s_it,c_it, rd.params[0]);
+        IReq *requirement = new ReqSecCircleDist(s_it, c_it, rd.params[0]);
         Arry<PARAMID> params = requirement->getParams();
         Arry<double> paramValues;
         paramValues.addElement(c_it->center->x);
@@ -45,7 +44,18 @@ ID Paint::addRequirement(const RequirementData &rd) {
         paramValues.addElement(s_it->end->x);
         paramValues.addElement(s_it->end->y);
         Arry<double> derivatives;
-        info.m_paramsBefore = paramValues;
+
+        Arry<double> circleParam;
+        circleParam.addElement(paramValues[0]);
+        circleParam.addElement(paramValues[1]);
+        Arry<double> sectionParam;
+        sectionParam.addElement(paramValues[2]);
+        sectionParam.addElement(paramValues[3]);
+        sectionParam.addElement(paramValues[4]);
+        sectionParam.addElement(paramValues[5]);
+        info.m_paramsBefore.addElement(circleParam);
+        info.m_paramsBefore.addElement(sectionParam);
+
         int k = 0;
         for (auto it = params.begin(); it != params.end(); ++it, ++k) {
             derivatives.addElement(requirement->getDerivative(*it));
@@ -64,43 +74,53 @@ ID Paint::addRequirement(const RequirementData &rd) {
             (s_it)->end->y = paramValues[5];
             e = requirement->getError();
         }
-        info.m_paramsAfter = paramValues;
+
+
+        circleParam[0] = paramValues[0];
+        circleParam[1] = paramValues[1];
+
+        sectionParam[0] = paramValues[2];
+        sectionParam[1] = paramValues[3];
+        sectionParam[2] = paramValues[4];
+        sectionParam[3] = paramValues[5];
+        info.m_paramsAfter.addElement(circleParam);
+        info.m_paramsAfter.addElement(sectionParam);
         c_undoRedo.add(info);
+
         s_allFigures = s_allFigures || c_it->rect();
         s_allFigures = s_allFigures || s_it->rect();
-        m_reqIDs.addPair(++s_maxID.id, m_reqStorage.addElement(requirement));
+        m_reqIDs[++s_maxID.id] = m_reqStorage.addElement(requirement);
         return s_maxID.id;
     }
-    if (rd.req == ET_SECTIONONCIRCLE){
+    if (rd.req == ET_SECTIONONCIRCLE) {
         circle *c_it = nullptr;
         section *s_it = nullptr;
-        info.s_req = ET_SECTIONONCIRCLE;
         try {
-            c_it = &(*(m_circleIDs.findByKey(rd.objects[0])));
-            info.s_object1 = rd.objects[0];
+            c_it = &(*(m_circleIDs[rd.objects[0]]));
+            info.m_objects.addElement(rd.objects[0]);
+            info.m_objects.addElement(rd.objects[1]);
         }
         catch (...) {
-            s_it = &(*(m_sectionIDs.findByKey(rd.objects[0])));
-            info.s_object2 = rd.objects[0];
+            s_it = &(*(m_sectionIDs[rd.objects[0]]));
+            info.m_objects.addElement(rd.objects[1]);
+            info.m_objects.addElement(rd.objects[0]);
         }
         if (c_it != nullptr) {
             try {
-                s_it = &(*(m_sectionIDs.findByKey(rd.objects[1])));
-                info.s_object2 = rd.objects[1];
+                s_it = &(*(m_sectionIDs[rd.objects[1]]));
             }
             catch (...) {
                 throw std::invalid_argument("No such section or circle");
             }
         } else if (s_it != nullptr) {
             try {
-                c_it = &(*(m_circleIDs.findByKey(rd.objects[1])));
-                info.s_object1 = rd.objects[1];
+                c_it = &(*(m_circleIDs[rd.objects[1]]));
             }
             catch (...) {
                 throw std::invalid_argument("No such circle or section");
             }
         }
-        IReq *requirement = new ReqSecOnCircle(s_it,c_it);
+        IReq *requirement = new ReqSecOnCircle(s_it, c_it);
         Arry<PARAMID> params = requirement->getParams();
         Arry<double> paramValues;
         paramValues.addElement(c_it->center->x);
@@ -109,7 +129,18 @@ ID Paint::addRequirement(const RequirementData &rd) {
         paramValues.addElement(s_it->beg->y);
         paramValues.addElement(s_it->end->x);
         paramValues.addElement(s_it->end->y);
-        info.m_paramsBefore = paramValues;
+
+        Arry<double> circleParam;
+        circleParam.addElement(paramValues[0]);
+        circleParam.addElement(paramValues[1]);
+        Arry<double> sectionParam;
+        sectionParam.addElement(paramValues[2]);
+        sectionParam.addElement(paramValues[3]);
+        sectionParam.addElement(paramValues[4]);
+        sectionParam.addElement(paramValues[5]);
+        info.m_paramsBefore.addElement(circleParam);
+        info.m_paramsBefore.addElement(sectionParam);
+
         Arry<double> derivatives;
         int k = 0;
         for (auto it = params.begin(); it != params.end(); ++it, ++k) {
@@ -129,36 +160,46 @@ ID Paint::addRequirement(const RequirementData &rd) {
             (s_it)->end->y = paramValues[5];
             e = requirement->getError();
         }
-        info.m_paramsAfter = paramValues;
+
+        circleParam[0] = paramValues[0];
+        circleParam[1] = paramValues[1];
+
+        sectionParam[0] = paramValues[2];
+        sectionParam[1] = paramValues[3];
+        sectionParam[2] = paramValues[4];
+        sectionParam[3] = paramValues[5];
+        info.m_paramsAfter.addElement(circleParam);
+        info.m_paramsAfter.addElement(sectionParam);
+        c_undoRedo.add(info);
+
         s_allFigures = s_allFigures || c_it->rect();
         s_allFigures = s_allFigures || s_it->rect();
-        m_reqIDs.addPair(++s_maxID.id, m_reqStorage.addElement(requirement));
+        m_reqIDs[++s_maxID.id] = m_reqStorage.addElement(requirement);
         return s_maxID.id;
     }
-    if (rd.req == ET_POINTONSECTION){
+    if (rd.req == ET_POINTONSECTION) {
         point *p_it = nullptr;
         section *s_it = nullptr;
-        info.s_req = ET_POINTONSECTION;
         try {
-            p_it = &(*(m_pointIDs.findByKey(rd.objects[0])));
-            info.s_object1 = rd.objects[0];
+            p_it = &(*(m_pointIDs[rd.objects[0]]));
+            info.m_objects.addElement(rd.objects[0]);
+            info.m_objects.addElement(rd.objects[1]);
         }
         catch (...) {
-            s_it = &(*(m_sectionIDs.findByKey(rd.objects[0])));
-            info.s_object2 = rd.objects[0];
+            s_it = &(*(m_sectionIDs[rd.objects[0]]));
+            info.m_objects.addElement(rd.objects[1]);
+            info.m_objects.addElement(rd.objects[0]);
         }
         if (p_it != nullptr) {
             try {
-                s_it = &(*(m_sectionIDs.findByKey(rd.objects[1])));
-                info.s_object2 = rd.objects[1];
+                s_it = &(*(m_sectionIDs[rd.objects[1]]));
             }
             catch (...) {
                 throw std::invalid_argument("No such section or point");
             }
         } else if (s_it != nullptr) {
             try {
-                p_it = &(*(m_pointIDs.findByKey(rd.objects[1])));
-                info.s_object1 = rd.objects[1];
+                p_it = &(*(m_pointIDs[rd.objects[1]]));
             }
             catch (...) {
                 throw std::invalid_argument("No such point or section");
@@ -173,7 +214,16 @@ ID Paint::addRequirement(const RequirementData &rd) {
         paramValues.addElement(s_it->beg->y);
         paramValues.addElement(s_it->end->x);
         paramValues.addElement(s_it->end->y);
-        info.m_paramsBefore = paramValues;
+        Arry<double> pointParam;
+        pointParam.addElement(paramValues[0]);
+        pointParam.addElement(paramValues[1]);
+        Arry<double> sectionParam;
+        sectionParam.addElement(paramValues[2]);
+        sectionParam.addElement(paramValues[3]);
+        sectionParam.addElement(paramValues[4]);
+        sectionParam.addElement(paramValues[5]);
+        info.m_paramsBefore.addElement(pointParam);
+        info.m_paramsBefore.addElement(sectionParam);
         Arry<double> derivatives;
         int k = 0;
         for (auto it = params.begin(); it != params.end(); ++it, ++k) {
@@ -193,24 +243,34 @@ ID Paint::addRequirement(const RequirementData &rd) {
             (s_it)->end->y = paramValues[5];
             e = requirement->getError();
         }
-        info.m_paramsAfter = paramValues;
+        pointParam[0] = paramValues[0];
+        pointParam[1] = paramValues[1];
+
+        sectionParam[0] = paramValues[2];
+        sectionParam[1] = paramValues[3];
+        sectionParam[2] = paramValues[4];
+        sectionParam[3] = paramValues[5];
+
+        info.m_paramsAfter.addElement(pointParam);
+        info.m_paramsAfter.addElement(sectionParam);
+        c_undoRedo.add(info);
         s_allFigures = s_allFigures || p_it->rect();
         s_allFigures = s_allFigures || s_it->rect();
-        m_reqIDs.addPair(++s_maxID.id, m_reqStorage.addElement(requirement));
+        m_reqIDs[++s_maxID.id] = m_reqStorage.addElement(requirement);
         return s_maxID.id;
     }
-    if (rd.req == ET_POINTPOINTDIST){
+    if (rd.req == ET_POINTPOINTDIST) {
         point *p1_it = nullptr;
         point *p2_it = nullptr;
         try {
-            p1_it = &(*(m_pointIDs.findByKey(rd.objects[0])));
-            p2_it = &(*(m_pointIDs.findByKey(rd.objects[1])));
-            info.s_object2 = rd.objects[1];
-            info.s_object1 = rd.objects[0];
+            p1_it = &(*(m_pointIDs[rd.objects[0]]));
+            p2_it = &(*(m_pointIDs[rd.objects[1]]));
+            info.m_objects.addElement(rd.objects[0]);
+            info.m_objects.addElement(rd.objects[1]);
         } catch (...) {
             throw std::invalid_argument("No such points");
         }
-        IReq *requirement = new ReqPointPointDist(p1_it, p2_it,rd.params[0]);
+        IReq *requirement = new ReqPointPointDist(p1_it, p2_it, rd.params[0]);
         Arry<PARAMID> params;
         params = requirement->getParams();
         Arry<double> values;
@@ -218,7 +278,15 @@ ID Paint::addRequirement(const RequirementData &rd) {
         values.addElement(p1_it->y);
         values.addElement(p2_it->x);
         values.addElement(p2_it->y);
-        info.m_paramsBefore = values;
+
+        Arry<double> paramP1;
+        paramP1.addElement(values[0]);
+        paramP1.addElement(values[1]);
+        Arry<double> paramP2;
+        paramP2.addElement(values[2]);
+        paramP2.addElement(values[3]);
+        info.m_paramsBefore.addElement(paramP1);
+        info.m_paramsBefore.addElement(paramP2);
         Arry<double> derivatives;
         int k = 0;
         for (auto it = params.begin(); it != params.end(); ++it, ++k) {
@@ -236,20 +304,26 @@ ID Paint::addRequirement(const RequirementData &rd) {
             (p2_it)->y = values[3];
             e = requirement->getError();
         }
-        info.m_paramsAfter = values;
+        paramP1[0] = values[0];
+        paramP1[1] = values[1];
+        paramP2[0] = values[2];
+        paramP2[1] = values[3];
+        info.m_paramsAfter.addElement(paramP1);
+        info.m_paramsAfter.addElement(paramP2);
+        c_undoRedo.add(info);
         s_allFigures = s_allFigures || p1_it->rect();
         s_allFigures = s_allFigures || p2_it->rect();
-        m_reqIDs.addPair(++s_maxID.id, m_reqStorage.addElement(requirement));
+        m_reqIDs[++s_maxID.id] = m_reqStorage.addElement(requirement);
         return s_maxID.id;
     }
     if (rd.req == ET_POINTONPOINT) {
         point *p1_it = nullptr;
         point *p2_it = nullptr;
         try {
-            p1_it = &(*(m_pointIDs.findByKey(rd.objects[0])));
-            p2_it = &(*(m_pointIDs.findByKey(rd.objects[1])));
-            info.s_object2 = rd.objects[1];
-            info.s_object1 = rd.objects[0];
+            p1_it = &(*(m_pointIDs[rd.objects[0]]));
+            p2_it = &(*(m_pointIDs[rd.objects[1]]));
+            info.m_objects.addElement(rd.objects[0]);
+            info.m_objects.addElement(rd.objects[1]);
         } catch (...) {
             throw std::invalid_argument("No such points");
         }
@@ -261,7 +335,14 @@ ID Paint::addRequirement(const RequirementData &rd) {
         values.addElement(p1_it->y);
         values.addElement(p2_it->x);
         values.addElement(p2_it->y);
-        info.m_paramsBefore = values;
+        Arry<double> paramP1;
+        paramP1.addElement(values[0]);
+        paramP1.addElement(values[1]);
+        Arry<double> paramP2;
+        paramP2.addElement(values[2]);
+        paramP2.addElement(values[3]);
+        info.m_paramsBefore.addElement(paramP1);
+        info.m_paramsBefore.addElement(paramP2);
         Arry<double> derivatives;
         int k = 0;
         for (auto it = params.begin(); it != params.end(); ++it, ++k) {
@@ -279,36 +360,41 @@ ID Paint::addRequirement(const RequirementData &rd) {
             (p2_it)->y = values[3];
             e = requirement->getError();
         }
-        info.m_paramsAfter = values;
+        paramP1[0] = values[0];
+        paramP1[1] = values[1];
+        paramP2[0] = values[2];
+        paramP2[1] = values[3];
+        info.m_paramsAfter.addElement(paramP1);
+        info.m_paramsAfter.addElement(paramP2);
+        c_undoRedo.add(info);
         s_allFigures = s_allFigures || p1_it->rect();
         s_allFigures = s_allFigures || p2_it->rect();
-        m_reqIDs.addPair(++s_maxID.id, m_reqStorage.addElement(requirement));
+        m_reqIDs[++s_maxID.id] = m_reqStorage.addElement(requirement);
         return s_maxID.id;
     }
     if (rd.req == ET_POINTSECTIONDIST) {
         point *p_it = nullptr;
         section *s_it = nullptr;
-        info.s_req = ET_POINTSECTIONDIST;
         try {
-            p_it = &(*(m_pointIDs.findByKey(rd.objects[0])));
-            info.s_object1 = rd.objects[0];
+            p_it = &(*(m_pointIDs[rd.objects[0]]));
+            info.m_objects.addElement(rd.objects[0]);
+            info.m_objects.addElement(rd.objects[1]);
         }
         catch (...) {
-            s_it = &(*(m_sectionIDs.findByKey(rd.objects[0])));
-            info.s_object2 = rd.objects[0];
+            s_it = &(*(m_sectionIDs[rd.objects[0]]));
+            info.m_objects.addElement(rd.objects[1]);
+            info.m_objects.addElement(rd.objects[0]);
         }
         if (p_it != nullptr) {
             try {
-                s_it = &(*(m_sectionIDs.findByKey(rd.objects[1])));
-                info.s_object2 = rd.objects[1];
+                s_it = &(*(m_sectionIDs[rd.objects[1]]));
             }
             catch (...) {
                 throw std::invalid_argument("No such section or point");
             }
         } else if (s_it != nullptr) {
             try {
-                p_it = &(*(m_pointIDs.findByKey(rd.objects[1])));
-                info.s_object1 = rd.objects[1];
+                p_it = &(*(m_pointIDs[rd.objects[1]]));
             }
             catch (...) {
                 throw std::invalid_argument("No such point or section");
@@ -323,7 +409,16 @@ ID Paint::addRequirement(const RequirementData &rd) {
         paramValues.addElement(s_it->beg->y);
         paramValues.addElement(s_it->end->x);
         paramValues.addElement(s_it->end->y);
-        info.m_paramsBefore = paramValues;
+        Arry<double> pointParam;
+        pointParam.addElement(paramValues[0]);
+        pointParam.addElement(paramValues[1]);
+        Arry<double> sectionParam;
+        sectionParam.addElement(paramValues[2]);
+        sectionParam.addElement(paramValues[3]);
+        sectionParam.addElement(paramValues[4]);
+        sectionParam.addElement(paramValues[5]);
+        info.m_paramsBefore.addElement(pointParam);
+        info.m_paramsBefore.addElement(sectionParam);
         Arry<double> derivatives;
         int k = 0;
         for (auto it = params.begin(); it != params.end(); ++it, ++k) {
@@ -332,15 +427,15 @@ ID Paint::addRequirement(const RequirementData &rd) {
         double alpha;
         double e = requirement->getError();
         //TODO for matrix
-        if (m_reqStorage.getSize() == 1){
-            IReq* requirement1 = m_reqStorage.getElement(0);
+        if (m_reqStorage.getSize() == 1) {
+            IReq *requirement1 = m_reqStorage.getElement(0);
             Arry<PARAMID> params1 = requirement1->getParams();
             Matrix<double> dotParam(1, 2);
             dotParam.setElement(0, 0, paramValues[0]);
             dotParam.setElement(0, 1, paramValues[1]);
             Arry<double> derivatives1;
             int k1 = 0;
-            for (auto it = params1.begin(); it!= params1.end(); ++it, ++k1) {
+            for (auto it = params1.begin(); it != params1.end(); ++it, ++k1) {
                 derivatives1.addElement(requirement1->getDerivative(*it));
             }
             Matrix<double> neededDerivatives(2, 2);
@@ -362,7 +457,7 @@ ID Paint::addRequirement(const RequirementData &rd) {
             }
             s_allFigures = s_allFigures || p_it->rect();
             s_allFigures = s_allFigures || s_it->rect();
-            m_reqIDs.addPair(++s_maxID.id, m_reqStorage.addElement(requirement));
+            m_reqIDs[++s_maxID.id] = m_reqStorage.addElement(requirement);
             return s_maxID.id;
         }
         while (e > 10e-2) {
@@ -378,22 +473,32 @@ ID Paint::addRequirement(const RequirementData &rd) {
             (s_it)->end->y = paramValues[5];
             e = requirement->getError();
         }
-        info.m_paramsAfter = paramValues;
+        pointParam[0] = paramValues[0];
+        pointParam[1] = paramValues[1];
+
+        sectionParam[0] = paramValues[2];
+        sectionParam[1] = paramValues[3];
+        sectionParam[2] = paramValues[4];
+        sectionParam[3] = paramValues[5];
+
+        info.m_paramsAfter.addElement(pointParam);
+        info.m_paramsAfter.addElement(sectionParam);
+        c_undoRedo.add(info);
         s_allFigures = s_allFigures || p_it->rect();
         s_allFigures = s_allFigures || s_it->rect();
-        m_reqIDs.addPair(++s_maxID.id, m_reqStorage.addElement(requirement));
+        m_reqIDs[++s_maxID.id] = m_reqStorage.addElement(requirement);
         return s_maxID.id;
     }
     return ID{-1};
 }
 
-ID Paint::addElement(const ElementData& ed) {
+ID Paint::addElement(const ElementData &ed) {
     if (ed.et == ET_POINT) {
         point tmp;
         tmp.x = ed.params[0];
         tmp.y = ed.params[1];
         s_allFigures = s_allFigures || tmp.rect();
-        m_pointIDs.addPair(++s_maxID.id, m_pointStorage.addElement(tmp));
+        m_pointIDs[++s_maxID.id] = m_pointStorage.addElement(tmp);
         return s_maxID;
     }
     if (ed.et == ET_SECTION) {
@@ -401,17 +506,17 @@ ID Paint::addElement(const ElementData& ed) {
         tmp1.x = ed.params[0];
         tmp1.y = ed.params[1];
         auto beg = m_pointStorage.addElement(tmp1);
-        m_pointIDs.addPair(++s_maxID.id, beg);
+        m_pointIDs[++s_maxID.id] = beg;
         point tmp2;
         tmp2.x = ed.params[2];
         tmp2.y = ed.params[3];
         auto end = m_pointStorage.addElement(tmp2);
-        m_pointIDs.addPair(++s_maxID.id,end);
+        m_pointIDs[++s_maxID.id] = end;
         section tmp;
         tmp.beg = &(*beg);
         tmp.end = &(*end);
         s_allFigures = s_allFigures || tmp.rect();
-        m_sectionIDs.addPair(++s_maxID.id,m_sectionStorage.addElement(tmp));
+        m_sectionIDs[++s_maxID.id] = m_sectionStorage.addElement(tmp);
         return s_maxID;
     }
     if (ed.et == ET_CIRCLE) {
@@ -419,37 +524,37 @@ ID Paint::addElement(const ElementData& ed) {
         center.x = ed.params[0];
         center.y = ed.params[1];
         auto cent = m_pointStorage.addElement(center);
-        m_pointIDs.addPair(++s_maxID.id, cent);
+        m_pointIDs[++s_maxID.id] = cent;
         circle tmp;
         tmp.center = &(*cent);
         tmp.R = ed.params[2];
         s_allFigures = s_allFigures || tmp.rect();
-        m_circleIDs.addPair(++s_maxID.id, m_circleStorage.addElement(tmp));
+        m_circleIDs[++s_maxID.id] = m_circleStorage.addElement(tmp);
         return s_maxID;
     }
-    return ID{ -1 };
+    return ID{-1};
 }
 
 ElementData Paint::getElementInfo(ID id) {
     ElementData result;
 
     try {
-        auto p = m_pointIDs.findByKey(id);
+        auto p = m_pointIDs[id];
         result.et = ET_POINT;
         result.params.addElement((*p).x);
         result.params.addElement((*p).y);
     }
-    catch (const std::runtime_error&) {
+    catch (const std::runtime_error &) {
         try {
-            auto sec = m_sectionIDs.findByKey(id);
+            auto sec = m_sectionIDs[id];
             result.et = ET_SECTION;
             result.params.addElement((*sec).beg->x);
             result.params.addElement((*sec).beg->y);
             result.params.addElement((*sec).end->x);
             result.params.addElement((*sec).end->y);
         }
-        catch (const std::runtime_error&) {
-            auto circ = m_circleIDs.findByKey(id);
+        catch (const std::runtime_error &) {
+            auto circ = m_circleIDs[id];
             result.et = ET_CIRCLE;
             result.params.addElement((*circ).center->x);
             result.params.addElement((*circ).center->y);
@@ -459,17 +564,19 @@ ElementData Paint::getElementInfo(ID id) {
 
     return result;
 }
+
 RequirementData Paint::getRequirementInfo(ID id) {
     RequirementData result;
-    auto req = m_reqIDs.findByKey(id);
+    auto req = m_reqIDs[id];
     Arry<PARAMID> paramIDs = (*req)->getParams();
     Arry<double> params;
-    for (auto paramID = paramIDs.begin(); paramID!= paramIDs.end(); ++paramID) {
+    for (auto paramID = paramIDs.begin(); paramID != paramIDs.end(); ++paramID) {
         params.addElement(*(*paramID));
     }
     result.params = params;
     return result;
 }
+
 void Paint::paint() {
     c_bmpPainter.changeSize(s_allFigures);
     for (auto point = m_pointStorage.begin(); point != m_pointStorage.end(); ++point) {
@@ -482,6 +589,7 @@ void Paint::paint() {
         c_bmpPainter.drawSection(*section, false);
     }
 }
+
 /*
 void Paint::saveToFile(const char* file) {
     std::ofstream fout;
@@ -600,7 +708,7 @@ void Paint::loadFromFile(const char* filename) {
 }
 */
 
-void Paint::exportToBMP(const char* file) {
+void Paint::exportToBMP(const char *file) {
     paint();
     try {
         c_bmpPainter.saveBMP(file);
@@ -609,6 +717,7 @@ void Paint::exportToBMP(const char* file) {
         throw std::invalid_argument("Can not opened file!");
     }
 }
+
 /*
 void Paint::makeMySectionOrt(const ElementData& ed, ElementData& changing){
     if (ed.et != ET_SECTION or changing.et != ET_SECTION) {
@@ -655,22 +764,19 @@ void Paint::makeMyCircleEqual(const ElementData& ed, ElementData& changing) {
 */
 
 
-void Paint::changeBMP(const BMPfile& file)
-{
+void Paint::changeBMP(const BMPfile &file) {
     c_bmpPainter = BMPpainter(file);
 }
 
-void Paint::changeBMP(const char* filename)
-{
+void Paint::changeBMP(const char *filename) {
     c_bmpPainter = BMPpainter(BMPfile(filename));
 }
 
 
-
 void Paint::deleteRequirement(ID req) {
     try {
-        m_reqStorage.remove(m_reqIDs.findByKey(req));
-    }catch(...){
+        m_reqStorage.remove(m_reqIDs[req]);
+    } catch (...) {
         std::cout << "no requirement with ID " << req.id << std::endl;
     }
 }
@@ -728,27 +834,28 @@ void Paint::redoReq() {
         s_allFigures = s_allFigures || c_it->rect();
         s_allFigures = s_allFigures || s_it->rect();
     }
-    if (lastUndo.s_req == ET_POINTONSECTION || lastUndo.s_req == ET_POINTSECTIONDIST){
-        point* p_it = &(*(m_pointIDs.findByKey(lastUndo.s_object1)));
-        section* s_it = &(*(m_sectionIDs.findByKey(lastUndo.s_object2)));
-        p_it->x = lastUndo.m_paramsAfter[0];
-        p_it->y = lastUndo.m_paramsAfter[1];
-        s_it->beg->x = lastUndo.m_paramsAfter[2];
-        s_it->beg->y = lastUndo.m_paramsAfter[3];
-        s_it->end->x = lastUndo.m_paramsAfter[4];
-        s_it->end->y = lastUndo.m_paramsAfter[5];
-
-        s_allFigures = s_allFigures || p_it->rect();
-        s_allFigures = s_allFigures || s_it->rect();
-    }
-    if (lastUndo.s_req == ET_POINTPOINTDIST || lastUndo.s_req == ET_POINTONPOINT){
-        point* p1_it = &(*(m_pointIDs.findByKey(lastUndo.s_object1)));
-        point* p2_it = &(*(m_pointIDs.findByKey(lastUndo.s_object2)));
-        p1_it->x = lastUndo.m_paramsAfter[0];
-        p1_it->y = lastUndo.m_paramsAfter[1];
-        p2_it->x = lastUndo.m_paramsAfter[2];
-        p2_it->y = lastUndo.m_paramsAfter[3];
-        s_allFigures = s_allFigures || p1_it->rect();
-        s_allFigures = s_allFigures || p2_it->rect();
+    for (int i = 0; i < info.m_objects.getSize(); ++i) {
+        try {
+            p = &(*m_pointIDs[info.m_objects[i]]);
+            p->x = info.m_paramsAfter[i][0];
+            p->y = info.m_paramsAfter[i][1];
+        } catch (...) {
+            try {
+                s = &(*m_sectionIDs[info.m_objects[i]]);
+                s->beg->x = info.m_paramsAfter[i][0];
+                s->beg->y = info.m_paramsAfter[i][1];
+                s->end->x = info.m_paramsAfter[i][2];
+                s->end->y = info.m_paramsAfter[i][3];
+            } catch (...) {
+                try {
+                    c = &(*m_circleIDs[info.m_objects[i]]);
+                    c->center->x = info.m_paramsAfter[i][0];
+                    c->center->y = info.m_paramsAfter[i][1];
+                } catch (...) {
+                    std::cout << "No ID to undo" << std::endl;
+                    break;
+                }
+            }
+        }
     }
 }

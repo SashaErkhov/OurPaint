@@ -11,26 +11,26 @@
 #include "enums.h"
 #include "requirements.h"
 #include "UndoRedo.h"
+#include <map>
 struct ElementData {
     Element et;
     Arry<double> params;
     ElementData();
 };
-struct RequirementInfo{
-    Requirement s_req;
-    ID s_object1;
-    ID s_object2;
-    Arry<double> m_paramsBefore;
-    Arry<double> m_paramsAfter;
+struct ActionsInfo{
+    bool isNew;
+    Arry<ID> m_objects;
+    Arry<Arry<double>> m_paramsBefore;
+    Arry<Arry<double>> m_paramsAfter;
 };
 
 //c_ - класс, v_- переменная, s_структура, m_ - контейнеры(списки, массивы и другие) f_ - приватный метод класса
 class Paint {
-    UndoRedo<RequirementInfo> c_undoRedo;
-    Assoc<ID, List<point>::iterator> m_pointIDs;
-    Assoc<ID, List<section>::iterator> m_sectionIDs;
-    Assoc<ID, List<circle>::iterator> m_circleIDs;
-    Assoc<ID, List<IReq*>::iterator> m_reqIDs;
+    UndoRedo<ActionsInfo> c_undoRedo;
+    std::map<ID, List<point>::iterator> m_pointIDs;
+    std::map<ID, List<section>::iterator> m_sectionIDs;
+    std::map<ID, List<circle>::iterator> m_circleIDs;
+    std::map<ID, List<IReq*>::iterator> m_reqIDs;
     ID s_maxID;
     List<IReq*> m_reqStorage;
     List<point> m_pointStorage;
@@ -80,8 +80,8 @@ public:
     void deleteElement(ID elem);
     void deleteRequirement(ID req);
 
-    void undoReq();
-    void redoReq();
+    void undo();
+    void redo();
 
     void paint();
 };
