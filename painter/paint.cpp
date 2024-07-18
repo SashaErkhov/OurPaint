@@ -1,8 +1,9 @@
 #include "paint.h"
 
-ElementData::ElementData(){
+ElementData::ElementData() {
     params = Arry<double>();
 }
+
 ID Paint::addRequirement(const RequirementData &rd) {
     c_bmpPainter = BMPpainter();
     ActionsInfo info;
@@ -493,12 +494,16 @@ ID Paint::addRequirement(const RequirementData &rd) {
 }
 
 ID Paint::addElement(const ElementData &ed) {
+    ActionsInfo info;
     if (ed.et == ET_POINT) {
         point tmp;
         tmp.x = ed.params[0];
         tmp.y = ed.params[1];
         s_allFigures = s_allFigures || tmp.rect();
         m_pointIDs[++s_maxID.id] = m_pointStorage.addElement(tmp);
+        info.m_objects.addElement(s_maxID);
+        info.m_paramsAfter.addElement(ed.params);
+        c_undoRedo.add(info);
         return s_maxID;
     }
     if (ed.et == ET_SECTION) {
@@ -507,29 +512,51 @@ ID Paint::addElement(const ElementData &ed) {
         tmp1.y = ed.params[1];
         auto beg = m_pointStorage.addElement(tmp1);
         m_pointIDs[++s_maxID.id] = beg;
+        Arry<double> params1;
+        params1.addElement(ed.params[0]);
+        params1.addElement(ed.params[1]);
+        info.m_objects.addElement(s_maxID);
+        info.m_paramsAfter.addElement(params1);
         point tmp2;
         tmp2.x = ed.params[2];
         tmp2.y = ed.params[3];
         auto end = m_pointStorage.addElement(tmp2);
         m_pointIDs[++s_maxID.id] = end;
+        Arry<double> params2;
+        params2.addElement(ed.params[2]);
+        params2.addElement(ed.params[3]);
+        info.m_objects.addElement(s_maxID);
+        info.m_paramsAfter.addElement(params2);
         section tmp;
         tmp.beg = &(*beg);
         tmp.end = &(*end);
         s_allFigures = s_allFigures || tmp.rect();
         m_sectionIDs[++s_maxID.id] = m_sectionStorage.addElement(tmp);
+        info.m_objects.addElement(s_maxID);
+        info.m_paramsAfter.addElement(ed.params);
+        c_undoRedo.add(info);
         return s_maxID;
     }
     if (ed.et == ET_CIRCLE) {
         point center;
         center.x = ed.params[0];
         center.y = ed.params[1];
+        Arry<double> params1;
+        params1.addElement(ed.params[0]);
+        params1.addElement(ed.params[1]);
+        info.m_paramsAfter.addElement(params1);
         auto cent = m_pointStorage.addElement(center);
         m_pointIDs[++s_maxID.id] = cent;
+        info.m_objects.addElement(s_maxID);
         circle tmp;
         tmp.center = &(*cent);
         tmp.R = ed.params[2];
         s_allFigures = s_allFigures || tmp.rect();
         m_circleIDs[++s_maxID.id] = m_circleStorage.addElement(tmp);
+        info.m_objects.addElement(s_maxID);
+        params1.addElement(ed.params[2]);
+        info.m_paramsAfter.addElement(params1);
+        c_undoRedo.add(info);
         return s_maxID;
     }
     return ID{-1};
@@ -786,20 +813,20 @@ void Paint::undo() {
     point *p = nullptr;
     section *s = nullptr;
     circle *c = nullptr;
-    if (info.m_objects.getSize() == 1) {
-        try {
-            m_pointStorage.remove(m_pointIDs[info.m_objects[0]]);
-        } catch (...) {
-            try {
-                m_sectionStorage.remove(m_sectionIDs[info.m_objects[0]]);
-            } catch (...) {
-                try {
-                    m_circleStorage.remove(m_circleIDs[info.m_objects[0]]);
-                } catch (...) {
-                    std::cout << "No ID to undo" << std::endl;
-                }
+    if (info.m_paramsBefore.getSize() == 0) {
+        for (int i = 0; i < info.m_objects.getSize(); ++i) {
+            if (m_pointIDs.contains(info.m_objects[i])) {
+                m_pointStorage.remove(m_pointIDs[info.m_objects[i]]);
+            }else if (m_sectionIDs.contains(info.m_objects[i])) {
+                m_sectionStorage.remove(m_sectionIDs[info.m_objects[i]]);
+            }else if (m_circleIDs.contains(info.m_objects[i])){
+                m_circleStorage.remove(m_circleIDs[info.m_objects[i]]);
+            } else {
+                std::cout << "No ID to undo" << std::endl;
+                break;
             }
         }
+        return;
     }
     for (int i = 0; i < info.m_objects.getSize(); ++i) {
         try {
@@ -828,35 +855,37 @@ void Paint::undo() {
 }
 
 void Paint::redo() {
-    ActionsInfo info = c_undoRedo.undo();
+    ActionsInfo info = c_undoRedo.redo();
     point *p = nullptr;
     section *s = nullptr;
     circle *c = nullptr;
-    if (info.m_objects.getSize() == 1) {
-        try {
-            p = new point;
-            p->x = info.m_paramsAfter[0][0];
-            p->y = info.m_paramsAfter[0][1];
-            m_pointIDs[info.m_objects[0]] =m_pointStorage.addElement(*p);
-        } catch (...) {
-            try {
+    if (info.m_paramsBefore.getSize() == 0) {
+        for (int i = 0; i < info.m_objects.getSize(); ++i) {
+            if (m_pointIDs.contains(info.m_objects[i])) {
+                p = new point;
+                p->x = info.m_paramsAfter[i][0];
+                p->y = info.m_paramsAfter[i][1];
+                m_pointIDs[info.m_objects[i]] = m_pointStorage.addElement(*p);
+            }else if (m_sectionIDs.contains(info.m_objects[i])) {
                 s = new section;
-                s->beg->x = info.m_paramsAfter[0][0];
-                s->beg->y = info.m_paramsAfter[0][1];
-                s->end->x = info.m_paramsAfter[0][2];
-                s->end->y = info.m_paramsAfter[0][3];
-                m_sectionIDs[info.m_objects[0]] = m_sectionStorage.addElement(*s);
-            } catch (...) {
-                try {
-                    c = new circle;
-                    c->center->x = info.m_paramsAfter[0][0];
-                    c->center->y = info.m_paramsAfter[0][1];\
-                    m_circleIDs[info.m_objects[0]] = m_circleStorage.addElement(*c);
-                } catch (...) {
-                    std::cout << "No ID to undo" << std::endl;
-                }
+                s->beg->x = info.m_paramsAfter[i][0];
+                s->beg->y = info.m_paramsAfter[i][1];
+                s->end->x = info.m_paramsAfter[i][2];
+                s->end->y = info.m_paramsAfter[i][3];
+                m_sectionIDs[info.m_objects[i]] = m_sectionStorage.addElement(*s);
+            } else if (m_circleIDs.contains(info.m_objects[i])){
+                c = new circle;
+                tmpp.x = info.m_paramsAfter[i][0];
+                c->center->x = info.m_paramsAfter[i][0];
+                c->center->y = info.m_paramsAfter[i][1];
+                c->R = info.m_paramsAfter[i][2];
+                m_circleIDs[info.m_objects[i]] = m_circleStorage.addElement(*c);
+            } else {
+                std::cout << "No ID to undo" << std::endl;
+                break;
             }
         }
+        return;
     }
     for (int i = 0; i < info.m_objects.getSize(); ++i) {
         try {
@@ -876,7 +905,7 @@ void Paint::redo() {
                     c->center->x = info.m_paramsAfter[i][0];
                     c->center->y = info.m_paramsAfter[i][1];
                 } catch (...) {
-                    std::cout << "No ID to undo" << std::endl;
+                    std::cout << "No ID to redo" << std::endl;
                     break;
                 }
             }

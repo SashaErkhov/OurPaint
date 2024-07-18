@@ -216,11 +216,11 @@ int main()
             std::cin >> req.id;
             screen.deleteRequirement(req);
         }
-        if (strcmp(command, "undo_req") == 0){
-            screen.undoReq();
+        if (strcmp(command, "undo") == 0){
+            screen.undo();
         }
-        if (strcmp(command, "redo_req") == 0){
-            screen.redoReq();
+        if (strcmp(command, "redo") == 0){
+            screen.redo();
         }
     }
 }
