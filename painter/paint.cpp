@@ -7,375 +7,11 @@ ElementData::ElementData() {
 ID Paint::addRequirement(const RequirementData &rd) {
     c_bmpPainter = BMPpainter();
     ActionsInfo info;
-    if (rd.req == ET_SECTIONCIRCLEDIST) {
-        circle *c_it = nullptr;
-        section *s_it = nullptr;
-        try {
-            c_it = &(*(m_circleIDs[rd.objects[0]]));
-            info.m_objects.addElement(rd.objects[0]);
-            info.m_objects.addElement(rd.objects[1]);
-        }
-        catch (...) {
-            s_it = &(*(m_sectionIDs[rd.objects[0]]));
-            info.m_objects.addElement(rd.objects[1]);
-            info.m_objects.addElement(rd.objects[0]);
-        }
-        if (c_it != nullptr) {
-            try {
-                s_it = &(*(m_sectionIDs[rd.objects[1]]));
-            }
-            catch (...) {
-                throw std::invalid_argument("No such section or circle");
-            }
-        } else if (s_it != nullptr) {
-            try {
-                c_it = &(*(m_circleIDs[rd.objects[1]]));
-            }
-            catch (...) {
-                throw std::invalid_argument("No such circle or section");
-            }
-        }
-        IReq *requirement = new ReqSecCircleDist(s_it, c_it, rd.params[0]);
-        Arry<PARAMID> params = requirement->getParams();
-        Arry<double> paramValues;
-        paramValues.addElement(c_it->center->x);
-        paramValues.addElement(c_it->center->y);
-        paramValues.addElement(s_it->beg->x);
-        paramValues.addElement(s_it->beg->y);
-        paramValues.addElement(s_it->end->x);
-        paramValues.addElement(s_it->end->y);
-        Arry<double> derivatives;
 
-        Arry<double> circleParam;
-        circleParam.addElement(paramValues[0]);
-        circleParam.addElement(paramValues[1]);
-        Arry<double> sectionParam;
-        sectionParam.addElement(paramValues[2]);
-        sectionParam.addElement(paramValues[3]);
-        sectionParam.addElement(paramValues[4]);
-        sectionParam.addElement(paramValues[5]);
-        info.m_paramsBefore.addElement(circleParam);
-        info.m_paramsBefore.addElement(sectionParam);
-
-        int k = 0;
-        for (auto it = params.begin(); it != params.end(); ++it, ++k) {
-            derivatives.addElement(requirement->getDerivative(*it));
-        }
-        double alpha = 10e-5;
-        double e = requirement->getError();
-        while (e > 10e-2) {
-            for (int i = 0; i < paramValues.getSize(); ++i) {
-                paramValues[i] -= derivatives[i] * alpha;
-            }
-            (c_it)->center->x = paramValues[0];
-            (c_it)->center->y = paramValues[1];
-            (s_it)->beg->x = paramValues[2];
-            (s_it)->beg->y = paramValues[3];
-            (s_it)->end->x = paramValues[4];
-            (s_it)->end->y = paramValues[5];
-            e = requirement->getError();
-        }
-
-
-        circleParam[0] = paramValues[0];
-        circleParam[1] = paramValues[1];
-
-        sectionParam[0] = paramValues[2];
-        sectionParam[1] = paramValues[3];
-        sectionParam[2] = paramValues[4];
-        sectionParam[3] = paramValues[5];
-        info.m_paramsAfter.addElement(circleParam);
-        info.m_paramsAfter.addElement(sectionParam);
-        c_undoRedo.add(info);
-
-        s_allFigures = s_allFigures || c_it->rect();
-        s_allFigures = s_allFigures || s_it->rect();
-        m_reqIDs[++s_maxID.id] = m_reqStorage.addElement(requirement);
-        return s_maxID.id;
-    }
-    if (rd.req == ET_SECTIONONCIRCLE) {
-        circle *c_it = nullptr;
-        section *s_it = nullptr;
-        try {
-            c_it = &(*(m_circleIDs[rd.objects[0]]));
-            info.m_objects.addElement(rd.objects[0]);
-            info.m_objects.addElement(rd.objects[1]);
-        }
-        catch (...) {
-            s_it = &(*(m_sectionIDs[rd.objects[0]]));
-            info.m_objects.addElement(rd.objects[1]);
-            info.m_objects.addElement(rd.objects[0]);
-        }
-        if (c_it != nullptr) {
-            try {
-                s_it = &(*(m_sectionIDs[rd.objects[1]]));
-            }
-            catch (...) {
-                throw std::invalid_argument("No such section or circle");
-            }
-        } else if (s_it != nullptr) {
-            try {
-                c_it = &(*(m_circleIDs[rd.objects[1]]));
-            }
-            catch (...) {
-                throw std::invalid_argument("No such circle or section");
-            }
-        }
-        IReq *requirement = new ReqSecOnCircle(s_it, c_it);
-        Arry<PARAMID> params = requirement->getParams();
-        Arry<double> paramValues;
-        paramValues.addElement(c_it->center->x);
-        paramValues.addElement(c_it->center->y);
-        paramValues.addElement(s_it->beg->x);
-        paramValues.addElement(s_it->beg->y);
-        paramValues.addElement(s_it->end->x);
-        paramValues.addElement(s_it->end->y);
-
-        Arry<double> circleParam;
-        circleParam.addElement(paramValues[0]);
-        circleParam.addElement(paramValues[1]);
-        Arry<double> sectionParam;
-        sectionParam.addElement(paramValues[2]);
-        sectionParam.addElement(paramValues[3]);
-        sectionParam.addElement(paramValues[4]);
-        sectionParam.addElement(paramValues[5]);
-        info.m_paramsBefore.addElement(circleParam);
-        info.m_paramsBefore.addElement(sectionParam);
-
-        Arry<double> derivatives;
-        int k = 0;
-        for (auto it = params.begin(); it != params.end(); ++it, ++k) {
-            derivatives.addElement(requirement->getDerivative(*it));
-        }
-        double alpha = 10e-5;
-        double e = requirement->getError();
-        while (e > 10e-2) {
-            for (int i = 0; i < paramValues.getSize(); ++i) {
-                paramValues[i] -= derivatives[i] * alpha;
-            }
-            (c_it)->center->x = paramValues[0];
-            (c_it)->center->y = paramValues[1];
-            (s_it)->beg->x = paramValues[2];
-            (s_it)->beg->y = paramValues[3];
-            (s_it)->end->x = paramValues[4];
-            (s_it)->end->y = paramValues[5];
-            e = requirement->getError();
-        }
-
-        circleParam[0] = paramValues[0];
-        circleParam[1] = paramValues[1];
-
-        sectionParam[0] = paramValues[2];
-        sectionParam[1] = paramValues[3];
-        sectionParam[2] = paramValues[4];
-        sectionParam[3] = paramValues[5];
-        info.m_paramsAfter.addElement(circleParam);
-        info.m_paramsAfter.addElement(sectionParam);
-        c_undoRedo.add(info);
-
-        s_allFigures = s_allFigures || c_it->rect();
-        s_allFigures = s_allFigures || s_it->rect();
-        m_reqIDs[++s_maxID.id] = m_reqStorage.addElement(requirement);
-        return s_maxID.id;
-    }
-    if (rd.req == ET_POINTONSECTION) {
-        point *p_it = nullptr;
-        section *s_it = nullptr;
-        try {
-            p_it = &(*(m_pointIDs[rd.objects[0]]));
-            info.m_objects.addElement(rd.objects[0]);
-            info.m_objects.addElement(rd.objects[1]);
-        }
-        catch (...) {
-            s_it = &(*(m_sectionIDs[rd.objects[0]]));
-            info.m_objects.addElement(rd.objects[1]);
-            info.m_objects.addElement(rd.objects[0]);
-        }
-        if (p_it != nullptr) {
-            try {
-                s_it = &(*(m_sectionIDs[rd.objects[1]]));
-            }
-            catch (...) {
-                throw std::invalid_argument("No such section or point");
-            }
-        } else if (s_it != nullptr) {
-            try {
-                p_it = &(*(m_pointIDs[rd.objects[1]]));
-            }
-            catch (...) {
-                throw std::invalid_argument("No such point or section");
-            }
-        }
-        IReq *requirement = new ReqPointOnSec(p_it, s_it);
-        Arry<PARAMID> params = requirement->getParams();
-        Arry<double> paramValues;
-        paramValues.addElement(p_it->x);
-        paramValues.addElement(p_it->y);
-        paramValues.addElement(s_it->beg->x);
-        paramValues.addElement(s_it->beg->y);
-        paramValues.addElement(s_it->end->x);
-        paramValues.addElement(s_it->end->y);
-        Arry<double> pointParam;
-        pointParam.addElement(paramValues[0]);
-        pointParam.addElement(paramValues[1]);
-        Arry<double> sectionParam;
-        sectionParam.addElement(paramValues[2]);
-        sectionParam.addElement(paramValues[3]);
-        sectionParam.addElement(paramValues[4]);
-        sectionParam.addElement(paramValues[5]);
-        info.m_paramsBefore.addElement(pointParam);
-        info.m_paramsBefore.addElement(sectionParam);
-        Arry<double> derivatives;
-        int k = 0;
-        for (auto it = params.begin(); it != params.end(); ++it, ++k) {
-            derivatives.addElement(requirement->getDerivative(*it));
-        }
-        double alpha = 10e-5;
-        double e = requirement->getError();
-        while (e > 10e-2) {
-            for (int i = 0; i < paramValues.getSize(); ++i) {
-                paramValues[i] -= derivatives[i] * alpha;
-            }
-            (p_it)->x = paramValues[0];
-            (p_it)->y = paramValues[1];
-            (s_it)->beg->x = paramValues[2];
-            (s_it)->beg->y = paramValues[3];
-            (s_it)->end->x = paramValues[4];
-            (s_it)->end->y = paramValues[5];
-            e = requirement->getError();
-        }
-        pointParam[0] = paramValues[0];
-        pointParam[1] = paramValues[1];
-
-        sectionParam[0] = paramValues[2];
-        sectionParam[1] = paramValues[3];
-        sectionParam[2] = paramValues[4];
-        sectionParam[3] = paramValues[5];
-
-        info.m_paramsAfter.addElement(pointParam);
-        info.m_paramsAfter.addElement(sectionParam);
-        c_undoRedo.add(info);
-        s_allFigures = s_allFigures || p_it->rect();
-        s_allFigures = s_allFigures || s_it->rect();
-        m_reqIDs[++s_maxID.id] = m_reqStorage.addElement(requirement);
-        return s_maxID.id;
-    }
-    if (rd.req == ET_POINTPOINTDIST) {
-        point *p1_it = nullptr;
-        point *p2_it = nullptr;
-        try {
-            p1_it = &(*(m_pointIDs[rd.objects[0]]));
-            p2_it = &(*(m_pointIDs[rd.objects[1]]));
-            info.m_objects.addElement(rd.objects[0]);
-            info.m_objects.addElement(rd.objects[1]);
-        } catch (...) {
-            throw std::invalid_argument("No such points");
-        }
-        IReq *requirement = new ReqPointPointDist(p1_it, p2_it, rd.params[0]);
-        Arry<PARAMID> params;
-        params = requirement->getParams();
-        Arry<double> values;
-        values.addElement(p1_it->x);
-        values.addElement(p1_it->y);
-        values.addElement(p2_it->x);
-        values.addElement(p2_it->y);
-
-        Arry<double> paramP1;
-        paramP1.addElement(values[0]);
-        paramP1.addElement(values[1]);
-        Arry<double> paramP2;
-        paramP2.addElement(values[2]);
-        paramP2.addElement(values[3]);
-        info.m_paramsBefore.addElement(paramP1);
-        info.m_paramsBefore.addElement(paramP2);
-        Arry<double> derivatives;
-        int k = 0;
-        for (auto it = params.begin(); it != params.end(); ++it, ++k) {
-            derivatives.addElement(requirement->getDerivative(*it));
-        }
-        double alpha = 10e-6;
-        double e = requirement->getError();
-        while (e > 10e-5) {
-            for (int i = 0; i < values.getSize(); ++i) {
-                values[i] -= derivatives[i] * alpha;
-            }
-            (p1_it)->x = values[0];
-            (p1_it)->y = values[1];
-            (p2_it)->x = values[2];
-            (p2_it)->y = values[3];
-            e = requirement->getError();
-        }
-        paramP1[0] = values[0];
-        paramP1[1] = values[1];
-        paramP2[0] = values[2];
-        paramP2[1] = values[3];
-        info.m_paramsAfter.addElement(paramP1);
-        info.m_paramsAfter.addElement(paramP2);
-        c_undoRedo.add(info);
-        s_allFigures = s_allFigures || p1_it->rect();
-        s_allFigures = s_allFigures || p2_it->rect();
-        m_reqIDs[++s_maxID.id] = m_reqStorage.addElement(requirement);
-        return s_maxID.id;
-    }
-    if (rd.req == ET_POINTONPOINT) {
-        point *p1_it = nullptr;
-        point *p2_it = nullptr;
-        try {
-            p1_it = &(*(m_pointIDs[rd.objects[0]]));
-            p2_it = &(*(m_pointIDs[rd.objects[1]]));
-            info.m_objects.addElement(rd.objects[0]);
-            info.m_objects.addElement(rd.objects[1]);
-        } catch (...) {
-            throw std::invalid_argument("No such points");
-        }
-        IReq *requirement = new ReqPointOnPoint(p1_it, p2_it);
-        Arry<PARAMID> params;
-        params = requirement->getParams();
-        Arry<double> values;
-        values.addElement(p1_it->x);
-        values.addElement(p1_it->y);
-        values.addElement(p2_it->x);
-        values.addElement(p2_it->y);
-        Arry<double> paramP1;
-        paramP1.addElement(values[0]);
-        paramP1.addElement(values[1]);
-        Arry<double> paramP2;
-        paramP2.addElement(values[2]);
-        paramP2.addElement(values[3]);
-        info.m_paramsBefore.addElement(paramP1);
-        info.m_paramsBefore.addElement(paramP2);
-        Arry<double> derivatives;
-        int k = 0;
-        for (auto it = params.begin(); it != params.end(); ++it, ++k) {
-            derivatives.addElement(requirement->getDerivative(*it));
-        }
-        double alpha = 10e-6;
-        double e = requirement->getError();
-        while (e > 10e-5) {
-            for (int i = 0; i < values.getSize(); ++i) {
-                values[i] -= derivatives[i] * alpha;
-            }
-            (p1_it)->x = values[0];
-            (p1_it)->y = values[1];
-            (p2_it)->x = values[2];
-            (p2_it)->y = values[3];
-            e = requirement->getError();
-        }
-        paramP1[0] = values[0];
-        paramP1[1] = values[1];
-        paramP2[0] = values[2];
-        paramP2[1] = values[3];
-        info.m_paramsAfter.addElement(paramP1);
-        info.m_paramsAfter.addElement(paramP2);
-        c_undoRedo.add(info);
-        s_allFigures = s_allFigures || p1_it->rect();
-        s_allFigures = s_allFigures || p2_it->rect();
-        m_reqIDs[++s_maxID.id] = m_reqStorage.addElement(requirement);
-        return s_maxID.id;
-    }
+    // 1
     if (rd.req == ET_POINTSECTIONDIST) {
-        point *p_it = nullptr;
-        section *s_it = nullptr;
+        point* p_it = nullptr;
+        section* s_it = nullptr;
         try {
             p_it = &(*(m_pointIDs[rd.objects[0]]));
             info.m_objects.addElement(rd.objects[0]);
@@ -393,7 +29,8 @@ ID Paint::addRequirement(const RequirementData &rd) {
             catch (...) {
                 throw std::invalid_argument("No such section or point");
             }
-        } else if (s_it != nullptr) {
+        }
+        else if (s_it != nullptr) {
             try {
                 p_it = &(*(m_pointIDs[rd.objects[1]]));
             }
@@ -401,15 +38,13 @@ ID Paint::addRequirement(const RequirementData &rd) {
                 throw std::invalid_argument("No such point or section");
             }
         }
-        IReq *requirement = new ReqPointSegDist(p_it, s_it, rd.params[0]);
+        IReq* requirement = new ReqPointSecDist(p_it, s_it, rd.params[0]);
         Arry<PARAMID> params = requirement->getParams();
         Arry<double> paramValues;
-        paramValues.addElement(p_it->x);
-        paramValues.addElement(p_it->y);
-        paramValues.addElement(s_it->beg->x);
-        paramValues.addElement(s_it->beg->y);
-        paramValues.addElement(s_it->end->x);
-        paramValues.addElement(s_it->end->y);
+        for (size_t i = 0; i < params.getSize(); i++)
+        {
+            paramValues.addElement(*params[i]);
+        }
         Arry<double> pointParam;
         pointParam.addElement(paramValues[0]);
         pointParam.addElement(paramValues[1]);
@@ -429,7 +64,7 @@ ID Paint::addRequirement(const RequirementData &rd) {
         double e = requirement->getError();
         //TODO for matrix
         if (m_reqStorage.getSize() == 1) {
-            IReq *requirement1 = m_reqStorage.getElement(0);
+            IReq* requirement1 = m_reqStorage.getElement(0);
             Arry<PARAMID> params1 = requirement1->getParams();
             Matrix<double> dotParam(1, 2);
             dotParam.setElement(0, 0, paramValues[0]);
@@ -490,6 +125,630 @@ ID Paint::addRequirement(const RequirementData &rd) {
         m_reqIDs[++s_maxID.id] = m_reqStorage.addElement(requirement);
         return s_maxID.id;
     }
+
+
+
+    // 2
+    if (rd.req == ET_POINTONSECTION) {
+        point* p_it = nullptr;
+        section* s_it = nullptr;
+        try {
+            p_it = &(*(m_pointIDs[rd.objects[0]]));
+            info.m_objects.addElement(rd.objects[0]);
+            info.m_objects.addElement(rd.objects[1]);
+        }
+        catch (...) {
+            s_it = &(*(m_sectionIDs[rd.objects[0]]));
+            info.m_objects.addElement(rd.objects[1]);
+            info.m_objects.addElement(rd.objects[0]);
+        }
+        if (p_it != nullptr) {
+            try {
+                s_it = &(*(m_sectionIDs[rd.objects[1]]));
+            }
+            catch (...) {
+                throw std::invalid_argument("No such section or point");
+            }
+        }
+        else if (s_it != nullptr) {
+            try {
+                p_it = &(*(m_pointIDs[rd.objects[1]]));
+            }
+            catch (...) {
+                throw std::invalid_argument("No such point or section");
+            }
+        }
+        IReq* requirement = new ReqPointOnSec(p_it, s_it);
+        Arry<PARAMID> params = requirement->getParams();
+        Arry<double> paramValues;
+        for (size_t i = 0; i < params.getSize(); i++)
+        {
+            paramValues.addElement(*params[i]);
+        }
+        Arry<double> pointParam;
+        pointParam.addElement(paramValues[0]);
+        pointParam.addElement(paramValues[1]);
+        Arry<double> sectionParam;
+        sectionParam.addElement(paramValues[2]);
+        sectionParam.addElement(paramValues[3]);
+        sectionParam.addElement(paramValues[4]);
+        sectionParam.addElement(paramValues[5]);
+        info.m_paramsBefore.addElement(pointParam);
+        info.m_paramsBefore.addElement(sectionParam);
+        Arry<double> derivatives;
+        int k = 0;
+        for (auto it = params.begin(); it != params.end(); ++it, ++k) {
+            derivatives.addElement(requirement->getDerivative(*it));
+        }
+        double alpha = 10e-5;
+        double e = requirement->getError();
+        while (e > 10e-2) {
+            for (int i = 0; i < paramValues.getSize(); ++i) {
+                paramValues[i] -= derivatives[i] * alpha;
+            }
+            (p_it)->x = paramValues[0];
+            (p_it)->y = paramValues[1];
+            (s_it)->beg->x = paramValues[2];
+            (s_it)->beg->y = paramValues[3];
+            (s_it)->end->x = paramValues[4];
+            (s_it)->end->y = paramValues[5];
+            e = requirement->getError();
+        }
+        pointParam[0] = paramValues[0];
+        pointParam[1] = paramValues[1];
+
+        sectionParam[0] = paramValues[2];
+        sectionParam[1] = paramValues[3];
+        sectionParam[2] = paramValues[4];
+        sectionParam[3] = paramValues[5];
+
+        info.m_paramsAfter.addElement(pointParam);
+        info.m_paramsAfter.addElement(sectionParam);
+        c_undoRedo.add(info);
+        s_allFigures = s_allFigures || p_it->rect();
+        s_allFigures = s_allFigures || s_it->rect();
+        m_reqIDs[++s_maxID.id] = m_reqStorage.addElement(requirement);
+        return s_maxID.id;
+    }
+
+
+
+    // 3
+    if (rd.req == ET_POINTPOINTDIST) {
+        point* p1_it = nullptr;
+        point* p2_it = nullptr;
+        try {
+            p1_it = &(*(m_pointIDs[rd.objects[0]]));
+            p2_it = &(*(m_pointIDs[rd.objects[1]]));
+            info.m_objects.addElement(rd.objects[0]);
+            info.m_objects.addElement(rd.objects[1]);
+        }
+        catch (...) {
+            throw std::invalid_argument("No such points");
+        }
+        IReq* requirement = new ReqPointPointDist(p1_it, p2_it, rd.params[0]);
+        Arry<PARAMID> params;
+        params = requirement->getParams();
+        Arry<double> values;
+        values.addElement(p1_it->x);
+        values.addElement(p1_it->y);
+        values.addElement(p2_it->x);
+        values.addElement(p2_it->y);
+
+        Arry<double> paramP1;
+        paramP1.addElement(values[0]);
+        paramP1.addElement(values[1]);
+        Arry<double> paramP2;
+        paramP2.addElement(values[2]);
+        paramP2.addElement(values[3]);
+        info.m_paramsBefore.addElement(paramP1);
+        info.m_paramsBefore.addElement(paramP2);
+        Arry<double> derivatives;
+        int k = 0;
+        for (auto it = params.begin(); it != params.end(); ++it, ++k) {
+            derivatives.addElement(requirement->getDerivative(*it));
+        }
+        double alpha = 10e-6;
+        double e = requirement->getError();
+        while (e > 10e-5) {
+            for (int i = 0; i < values.getSize(); ++i) {
+                values[i] -= derivatives[i] * alpha;
+            }
+            (p1_it)->x = values[0];
+            (p1_it)->y = values[1];
+            (p2_it)->x = values[2];
+            (p2_it)->y = values[3];
+            e = requirement->getError();
+        }
+        paramP1[0] = values[0];
+        paramP1[1] = values[1];
+        paramP2[0] = values[2];
+        paramP2[1] = values[3];
+        info.m_paramsAfter.addElement(paramP1);
+        info.m_paramsAfter.addElement(paramP2);
+        c_undoRedo.add(info);
+        s_allFigures = s_allFigures || p1_it->rect();
+        s_allFigures = s_allFigures || p2_it->rect();
+        m_reqIDs[++s_maxID.id] = m_reqStorage.addElement(requirement);
+        return s_maxID.id;
+    }
+
+
+
+    // 4
+    if (rd.req == ET_POINTONPOINT) {
+        point* p1_it = nullptr;
+        point* p2_it = nullptr;
+        try {
+            p1_it = &(*(m_pointIDs[rd.objects[0]]));
+            p2_it = &(*(m_pointIDs[rd.objects[1]]));
+            info.m_objects.addElement(rd.objects[0]);
+            info.m_objects.addElement(rd.objects[1]);
+        }
+        catch (...) {
+            throw std::invalid_argument("No such points");
+        }
+        IReq* requirement = new ReqPointOnPoint(p1_it, p2_it);
+        Arry<PARAMID> params;
+        params = requirement->getParams();
+        Arry<double> values;
+        values.addElement(p1_it->x);
+        values.addElement(p1_it->y);
+        values.addElement(p2_it->x);
+        values.addElement(p2_it->y);
+        Arry<double> paramP1;
+        paramP1.addElement(values[0]);
+        paramP1.addElement(values[1]);
+        Arry<double> paramP2;
+        paramP2.addElement(values[2]);
+        paramP2.addElement(values[3]);
+        info.m_paramsBefore.addElement(paramP1);
+        info.m_paramsBefore.addElement(paramP2);
+        Arry<double> derivatives;
+        int k = 0;
+        for (auto it = params.begin(); it != params.end(); ++it, ++k) {
+            derivatives.addElement(requirement->getDerivative(*it));
+        }
+        double alpha = 10e-6;
+        double e = requirement->getError();
+        while (e > 10e-5) {
+            for (int i = 0; i < values.getSize(); ++i) {
+                values[i] -= derivatives[i] * alpha;
+            }
+            (p1_it)->x = values[0];
+            (p1_it)->y = values[1];
+            (p2_it)->x = values[2];
+            (p2_it)->y = values[3];
+            e = requirement->getError();
+        }
+        paramP1[0] = values[0];
+        paramP1[1] = values[1];
+        paramP2[0] = values[2];
+        paramP2[1] = values[3];
+        info.m_paramsAfter.addElement(paramP1);
+        info.m_paramsAfter.addElement(paramP2);
+        c_undoRedo.add(info);
+        s_allFigures = s_allFigures || p1_it->rect();
+        s_allFigures = s_allFigures || p2_it->rect();
+        m_reqIDs[++s_maxID.id] = m_reqStorage.addElement(requirement);
+        return s_maxID.id;
+    }
+
+
+
+    // 5
+    if (rd.req == ET_SECTIONCIRCLEDIST) {
+        circle* c_it = nullptr;
+        section* s_it = nullptr;
+        try {
+            c_it = &(*(m_circleIDs[rd.objects[0]]));
+            info.m_objects.addElement(rd.objects[0]);
+            info.m_objects.addElement(rd.objects[1]);
+        }
+        catch (...) {
+            s_it = &(*(m_sectionIDs[rd.objects[0]]));
+            info.m_objects.addElement(rd.objects[1]);
+            info.m_objects.addElement(rd.objects[0]);
+        }
+        if (c_it != nullptr) {
+            try {
+                s_it = &(*(m_sectionIDs[rd.objects[1]]));
+            }
+            catch (...) {
+                throw std::invalid_argument("No such section or circle");
+            }
+        }
+        else if (s_it != nullptr) {
+            try {
+                c_it = &(*(m_circleIDs[rd.objects[1]]));
+            }
+            catch (...) {
+                throw std::invalid_argument("No such circle or section");
+            }
+        }
+        IReq* requirement = new ReqSecCircleDist(s_it, c_it, rd.params[0]);
+        Arry<PARAMID> params = requirement->getParams();
+        Arry<double> paramValues;
+        for (size_t i = 0; i < params.getSize(); i++)
+        {
+            paramValues.addElement(*params[i]);
+        }
+        Arry<double> derivatives;
+
+        Arry<double> circleParam;
+        circleParam.addElement(paramValues[0]);
+        circleParam.addElement(paramValues[1]);
+        Arry<double> sectionParam;
+        sectionParam.addElement(paramValues[2]);
+        sectionParam.addElement(paramValues[3]);
+        sectionParam.addElement(paramValues[4]);
+        sectionParam.addElement(paramValues[5]);
+        info.m_paramsBefore.addElement(circleParam);
+        info.m_paramsBefore.addElement(sectionParam);
+
+        int k = 0;
+        for (auto it = params.begin(); it != params.end(); ++it, ++k) {
+            derivatives.addElement(requirement->getDerivative(*it));
+        }
+        double alpha = 10e-5;
+        double e = requirement->getError();
+        while (e > 10e-2) {
+            for (int i = 0; i < paramValues.getSize(); ++i) {
+                paramValues[i] -= derivatives[i] * alpha;
+            }
+            (c_it)->center->x = paramValues[0];
+            (c_it)->center->y = paramValues[1];
+            (s_it)->beg->x = paramValues[2];
+            (s_it)->beg->y = paramValues[3];
+            (s_it)->end->x = paramValues[4];
+            (s_it)->end->y = paramValues[5];
+            e = requirement->getError();
+        }
+
+
+        circleParam[0] = paramValues[0];
+        circleParam[1] = paramValues[1];
+
+        sectionParam[0] = paramValues[2];
+        sectionParam[1] = paramValues[3];
+        sectionParam[2] = paramValues[4];
+        sectionParam[3] = paramValues[5];
+        info.m_paramsAfter.addElement(circleParam);
+        info.m_paramsAfter.addElement(sectionParam);
+        c_undoRedo.add(info);
+
+        s_allFigures = s_allFigures || c_it->rect();
+        s_allFigures = s_allFigures || s_it->rect();
+        m_reqIDs[++s_maxID.id] = m_reqStorage.addElement(requirement);
+        return s_maxID.id;
+    }
+
+
+
+    // 6
+    if (rd.req == ET_SECTIONONCIRCLE) {
+        circle* c_it = nullptr;
+        section* s_it = nullptr;
+        try {
+            c_it = &(*(m_circleIDs[rd.objects[0]]));
+            info.m_objects.addElement(rd.objects[0]);
+            info.m_objects.addElement(rd.objects[1]);
+        }
+        catch (...) {
+            s_it = &(*(m_sectionIDs[rd.objects[0]]));
+            info.m_objects.addElement(rd.objects[1]);
+            info.m_objects.addElement(rd.objects[0]);
+        }
+        if (c_it != nullptr) {
+            try {
+                s_it = &(*(m_sectionIDs[rd.objects[1]]));
+            }
+            catch (...) {
+                throw std::invalid_argument("No such section or circle");
+            }
+        }
+        else if (s_it != nullptr) {
+            try {
+                c_it = &(*(m_circleIDs[rd.objects[1]]));
+            }
+            catch (...) {
+                throw std::invalid_argument("No such circle or section");
+            }
+        }
+        IReq* requirement = new ReqSecOnCircle(s_it, c_it);
+        Arry<PARAMID> params = requirement->getParams();
+        Arry<double> paramValues;
+        for (size_t i = 0; i < params.getSize(); i++)
+        {
+            paramValues.addElement(*params[i]);
+        }
+
+        Arry<double> circleParam;
+        circleParam.addElement(paramValues[0]);
+        circleParam.addElement(paramValues[1]);
+        Arry<double> sectionParam;
+        sectionParam.addElement(paramValues[2]);
+        sectionParam.addElement(paramValues[3]);
+        sectionParam.addElement(paramValues[4]);
+        sectionParam.addElement(paramValues[5]);
+        info.m_paramsBefore.addElement(circleParam);
+        info.m_paramsBefore.addElement(sectionParam);
+
+        Arry<double> derivatives;
+        for (const auto& it : params) {
+            derivatives.addElement(requirement->getDerivative(it));
+        }
+        double alpha = 10e-5;
+        double e = requirement->getError();
+        while (e > 10e-2) {
+            for (int i = 0; i < paramValues.getSize(); ++i) {
+                paramValues[i] -= derivatives[i] * alpha;
+            }
+            (c_it)->center->x = paramValues[0];
+            (c_it)->center->y = paramValues[1];
+            (s_it)->beg->x = paramValues[2];
+            (s_it)->beg->y = paramValues[3];
+            (s_it)->end->x = paramValues[4];
+            (s_it)->end->y = paramValues[5];
+            e = requirement->getError();
+        }
+
+        circleParam[0] = paramValues[0];
+        circleParam[1] = paramValues[1];
+
+        sectionParam[0] = paramValues[2];
+        sectionParam[1] = paramValues[3];
+        sectionParam[2] = paramValues[4];
+        sectionParam[3] = paramValues[5];
+        info.m_paramsAfter.addElement(circleParam);
+        info.m_paramsAfter.addElement(sectionParam);
+        c_undoRedo.add(info);
+
+        s_allFigures = s_allFigures || c_it->rect();
+        s_allFigures = s_allFigures || s_it->rect();
+        m_reqIDs[++s_maxID.id] = m_reqStorage.addElement(requirement);
+        return s_maxID.id;
+    }
+
+
+
+    // 7
+    if (rd.req == ET_SECTIONINCIRCLE) {
+        circle* c_it = nullptr;
+        section* s_it = nullptr;
+        try {
+            c_it = &(*(m_circleIDs[rd.objects[0]]));
+        }
+        catch (...) {
+            s_it = &(*(m_sectionIDs[rd.objects[0]]));
+        }
+        if (c_it != nullptr) {
+            try {
+                s_it = &(*(m_sectionIDs[rd.objects[1]]));
+            }
+            catch (...) {
+                throw std::invalid_argument("No such section or circle");
+            }
+        }
+        else if (s_it != nullptr) {
+            try {
+                c_it = &(*(m_circleIDs[rd.objects[1]]));
+            }
+            catch (...) {
+                throw std::invalid_argument("No such circle or section");
+            }
+        }
+        IReq* requirement = new ReqSecInCircle(s_it, c_it);
+        Arry<PARAMID> params = requirement->getParams();
+        Arry<double> derivatives;
+        Arry<double> paramValues;
+        for (size_t i = 0; i < params.getSize() ; i++)
+        {
+            paramValues.addElement(*params[i]);
+        }
+        info.m_paramsBefore.addElement(paramValues);
+
+        const double alpha = 0.01;
+        double e = requirement->getError();
+        while (e > 0.001) {
+            for (auto it = params.begin(); it != params.end(); ++it) {
+                derivatives.addElement(requirement->getDerivative(*it));
+            }
+            (s_it)->beg->x -= derivatives[0] * alpha;
+            (s_it)->beg->y -= derivatives[1] * alpha;
+            (s_it)->end->x -= derivatives[2] * alpha;
+            (s_it)->end->y -= derivatives[3] * alpha;
+            e = requirement->getError();
+        }
+
+        params = requirement->getParams();
+        for (size_t i = 0; i < params.getSize(); i++)
+        {
+            paramValues.addElement(*params[i]);
+        }
+        info.m_paramsAfter.addElement(paramValues);
+        c_undoRedo.add(info);
+
+        s_allFigures = s_allFigures || c_it->rect();
+        s_allFigures = s_allFigures || s_it->rect();
+        m_reqIDs[++s_maxID.id] = m_reqStorage.addElement(requirement);
+        return s_maxID.id;
+    }
+
+
+
+    // 8
+    if (rd.req == ET_SECTIONSECTIONPARALLEL) {
+        section* s1_it = nullptr;
+        section* s2_it = nullptr;
+
+        try
+        {
+            s1_it = &(*(m_sectionIDs[rd.objects[0]]));
+            s2_it = &(*(m_sectionIDs[rd.objects[1]]));
+        }
+        catch (...)
+        {
+            throw std::invalid_argument("No such section");
+        }
+
+        IReq* requirement = new ReqSecSecParallel(s1_it, s2_it);
+        Arry<PARAMID> params = requirement->getParams();
+        Arry<double> paramValues;
+        for (size_t i = 0; i < params.getSize(); i++)
+        {
+            paramValues.addElement(*params[i]);
+        }
+        info.m_paramsBefore.addElement(paramValues);
+        Arry<double> derivatives;
+
+        const double alpha = 0.0001;
+        double e = requirement->getError();
+        while (e > 0.1) {
+            for (auto it = params.begin(); it != params.end(); ++it) {
+                derivatives.addElement(requirement->getDerivative(*it));
+            }
+            (s1_it)->beg->x -= derivatives[0] * alpha;
+            (s1_it)->beg->y -= derivatives[1] * alpha;
+            (s1_it)->end->x -= derivatives[2] * alpha;
+            (s1_it)->end->y -= derivatives[3] * alpha;
+            (s2_it)->beg->x -= derivatives[4] * alpha;
+            (s2_it)->beg->y -= derivatives[5] * alpha;
+            (s2_it)->end->x -= derivatives[6] * alpha;
+            (s2_it)->end->y -= derivatives[7] * alpha;
+            e = requirement->getError();
+        }
+
+        params = requirement->getParams();
+        for (size_t i = 0; i < params.getSize(); i++)
+        {
+            paramValues.addElement(*params[i]);
+        }
+        info.m_paramsAfter.addElement(paramValues);
+        c_undoRedo.add(info);
+
+        s_allFigures = s_allFigures || s1_it->rect();
+        s_allFigures = s_allFigures || s2_it->rect();
+        m_reqIDs[++s_maxID.id] = m_reqStorage.addElement(requirement);
+        return s_maxID.id;
+    }
+
+
+
+    // 9
+    if (rd.req == ET_SECTIONSECTIONPERPENDICULAR) {
+        section* s1_it = nullptr;
+        section* s2_it = nullptr;
+
+        try
+        {
+            s1_it = &(*(m_sectionIDs[rd.objects[0]]));
+            s2_it = &(*(m_sectionIDs[rd.objects[1]]));
+        }
+        catch (...)
+        {
+            throw std::invalid_argument("No such section");
+        }
+
+        IReq* requirement = new ReqSecSecPerpendicular(s1_it, s2_it);
+        Arry<PARAMID> params = requirement->getParams();
+        Arry<double> paramValues;
+        for (size_t i = 0; i < params.getSize(); i++)
+        {
+            paramValues.addElement(*params[i]);
+        }
+        info.m_paramsBefore.addElement(paramValues);
+        Arry<double> derivatives;
+
+        const double alpha = 0.0001;
+        double e = requirement->getError();
+        while (e > 0.1) {
+            for (auto it = params.begin(); it != params.end(); ++it) {
+                derivatives.addElement(requirement->getDerivative(*it));
+            }
+            (s1_it)->beg->x -= derivatives[0] * alpha;
+            (s1_it)->beg->y -= derivatives[1] * alpha;
+            (s1_it)->end->x -= derivatives[2] * alpha;
+            (s1_it)->end->y -= derivatives[3] * alpha;
+            (s2_it)->beg->x -= derivatives[4] * alpha;
+            (s2_it)->beg->y -= derivatives[5] * alpha;
+            (s2_it)->end->x -= derivatives[6] * alpha;
+            (s2_it)->end->y -= derivatives[7] * alpha;
+            e = requirement->getError();
+        }
+
+        params = requirement->getParams();
+        for (size_t i = 0; i < params.getSize(); i++)
+        {
+            paramValues.addElement(*params[i]);
+        }
+        info.m_paramsAfter.addElement(paramValues);
+        c_undoRedo.add(info);
+
+        s_allFigures = s_allFigures || s1_it->rect();
+        s_allFigures = s_allFigures || s2_it->rect();
+        m_reqIDs[++s_maxID.id] = m_reqStorage.addElement(requirement);
+        return s_maxID.id;
+    }
+
+
+
+    // 10
+    if (rd.req == ET_SECTIONSECTIONANGEL) {
+        section* s1_it = nullptr;
+        section* s2_it = nullptr;
+
+        try
+        {
+            s1_it = &(*(m_sectionIDs[rd.objects[0]]));
+            s2_it = &(*(m_sectionIDs[rd.objects[1]]));
+        }
+        catch (...)
+        {
+            throw std::invalid_argument("No such section");
+        }
+
+        IReq* requirement = new ReqSecSecAngel(s1_it, s2_it, rd.params[0]);
+        Arry<PARAMID> params = requirement->getParams();
+        Arry<double> paramValues;
+        for (size_t i = 0; i < params.getSize(); i++)
+        {
+            paramValues.addElement(*params[i]);
+        }
+        info.m_paramsBefore.addElement(paramValues);
+        Arry<double> derivatives;
+        for (auto it = params.begin(); it != params.end(); ++it) {
+            derivatives.addElement(requirement->getDerivative(*it));
+        }
+
+        const double alpha = 0.001;
+        double e = requirement->getError();
+        while (e > 0.001) {
+            (s1_it)->beg->x -= derivatives[0] * alpha;
+            (s1_it)->beg->y -= derivatives[1] * alpha;
+            (s1_it)->end->x -= derivatives[2] * alpha;
+            (s1_it)->end->y -= derivatives[3] * alpha;
+            (s2_it)->beg->x -= derivatives[4] * alpha;
+            (s2_it)->beg->y -= derivatives[5] * alpha;
+            (s2_it)->end->x -= derivatives[6] * alpha;
+            (s2_it)->end->y -= derivatives[7] * alpha;
+            e = requirement->getError();
+        }
+
+        params = requirement->getParams();
+        for (size_t i = 0; i < params.getSize(); i++)
+        {
+            paramValues.addElement(*params[i]);
+        }
+        info.m_paramsAfter.addElement(paramValues);
+        c_undoRedo.add(info);
+
+        s_allFigures = s_allFigures || s1_it->rect();
+        s_allFigures = s_allFigures || s2_it->rect();
+        m_reqIDs[++s_maxID.id] = m_reqStorage.addElement(requirement);
+        return s_maxID.id;
+    }
+
     return ID{-1};
 }
 
@@ -861,7 +1120,7 @@ void Paint::redo() {
     circle *c = nullptr;
     if (info.m_paramsBefore.getSize() == 0) {
         for (int i = 0; i < info.m_objects.getSize(); ++i) {
-            if (m_pointIDs.contains(info.m_objects[i])) {
+            /*if (m_pointIDs.contains(info.m_objects[i])) {
                 p = new point;
                 p->x = info.m_paramsAfter[i][0];
                 p->y = info.m_paramsAfter[i][1];
@@ -883,7 +1142,7 @@ void Paint::redo() {
             } else {
                 std::cout << "No ID to undo" << std::endl;
                 break;
-            }
+            }*/
         }
         return;
     }

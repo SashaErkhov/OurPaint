@@ -33,6 +33,7 @@ struct RequirementData {
     RequirementData();
 };
 
+// Abstract class
 struct IReq {
 protected:
     Arry<ID> objects;
@@ -42,16 +43,22 @@ public:
     virtual Arry<PARAMID> getParams() = 0;
     virtual double getDerivative(PARAMID p) = 0;
 };
-class ReqPointSegDist : public IReq {
+
+
+
+// 1
+class ReqPointSecDist : public IReq {
     point* m_p;
     section* m_s;
     double d;
 public:
-    ReqPointSegDist(point* p, section* s, double dist);
+    ReqPointSecDist(point* p, section* s, double dist);
     double getError() override;
     Arry<PARAMID> getParams() override;
     double getDerivative(PARAMID p) override;
 };
+
+// 2
 class ReqPointOnSec : public IReq {
     point* m_p;
     section* m_s;
@@ -61,16 +68,9 @@ public:
     Arry<PARAMID> getParams() override;
     double getDerivative(PARAMID param) override;
 };
-class ReqPointOnPoint: public IReq {
-    point* m_p1;
-    point* m_p2;
-public:
-    ReqPointOnPoint(point* p1, point* p2);
-    double getError() override;
-    Arry<PARAMID> getParams() override;
-    double getDerivative(PARAMID p) override;
-};
-class ReqPointPointDist: public IReq {
+
+// 3
+class ReqPointPointDist : public IReq {
     point* m_p1;
     point* m_p2;
     double v_dist;
@@ -80,7 +80,20 @@ public:
     Arry<PARAMID> getParams() override;
     double getDerivative(PARAMID p) override;
 };
-class ReqSecCircleDist: public IReq {
+
+// 4
+class ReqPointOnPoint : public IReq {
+    point* m_p1;
+    point* m_p2;
+public:
+    ReqPointOnPoint(point* p1, point* p2);
+    double getError() override;
+    Arry<PARAMID> getParams() override;
+    double getDerivative(PARAMID p) override;
+};
+
+// 5
+class ReqSecCircleDist : public IReq {
     section* m_s;
     circle* m_c;
     double v_dist;
@@ -90,11 +103,58 @@ public:
     Arry<PARAMID> getParams() override;
     double getDerivative(PARAMID p) override;
 };
-class ReqSecOnCircle: public IReq {
+
+// 6
+class ReqSecOnCircle : public IReq {
     section* m_s;
     circle* m_c;
 public:
     ReqSecOnCircle(section* m_s, circle* m_c);
+    double getError() override;
+    Arry<PARAMID> getParams() override;
+    double getDerivative(PARAMID p) override;
+};
+
+// 7
+class ReqSecInCircle : public IReq {
+    section* m_s;
+    circle* m_c;
+public:
+    ReqSecInCircle(section* m_s, circle* m_c);
+    double getError() override;
+    Arry<PARAMID> getParams() override;
+    double getDerivative(PARAMID p) override;
+};
+
+// 8
+class ReqSecSecParallel : public IReq {
+    section* m_s1;
+    section* m_s2;
+public:
+    ReqSecSecParallel(section* m_s1, section* m_s2);
+    double getError() override;
+    Arry<PARAMID> getParams() override;
+    double getDerivative(PARAMID p) override;
+};
+
+// 9
+class ReqSecSecPerpendicular : public IReq {
+    section* m_s1;
+    section* m_s2;
+public:
+    ReqSecSecPerpendicular(section* m_s1, section* m_s2);
+    double getError() override;
+    Arry<PARAMID> getParams() override;
+    double getDerivative(PARAMID p) override;
+};
+
+// 10
+class ReqSecSecAngel : public IReq {
+    section* m_s1;
+    section* m_s2;
+    double desired_angle;
+public:
+    ReqSecSecAngel(section* m_s1, section* m_s2, double desired_dist);
     double getError() override;
     Arry<PARAMID> getParams() override;
     double getDerivative(PARAMID p) override;

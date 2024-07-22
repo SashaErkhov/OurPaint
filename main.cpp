@@ -35,11 +35,18 @@ int main()
             std::cout << "load <bmp/db> file_name.<bmp/db> \t- \tload the information about objects from file_name.db if db or"
                 "just load the image from file_name.bmp" << std::endl;
             std::cout << "addreq <instruction> <objects> <param> \t- \tdo something with objects \n"
-                         "                 Types of instructions:\n                 '1' - Take 2 args: one point, and one section and distant that you want between them on <param>.\n"
-                         "                 '2' - Take 2 point(they may be on figure) and set it on each other(<param> can be empty)\n"
-                         "                 '3' - Take 2 point(they may be on figure) and set distance between them on <param> \n"
-                         "                 '4' - Take point and section and set it on each other(<param> can be empty)\n"
-                         "                 '5' - Take section and circle and set distance between them on <param> \n"<< std::endl;
+                "                 Types of instructions:\n"
+                "                 '1'  - Take 2 args: one point, and one section and distant that you want between them on <param>.\n"
+                "                 '2'  - Take point and section and set it on each other(<param> can be empty)\n"
+                "                 '3'  - Take 2 point(they may be on figure) and set distance between them on <param>\n"
+                "                 '4'  - Take 2 point(they may be on figure) and set it on each other(<param> can be empty)\n"
+                "                 '5'  - Take circle and section and set distance between them on <param>\n"
+                "                 '6'  - Take circle and section and set section to be on circle (<param> can be empty)\n"
+                "                 '7'  - Take circle and section, set the section completely inside circle (<param> can be empty)\n"
+                "                 '8'  - Take 2 sections, set distance and parallel alignment between them on <param>\n"
+                "                 '9'  - Take 2 sections, set them perpendicular to each other (<param> can be empty)\n"
+                "                 '10' - Take 2 sections, set a specific angle between them on <param>\n"
+                << std::endl;
             std::cout << "q \t- \tQuit" << std::endl;
             std::cout << "help \t- \tHelp that show you commands to use" << std::endl;
         }
@@ -138,7 +145,7 @@ int main()
             }
         }
         if (strcmp(command, "addreq")  ==  0)  {
-            char req;
+            int req;
             RequirementData reqData;
             ID obj1;
             ID obj2;
@@ -146,69 +153,107 @@ int main()
             double parameters;
             std::cin  >> req;
             switch  (req)  {
-                case '1':
-                    type = ET_POINTSECTIONDIST;
-                    std::cin >> obj1.id;
-                    std::cin >> obj2.id;
-                    std::cin  >> parameters;
-                    reqData.req = type;
-                    reqData.objects.addElement(obj1);
-                    reqData.objects.addElement(obj2);
-                    reqData.params.addElement(parameters);
-                    screen.addRequirement(reqData);
-                    break;
-                case '2':
-                    type = ET_POINTONPOINT;
-                    std::cin >> obj1.id;
-                    std::cin >> obj2.id;
-                    reqData.req = type;
-                    reqData.objects.addElement(obj1);
-                    reqData.objects.addElement(obj2);
-                    screen.addRequirement(reqData);
-                    break;
-                case '3':
-                    type = ET_POINTPOINTDIST;
-                    std::cin >> obj1.id;
-                    std::cin >> obj2.id;
-                    std::cin >> parameters;
-                    reqData.req = type;
-                    reqData.objects.addElement(obj1);
-                    reqData.objects.addElement(obj2);
-                    reqData.params.addElement(parameters);
-                    screen.addRequirement(reqData);
-                    break;
-                case '4':
-                    type = ET_POINTONSECTION;
-                    std::cin >> obj1.id;
-                    std::cin >> obj2.id;
-                    reqData.req = type;
-                    reqData.objects.addElement(obj1);
-                    reqData.objects.addElement(obj2);
-                    screen.addRequirement(reqData);
-                    break;
-                case '5':
-                    type = ET_SECTIONCIRCLEDIST;
-                    std::cin >> obj1.id;
-                    std::cin >> obj2.id;
-                    std::cin >> parameters;
-                    reqData.req = type;
-                    reqData.objects.addElement(obj1);
-                    reqData.objects.addElement(obj2);
-                    reqData.params.addElement(parameters);
-                    screen.addRequirement(reqData);
-                    break;
-                case '6':
-                    type = ET_SECTIONONCIRCLE;
-                    std::cin >> obj1.id;
-                    std::cin >> obj2.id;
-                    reqData.req = type;
-                    reqData.objects.addElement(obj1);
-                    reqData.objects.addElement(obj2);
-                    screen.addRequirement(reqData);
-                    break;
-                default:
-                    std::cout << "Unknown requirement. Please read types of instructions by help command" << std::endl;
-                    break;
+            case 1:
+                type = ET_POINTSECTIONDIST;
+                std::cin >> obj1.id;
+                std::cin >> obj2.id;
+                std::cin >> parameters;
+                reqData.req = type;
+                reqData.objects.addElement(obj1);
+                reqData.objects.addElement(obj2);
+                reqData.params.addElement(parameters);
+                screen.addRequirement(reqData);
+                break;
+            case 2:
+                type = ET_POINTONSECTION;
+                std::cin >> obj1.id;
+                std::cin >> obj2.id;
+                reqData.req = type;
+                reqData.objects.addElement(obj1);
+                reqData.objects.addElement(obj2);
+                screen.addRequirement(reqData);
+                break;
+            case 3:
+                type = ET_POINTPOINTDIST;
+                std::cin >> obj1.id;
+                std::cin >> obj2.id;
+                std::cin >> parameters;
+                reqData.req = type;
+                reqData.objects.addElement(obj1);
+                reqData.objects.addElement(obj2);
+                reqData.params.addElement(parameters);
+                screen.addRequirement(reqData);
+                break;
+            case 4:
+                type = ET_POINTONPOINT;
+                std::cin >> obj1.id;
+                std::cin >> obj2.id;
+                reqData.req = type;
+                reqData.objects.addElement(obj1);
+                reqData.objects.addElement(obj2);
+                screen.addRequirement(reqData);
+                break;
+            case 5:
+                type = ET_SECTIONCIRCLEDIST;
+                std::cin >> obj1.id;
+                std::cin >> obj2.id;
+                std::cin >> parameters;
+                reqData.req = type;
+                reqData.objects.addElement(obj1);
+                reqData.objects.addElement(obj2);
+                reqData.params.addElement(parameters);
+                screen.addRequirement(reqData);
+                break;
+            case 6:
+                type = ET_SECTIONONCIRCLE;
+                std::cin >> obj1.id;
+                std::cin >> obj2.id;
+                reqData.req = type;
+                reqData.objects.addElement(obj1);
+                reqData.objects.addElement(obj2);
+                screen.addRequirement(reqData);
+                break;
+            case 7:
+                type = ET_SECTIONINCIRCLE;
+                std::cin >> obj1.id;
+                std::cin >> obj2.id;
+                reqData.req = type;
+                reqData.objects.addElement(obj1);
+                reqData.objects.addElement(obj2);
+                screen.addRequirement(reqData);
+                break;
+            case 8:
+                type = ET_SECTIONSECTIONPARALLEL;
+                std::cin >> obj1.id;
+                std::cin >> obj2.id;
+                reqData.req = type;
+                reqData.objects.addElement(obj1);
+                reqData.objects.addElement(obj2);
+                screen.addRequirement(reqData);
+                break;
+            case 9:
+                type = ET_SECTIONSECTIONPERPENDICULAR;
+                std::cin >> obj1.id;
+                std::cin >> obj2.id;
+                reqData.req = type;
+                reqData.objects.addElement(obj1);
+                reqData.objects.addElement(obj2);
+                screen.addRequirement(reqData);
+                break;
+            case 10:
+                type = ET_SECTIONSECTIONANGEL;
+                std::cin >> obj1.id;
+                std::cin >> obj2.id;
+                std::cin >> parameters;
+                reqData.req = type;
+                reqData.objects.addElement(obj1);
+                reqData.objects.addElement(obj2);
+                reqData.params.addElement(parameters);
+                screen.addRequirement(reqData);
+                break;
+            default:
+                std::cout << "Unknown requirement. Please read types of instructions by help command" << std::endl;
+                break;
             }
         }
         if (strcmp(command, "remr") == 0){
