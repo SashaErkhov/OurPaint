@@ -1119,30 +1119,39 @@ void Paint::redo() {
     section *s = nullptr;
     circle *c = nullptr;
     if (info.m_paramsBefore.getSize() == 0) {
-        for (int i = 0; i < info.m_objects.getSize(); ++i) {
-            /*if (m_pointIDs.contains(info.m_objects[i])) {
-                p = new point;
-                p->x = info.m_paramsAfter[i][0];
-                p->y = info.m_paramsAfter[i][1];
-                m_pointIDs[info.m_objects[i]] = m_pointStorage.addElement(*p);
-            }else if (m_sectionIDs.contains(info.m_objects[i])) {
-                s = new section;
-                s->beg->x = info.m_paramsAfter[i][0];
-                s->beg->y = info.m_paramsAfter[i][1];
-                s->end->x = info.m_paramsAfter[i][2];
-                s->end->y = info.m_paramsAfter[i][3];
-                m_sectionIDs[info.m_objects[i]] = m_sectionStorage.addElement(*s);
-            } else if (m_circleIDs.contains(info.m_objects[i])){
-                c = new circle;
-                tmpp.x = info.m_paramsAfter[i][0];
-                c->center->x = info.m_paramsAfter[i][0];
-                c->center->y = info.m_paramsAfter[i][1];
-                c->R = info.m_paramsAfter[i][2];
-                m_circleIDs[info.m_objects[i]] = m_circleStorage.addElement(*c);
-            } else {
-                std::cout << "No ID to undo" << std::endl;
-                break;
-            }*/
+        if (info.m_objects.getSize() == 3){
+            point beg;
+            beg.x = info.m_paramsAfter[0][0];
+            beg.y = info.m_paramsAfter[0][1];
+            auto p1 = m_pointStorage.addElement(beg);
+            m_pointIDs[info.m_objects[0]] = p1;
+            point end;
+            end.x = info.m_paramsAfter[1][0];
+            end.y = info.m_paramsAfter[1][1];
+            auto p2 = m_pointStorage.addElement(end);
+            m_pointIDs[info.m_objects[1]] = p2;
+            section sec;
+            sec.beg = &(*(p1));
+            sec.end = &(*(p2));
+            m_sectionIDs[info.m_objects[2]] = m_sectionStorage.addElement(sec);
+            s_allFigures = s_allFigures || sec.rect();
+        }else if (info.m_objects.getSize() == 2){
+            point center;
+            center.x = info.m_paramsAfter[0][0];
+            center.y = info.m_paramsAfter[0][1];
+            circle circ;
+            auto p1 = m_pointStorage.addElement(center);
+            m_pointIDs[info.m_objects[0]] = p1;
+            circ.center = &(*(p1));
+            circ.R = info.m_paramsAfter[1][2];
+            m_circleIDs[info.m_objects[1]] = m_circleStorage.addElement(circ);
+            s_allFigures = s_allFigures || circ.rect();
+        } else if (info.m_objects.getSize() == 1){
+            point pt;
+            pt.x = info.m_paramsAfter[0][0];
+            pt.y = info.m_paramsAfter[0][1];
+            m_pointIDs[info.m_objects[0]] = m_pointStorage.addElement(pt);
+            s_allFigures = s_allFigures || pt.rect();
         }
         return;
     }

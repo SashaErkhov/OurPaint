@@ -262,10 +262,18 @@ int main()
             screen.deleteRequirement(req);
         }
         if (strcmp(command, "undo") == 0){
-            screen.undo();
+            try {
+                screen.undo();
+            }catch (std::exception& e){
+                std::cout << e.what() << std::endl;
+            }
         }
         if (strcmp(command, "redo") == 0){
+            try{
             screen.redo();
+            }catch (std::exception& e){
+                std::cout << e.what() << std::endl;
+            }
         }
     }
 }
