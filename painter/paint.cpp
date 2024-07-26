@@ -378,11 +378,12 @@ ID Paint::addRequirement(const RequirementData &rd) {
         Arry<double> circleParam;
         circleParam.addElement(paramValues[0]);
         circleParam.addElement(paramValues[1]);
+        circleParam.addElement(paramValues[2]);
         Arry<double> sectionParam;
-        sectionParam.addElement(paramValues[2]);
         sectionParam.addElement(paramValues[3]);
         sectionParam.addElement(paramValues[4]);
         sectionParam.addElement(paramValues[5]);
+        sectionParam.addElement(paramValues[6]);
         info.m_paramsBefore.addElement(circleParam);
         info.m_paramsBefore.addElement(sectionParam);
 
@@ -398,21 +399,23 @@ ID Paint::addRequirement(const RequirementData &rd) {
             }
             (c_it)->center->x = paramValues[0];
             (c_it)->center->y = paramValues[1];
-            (s_it)->beg->x = paramValues[2];
-            (s_it)->beg->y = paramValues[3];
-            (s_it)->end->x = paramValues[4];
-            (s_it)->end->y = paramValues[5];
+            (c_it)->R      = paramValues[2];
+            (s_it)->beg->x = paramValues[3];
+            (s_it)->beg->y = paramValues[4];
+            (s_it)->end->x = paramValues[5];
+            (s_it)->end->y = paramValues[6];
             e = requirement->getError();
         }
 
 
         circleParam[0] = paramValues[0];
         circleParam[1] = paramValues[1];
+        circleParam[2] = paramValues[2];
 
-        sectionParam[0] = paramValues[2];
-        sectionParam[1] = paramValues[3];
-        sectionParam[2] = paramValues[4];
-        sectionParam[3] = paramValues[5];
+        sectionParam[0] = paramValues[3];
+        sectionParam[1] = paramValues[4];
+        sectionParam[2] = paramValues[5];
+        sectionParam[3] = paramValues[6];
         info.m_paramsAfter.addElement(circleParam);
         info.m_paramsAfter.addElement(sectionParam);
         c_undoRedo.add(info);
@@ -466,11 +469,12 @@ ID Paint::addRequirement(const RequirementData &rd) {
         Arry<double> circleParam;
         circleParam.addElement(paramValues[0]);
         circleParam.addElement(paramValues[1]);
+        circleParam.addElement(paramValues[2]);
         Arry<double> sectionParam;
-        sectionParam.addElement(paramValues[2]);
         sectionParam.addElement(paramValues[3]);
         sectionParam.addElement(paramValues[4]);
         sectionParam.addElement(paramValues[5]);
+        sectionParam.addElement(paramValues[6]);
         info.m_paramsBefore.addElement(circleParam);
         info.m_paramsBefore.addElement(sectionParam);
 
@@ -478,7 +482,7 @@ ID Paint::addRequirement(const RequirementData &rd) {
         for (const auto& it : params) {
             derivatives.addElement(requirement->getDerivative(it));
         }
-        double alpha = 10e-5;
+        double alpha = 0.01;
         double e = requirement->getError();
         while (e > 10e-2) {
             for (int i = 0; i < paramValues.getSize(); ++i) {
@@ -486,20 +490,22 @@ ID Paint::addRequirement(const RequirementData &rd) {
             }
             (c_it)->center->x = paramValues[0];
             (c_it)->center->y = paramValues[1];
-            (s_it)->beg->x = paramValues[2];
-            (s_it)->beg->y = paramValues[3];
-            (s_it)->end->x = paramValues[4];
-            (s_it)->end->y = paramValues[5];
+            (c_it)->R      = paramValues[2];
+            (s_it)->beg->x = paramValues[3];
+            (s_it)->beg->y = paramValues[4];
+            (s_it)->end->x = paramValues[5];
+            (s_it)->end->y = paramValues[6];
             e = requirement->getError();
         }
 
         circleParam[0] = paramValues[0];
         circleParam[1] = paramValues[1];
+        circleParam[2] = paramValues[2];
 
-        sectionParam[0] = paramValues[2];
-        sectionParam[1] = paramValues[3];
-        sectionParam[2] = paramValues[4];
-        sectionParam[3] = paramValues[5];
+        sectionParam[0] = paramValues[3];
+        sectionParam[1] = paramValues[4];
+        sectionParam[2] = paramValues[5];
+        sectionParam[3] = paramValues[6];
         info.m_paramsAfter.addElement(circleParam);
         info.m_paramsAfter.addElement(sectionParam);
         c_undoRedo.add(info);
@@ -554,10 +560,13 @@ ID Paint::addRequirement(const RequirementData &rd) {
             for (auto it = params.begin(); it != params.end(); ++it) {
                 derivatives.addElement(requirement->getDerivative(*it));
             }
-            (s_it)->beg->x -= derivatives[0] * alpha;
-            (s_it)->beg->y -= derivatives[1] * alpha;
-            (s_it)->end->x -= derivatives[2] * alpha;
-            (s_it)->end->y -= derivatives[3] * alpha;
+            (c_it)->center->x -= derivatives[0] * alpha;
+            (c_it)->center->y -= derivatives[1] * alpha;
+            (c_it)->R         -= derivatives[2] * alpha;
+            (s_it)->beg->x    -= derivatives[3] * alpha;
+            (s_it)->beg->y    -= derivatives[4] * alpha;
+            (s_it)->end->x    -= derivatives[5] * alpha;
+            (s_it)->end->y    -= derivatives[6] * alpha;
             e = requirement->getError();
         }
 

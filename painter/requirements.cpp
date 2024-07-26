@@ -269,6 +269,7 @@ Arry<PARAMID> ReqSecCircleDist::getParams() {
     Arry<PARAMID> res;
     res.addElement(&(m_c->center->x));
     res.addElement(&(m_c->center->y));
+    res.addElement(&(m_c->R));
     res.addElement(&(m_s->beg->x));
     res.addElement(&(m_s->beg->y));
     res.addElement(&(m_s->end->x));
@@ -296,6 +297,9 @@ double ReqSecCircleDist::getDerivative(PARAMID p) {
         double den = std::hypot(-x1 + x2, -y1 + y2);
 
         return num / den;
+    }
+    else if (p == &m_c->R) { // R
+        return -0.5;
     }
     else if (p == &m_s->beg->x) { // x1
         double num1 = (-x1 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
@@ -351,6 +355,7 @@ Arry<PARAMID> ReqSecOnCircle::getParams() {
     Arry<PARAMID> res;
     res.addElement(&(m_c->center->x));
     res.addElement(&(m_c->center->y));
+    res.addElement(&(m_c->R));
     res.addElement(&(m_s->beg->x));
     res.addElement(&(m_s->beg->y));
     res.addElement(&(m_s->end->x));
@@ -378,6 +383,9 @@ double ReqSecOnCircle::getDerivative(double* p) {
         double den = std::hypot(-x1 + x2, -y1 + y2);
 
         return num / den;
+    }
+    else if (p == &m_c->R) { // R
+        return -0.5;
     }
     else if (p == &m_s->beg->x) { // x1
         double num1 = (-x1 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
@@ -412,7 +420,7 @@ double ReqSecOnCircle::getDerivative(double* p) {
         return num1 / den1 + num2 / den2;
     }
 
-    return 0;
+    return 0.0;
 }
 
 
@@ -441,6 +449,9 @@ double ReqSecInCircle::getError() {
 }
 Arry<PARAMID> ReqSecInCircle::getParams() {
     Arry<PARAMID> res;
+    res.addElement(&(m_c->center->x));
+    res.addElement(&(m_c->center->y));
+    res.addElement(&(m_c->R));
     res.addElement(&(m_s->beg->x));
     res.addElement(&(m_s->beg->y));
     res.addElement(&(m_s->end->x));
@@ -451,7 +462,7 @@ double ReqSecInCircle::getDerivative(PARAMID p) {
     double x0 = m_c->center->x;
     double y0 = m_c->center->y;
 
-    double r = m_c->R - 1;
+    double r = m_c->R;
 
     double x1 = m_s->beg->x;
     double y1 = m_s->beg->y;
@@ -462,33 +473,31 @@ double ReqSecInCircle::getDerivative(PARAMID p) {
     double dist1 = std::hypot(x1 - x0, y1 - y0);
     double dist2 = std::hypot(x2 - x0, y2 - y0);
 
-    double grad_x1;
-    double grad_y1;
-    double grad_x2;
-    double grad_y2;
+    double grad_x1 = 0, grad_y1 = 0, grad_x2 = 0, grad_y2 = 0, grad_x0 = 0, grad_y0 = 0, grad_r = 0;
 
     if (dist1 > r) {
         grad_x1 = (x1 - x0) / dist1;
         grad_y1 = (y1 - y0) / dist1;
-    }
-    else {
-        grad_x1 = 0;
-        grad_y1 = 0;
+        grad_x0 -= (x1 - x0) / dist1;
+        grad_y0 -= (y1 - y0) / dist1;
+        grad_r -= 1;
     }
 
     if (dist2 > r) {
         grad_x2 = (x2 - x0) / dist2;
         grad_y2 = (y2 - y0) / dist2;
-    }
-    else {
-        grad_x2 = 0;
-        grad_y2 = 0;
+        grad_x0 -= (x2 - x0) / dist2;
+        grad_y0 -= (y2 - y0) / dist2;
+        grad_r -= 0.01;
     }
 
     if (p == &m_s->beg->x) return grad_x1;
-    else if (p == &m_s->beg->y) return grad_y1;
-    else if (p == &m_s->end->x) return grad_x2;
-    else if (p == &m_s->end->y) return grad_y2;
+    if (p == &m_s->beg->y) return grad_y1;
+    if (p == &m_s->end->x) return grad_x2;
+    if (p == &m_s->end->y) return grad_y2;
+    if (p == &m_c->center->x) return grad_x0;
+    if (p == &m_c->center->y) return grad_y0;
+    if (p == &m_c->R) return grad_r;
 
     return 0.0;
 }
