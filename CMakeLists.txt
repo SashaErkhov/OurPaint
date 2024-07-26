@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 set(CMAKE_CXX_STANDARD 20)
 project(ourpaint)
-add_executable(ourpaint main.cpp painter/paint.cpp painter/BMPpainter.cpp painter/objects.cpp "Matrix/Matrix.h" painter/requirements.cpp painter/requirements.h painter/enums.h)
+add_executable(ourpaint main.cpp painter/paint.cpp painter/BMPpainter.cpp painter/objects.cpp "Matrix/Matrix.h" "graph/simpleGraph.h" painter/requirements.cpp painter/requirements.h painter/enums.h)
 include_directories(additions)
 include_directories(UndoRedo)
 include_directories(BMPfile/code)
