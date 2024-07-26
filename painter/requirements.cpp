@@ -43,13 +43,13 @@ double ReqPointSecDist::getDerivative(PARAMID param) {
 
     if (param == &m_p->x) { // x0
         double num = -y1 + y2;
-        double den = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+        double den = std::hypot(-x1 + x2, -y1 + y2);
 
         return num / den;
     }
     else if (param == &m_p->y) { // y0
         double num = x1 - x2;
-        double den = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+        double den = std::hypot(-x1 + x2, -y1 + y2);
 
         return num / den;
     }
@@ -57,7 +57,7 @@ double ReqPointSecDist::getDerivative(PARAMID param) {
         double num1 = (-x1 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
         double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
         double num2 = y0 - y2;
-        double den2 = sqrt(((-x1 + x2), 2) + ((-y1 + y2), 2));
+        double den2 = std::hypot(-x1 + x2, -y1 + y2);
 
         return num1 / den1 + num2 / den2;
     }
@@ -65,7 +65,7 @@ double ReqPointSecDist::getDerivative(PARAMID param) {
         double num1 = (-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
         double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
         double num2 = -x0 + x2;
-        double den2 = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+        double den2 = std::hypot(-x1 + x2, -y1 + y2);
 
         return num1 / den1 + num2 / den2;
     }
@@ -73,7 +73,7 @@ double ReqPointSecDist::getDerivative(PARAMID param) {
         double num1 = -(-x1 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
         double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
         double num2 = -y0 + y1;
-        double den2 = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+        double den2 = std::hypot(-x1 + x2, -y1 + y2);
 
         return num1 / den1 + num2 / den2;
     }
@@ -81,7 +81,7 @@ double ReqPointSecDist::getDerivative(PARAMID param) {
         double num1 = -(-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
         double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
         double num2 = x0 - x1;
-        double den2 = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+        double den2 = std::hypot(-x1 + x2, -y1 + y2);
 
         return num1 / den1 + num2 / den2;
     }
@@ -125,13 +125,13 @@ double ReqPointOnSec::getDerivative(PARAMID param) {
 
     if (param == &m_p->x) { // x0
         double num = -y1 + y2;
-        double den = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+        double den = std::hypot(-x1 + x2, -y1 + y2);
 
         return num / den;
     }
     else if (param == &m_p->y) { // y0
         double num = x1 - x2;
-        double den = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+        double den = std::hypot(-x1 + x2, -y1 + y2);
 
         return num / den;
     }
@@ -139,7 +139,7 @@ double ReqPointOnSec::getDerivative(PARAMID param) {
         double num1 = (-x1 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
         double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
         double num2 = y0 - y2;
-        double den2 = sqrt(((-x1 + x2), 2) + ((-y1 + y2), 2));
+        double den2 = std::hypot(-x1 + x2, -y1 + y2);
 
         return num1 / den1 + num2 / den2;
     }
@@ -147,7 +147,7 @@ double ReqPointOnSec::getDerivative(PARAMID param) {
         double num1 = (-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
         double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
         double num2 = -x0 + x2;
-        double den2 = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+        double den2 = std::hypot(-x1 + x2, -y1 + y2);
 
         return num1 / den1 + num2 / den2;
     }
@@ -155,7 +155,7 @@ double ReqPointOnSec::getDerivative(PARAMID param) {
         double num1 = -(-x1 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
         double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
         double num2 = -y0 + y1;
-        double den2 = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+        double den2 = std::hypot(-x1 + x2, -y1 + y2);
 
         return num1 / den1 + num2 / den2;
     }
@@ -163,7 +163,7 @@ double ReqPointOnSec::getDerivative(PARAMID param) {
         double num1 = -(-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
         double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
         double num2 = x0 - x1;
-        double den2 = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+        double den2 = std::hypot(-x1 + x2, -y1 + y2);
 
         return num1 / den1 + num2 / den2;
     }
@@ -287,13 +287,13 @@ double ReqSecCircleDist::getDerivative(PARAMID p) {
 
     if (p == &m_c->center->x) { // x0
         double num = -y1 + y2;
-        double den = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+        double den = std::hypot(-x1 + x2, -y1 + y2);
 
         return num / den;
     }
     else if (p == &m_c->center->y) { // y0
         double num = x1 - x2;
-        double den = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+        double den = std::hypot(-x1 + x2, -y1 + y2);
 
         return num / den;
     }
@@ -301,7 +301,7 @@ double ReqSecCircleDist::getDerivative(PARAMID p) {
         double num1 = (-x1 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
         double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
         double num2 = y0 - y2;
-        double den2 = sqrt(((-x1 + x2), 2) + ((-y1 + y2), 2));
+        double den2 = std::hypot(-x1 + x2, -y1 + y2);
 
         return num1 / den1 + num2 / den2;
     }
@@ -309,7 +309,7 @@ double ReqSecCircleDist::getDerivative(PARAMID p) {
         double num1 = (-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
         double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
         double num2 = -x0 + x2;
-        double den2 = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+        double den2 = std::hypot(-x1 + x2, -y1 + y2);
 
         return num1 / den1 + num2 / den2;
     }
@@ -317,7 +317,7 @@ double ReqSecCircleDist::getDerivative(PARAMID p) {
         double num1 = -(-x1 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
         double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
         double num2 = -y0 + y1;
-        double den2 = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+        double den2 = std::hypot(-x1 + x2, -y1 + y2);
 
         return num1 / den1 + num2 / den2;
     }
@@ -325,7 +325,7 @@ double ReqSecCircleDist::getDerivative(PARAMID p) {
         double num1 = -(-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
         double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
         double num2 = x0 - x1;
-        double den2 = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+        double den2 = std::hypot(-x1 + x2, -y1 + y2);
 
         return num1 / den1 + num2 / den2;
     }
@@ -369,13 +369,13 @@ double ReqSecOnCircle::getDerivative(double* p) {
 
     if (p == &m_c->center->x) { // x0
         double num = -y1 + y2;
-        double den = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+        double den = std::hypot(-x1 + x2, -y1 + y2);
 
         return num / den;
     }
     else if (p == &m_c->center->y) { // y0
         double num = x1 - x2;
-        double den = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+        double den = std::hypot(-x1 + x2, -y1 + y2);
 
         return num / den;
     }
@@ -383,7 +383,7 @@ double ReqSecOnCircle::getDerivative(double* p) {
         double num1 = (-x1 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
         double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
         double num2 = y0 - y2;
-        double den2 = sqrt(((-x1 + x2), 2) + ((-y1 + y2), 2));
+        double den2 = std::hypot(-x1 + x2, -y1 + y2);
 
         return num1 / den1 + num2 / den2;
     }
@@ -391,7 +391,7 @@ double ReqSecOnCircle::getDerivative(double* p) {
         double num1 = (-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
         double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
         double num2 = -x0 + x2;
-        double den2 = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+        double den2 = std::hypot(-x1 + x2, -y1 + y2);
 
         return num1 / den1 + num2 / den2;
     }
@@ -399,7 +399,7 @@ double ReqSecOnCircle::getDerivative(double* p) {
         double num1 = -(-x1 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
         double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
         double num2 = -y0 + y1;
-        double den2 = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+        double den2 = std::hypot(-x1 + x2, -y1 + y2);
 
         return num1 / den1 + num2 / den2;
     }
@@ -407,7 +407,7 @@ double ReqSecOnCircle::getDerivative(double* p) {
         double num1 = -(-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
         double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
         double num2 = x0 - x1;
-        double den2 = sqrt(pow((-x1 + x2), 2) + pow((-y1 + y2), 2));
+        double den2 = std::hypot(-x1 + x2, -y1 + y2);
 
         return num1 / den1 + num2 / den2;
     }
@@ -434,8 +434,8 @@ double ReqSecInCircle::getError() {
     double x2 = m_s->end->x;
     double y2 = m_s->end->y;
 
-    double dist1 = sqrt(pow((x1 - x0), 2) + pow((y1 - y0), 2));
-    double dist2 = sqrt(pow((x2 - x0), 2) + pow((y2 - y0), 2));
+    double dist1 = std::hypot(x1 - x0, y1 - y0);
+    double dist2 = std::hypot(x2 - x0, y2 - y0);
 
     return std::max(dist1 - r, dist2 - r);
 }
@@ -459,8 +459,8 @@ double ReqSecInCircle::getDerivative(PARAMID p) {
     double x2 = m_s->end->x;
     double y2 = m_s->end->y;
 
-    double dist1 = sqrt(pow((x1 - x0), 2) + pow((y1 - y0), 2));
-    double dist2 = sqrt(pow((x2 - x0), 2) + pow((y2 - y0), 2));
+    double dist1 = std::hypot(x1 - x0, y1 - y0);
+    double dist2 = std::hypot(x2 - x0, y2 - y0);
 
     double grad_x1;
     double grad_y1;
@@ -620,8 +620,8 @@ double ReqSecSecAngel::getError() {
     double w2 = m_s2->end->y - m_s2->beg->y;
 
     double dot_product = v1 * w1 + v2 * w2;
-    double mag_v = sqrt(v1 * v1 + v2 * v2);
-    double mag_w = sqrt(w1 * w1 + w2 * w2);
+    double mag_v = std::hypot(v1, v2);
+    double mag_w = std::hypot(w1, w2);
     double cos_angle = dot_product / (mag_v * mag_w);
     double angle = (acos(cos_angle) / 3.141592) * 180;
 
@@ -640,79 +640,39 @@ Arry<PARAMID> ReqSecSecAngel::getParams() {
     return res;
 }
 double ReqSecSecAngel::getDerivative(PARAMID p) {
-    double x1 = m_s1->beg->x;
-    double y1 = m_s1->beg->y;
-    double x2 = m_s1->end->x;
-    double y2 = m_s1->end->y;
+    double dx1 = m_s1->end->x - m_s1->beg->x;
+    double dy1 = m_s1->end->y - m_s1->beg->y;
+    double dx2 = m_s2->end->x - m_s2->beg->x;
+    double dy2 = m_s2->end->y - m_s2->beg->y;
 
-    double x3 = m_s2->beg->x;
-    double y3 = m_s2->beg->y;
-    double x4 = m_s2->end->x;
-    double y4 = m_s2->end->y;
-
+    double length1 = std::hypot(dx1, dy1);
+    double length2 = std::hypot(dx2, dy2);
+    double dotProduct = dx1 * dx2 + dy1 * dy2;
+    double cur = sqrt(1 - pow(dotProduct / (length1 * length2), 2));
+    
     if (p == &(m_s1->beg->x)) {
-        return -(((x3 - x4) /
-            (sqrt(pow(-x1 + x2, 2) + pow(-y1 + y2, 2)) * sqrt(pow(-x3 + x4, 2) + pow(-y3 + y4, 2))) +
-            ((-x1 + x2) * ((-x1 + x2) * (-x3 + x4) + (-y1 + y2) * (-y3 + y4))) /
-            (pow(pow(-x1 + x2, 2) + pow(-y1 + y2, 2), 1.5) * sqrt(pow(-x3 + x4, 2) + pow(-y3 + y4, 2)))) /
-            sqrt(1 - pow(((-x1 + x2) * (-x3 + x4) + (-y1 + y2) * (-y3 + y4)), 2) /
-                ((pow(-x1 + x2, 2) + pow(-y1 + y2, 2)) * (pow(-x3 + x4, 2) + pow(-y3 + y4, 2)))));
+        return (dx2 / (length1 * length2) - (dx1 * dotProduct) / (pow(length1, 1.5) * length2)) / cur;
     }
     else if (p == &(m_s1->beg->y)) {
-        return -(((y3 - y4) /
-            (sqrt(pow(-x1 + x2, 2) + pow(-y1 + y2, 2)) * sqrt(pow(-x3 + x4, 2) + pow(-y3 + y4, 2))) +
-            ((-y1 + y2) * ((-x1 + x2) * (-x3 + x4) + (-y1 + y2) * (-y3 + y4))) /
-            (pow(pow(-x1 + x2, 2) + pow(-y1 + y2, 2), 1.5) * sqrt(pow(-x3 + x4, 2) + pow(-y3 + y4, 2)))) /
-            sqrt(1 - pow(((-x1 + x2) * (-x3 + x4) + (-y1 + y2) * (-y3 + y4)), 2) /
-                ((pow(-x1 + x2, 2) + pow(-y1 + y2, 2)) * (pow(-x3 + x4, 2) + pow(-y3 + y4, 2)))));
+        return (dy2 / (length1 * length2) - (dy1 * dotProduct) / (pow(length1, 1.5) * length2)) / cur;
     }
     else if (p == &(m_s1->end->x)) {
-        return -(((-x3 + x4) /
-            (sqrt(pow(-x1 + x2, 2) + pow(-y1 + y2, 2)) * sqrt(pow(-x3 + x4, 2) + pow(-y3 + y4, 2))) -
-            ((-x1 + x2) * ((-x1 + x2) * (-x3 + x4) + (-y1 + y2) * (-y3 + y4))) /
-            (pow(pow(-x1 + x2, 2) + pow(-y1 + y2, 2), 1.5) * sqrt(pow(-x3 + x4, 2) + pow(-y3 + y4, 2)))) /
-            sqrt(1 - pow(((-x1 + x2) * (-x3 + x4) + (-y1 + y2) * (-y3 + y4)), 2) /
-                ((pow(-x1 + x2, 2) + pow(-y1 + y2, 2)) * (pow(-x3 + x4, 2) + pow(-y3 + y4, 2)))));
+        return (-dx2 / (length1 * length2) - (-dx1 * dotProduct) / (pow(length1, 1.5) * length2)) / cur;
     }
     else if (p == &(m_s1->end->y)) {
-        return -(((-y3 + y4) /
-            (sqrt(pow(-x1 + x2, 2) + pow(-y1 + y2, 2)) * sqrt(pow(-x3 + x4, 2) + pow(-y3 + y4, 2))) -
-            ((-y1 + y2) * ((-x1 + x2) * (-x3 + x4) + (-y1 + y2) * (-y3 + y4))) /
-            (pow(pow(-x1 + x2, 2) + pow(-y1 + y2, 2), 1.5) * sqrt(pow(-x3 + x4, 2) + pow(-y3 + y4, 2)))) /
-            sqrt(1 - pow(((-x1 + x2) * (-x3 + x4) + (-y1 + y2) * (-y3 + y4)), 2) /
-                ((pow(-x1 + x2, 2) + pow(-y1 + y2, 2)) * (pow(-x3 + x4, 2) + pow(-y3 + y4, 2)))));
+        return (-dy2 / (length1 * length2) - (-dy1 * dotProduct) / (pow(length1, 1.5) * length2)) / cur;
     }
     else if (p == &(m_s2->beg->x)) {
-        return -((((-x3 + x4) * ((-x1 + x2) * (-x3 + x4) + (-y1 + y2) * (-y3 + y4))) /
-            (sqrt(pow(-x1 + x2, 2) + pow(-y1 + y2, 2)) * pow(pow(-x3 + x4, 2) + pow(-y3 + y4, 2), 1.5)) +
-            (x1 - x2) /
-            (sqrt(pow(-x1 + x2, 2) + pow(-y1 + y2, 2)) * sqrt(pow(-x3 + x4, 2) + pow(-y3 + y4, 2)))) /
-            sqrt(1 - pow(((-x1 + x2) * (-x3 + x4) + (-y1 + y2) * (-y3 + y4)), 2) /
-                ((pow(-x1 + x2, 2) + pow(-y1 + y2, 2)) * (pow(-x3 + x4, 2) + pow(-y3 + y4, 2)))));
+        return (dx1 / (length1 * length2) - (dx2 * dotProduct) / (pow(length1, 1.5) * length2)) / cur;
     }
     else if (p == &(m_s2->beg->y)) {
-        return -((((-y3 + y4) * ((-x1 + x2) * (-x3 + x4) + (-y1 + y2) * (-y3 + y4))) /
-            (sqrt(pow(-x1 + x2, 2) + pow(-y1 + y2, 2)) * pow(pow(-x3 + x4, 2) + pow(-y3 + y4, 2), 1.5)) +
-            (y1 - y2) /
-            (sqrt(pow(-x1 + x2, 2) + pow(-y1 + y2, 2)) * sqrt(pow(-x3 + x4, 2) + pow(-y3 + y4, 2)))) /
-            sqrt(1 - pow(((-x1 + x2) * (-x3 + x4) + (-y1 + y2) * (-y3 + y4)), 2) /
-                ((pow(-x1 + x2, 2) + pow(-y1 + y2, 2)) * (pow(-x3 + x4, 2) + pow(-y3 + y4, 2)))));
+        return (dy1 / (length1 * length2) - (dy2 * dotProduct) / (pow(length1, 1.5) * length2)) / cur;
     }
     else if (p == &(m_s2->end->x)) {
-        return -((-(((-x3 + x4) * ((-x1 + x2) * (-x3 + x4) + (-y1 + y2) * (-y3 + y4))) /
-            (sqrt(pow(-x1 + x2, 2) + pow(-y1 + y2, 2)) * pow(pow(-x3 + x4, 2) + pow(-y3 + y4, 2), 1.5))) +
-            (-x1 + x2) /
-            (sqrt(pow(-x1 + x2, 2) + pow(-y1 + y2, 2)) * sqrt(pow(-x3 + x4, 2) + pow(-y3 + y4, 2)))) /
-            sqrt(1 - pow(((-x1 + x2) * (-x3 + x4) + (-y1 + y2) * (-y3 + y4)), 2) /
-                ((pow(-x1 + x2, 2) + pow(-y1 + y2, 2)) * (pow(-x3 + x4, 2) + pow(-y3 + y4, 2)))));
+        return (-dx1 / (length1 * length2) - (-dx2 * dotProduct) / (pow(length1, 1.5) * length2)) / cur;
     }
     else if (p == &(m_s2->end->y)) {
-        return -((-(((-y3 + y4) * ((-x1 + x2) * (-x3 + x4) + (-y1 + y2) * (-y3 + y4))) /
-            (sqrt(pow(-x1 + x2, 2) + pow(-y1 + y2, 2)) * pow(pow(-x3 + x4, 2) + pow(-y3 + y4, 2), 1.5))) +
-            (-y1 + y2) /
-            (sqrt(pow(-x1 + x2, 2) + pow(-y1 + y2, 2)) * sqrt(pow(-x3 + x4, 2) + pow(-y3 + y4, 2)))) /
-            sqrt(1 - pow(((-x1 + x2) * (-x3 + x4) + (-y1 + y2) * (-y3 + y4)), 2) /
-                ((pow(-x1 + x2, 2) + pow(-y1 + y2, 2)) * (pow(-x3 + x4, 2) + pow(-y3 + y4, 2)))));
+        return (-dy1 / (length1 * length2) - (-dy2 * dotProduct) / (pow(length1, 1.5) * length2)) / cur;
     }
 
     return 0.0;
