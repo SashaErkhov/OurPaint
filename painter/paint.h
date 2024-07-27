@@ -8,7 +8,7 @@
 #include "BMPpainter.h"
 #include "Assoc.h"
 #include "../Matrix/Matrix.h"
-#include "../graph/simpleGraph.h"
+//#include "../graph/simpleGraph.h"
 #include "enums.h"
 #include "requirements.h"
 #include "UndoRedo.h"
@@ -29,7 +29,7 @@ struct ActionsInfo{
 //c_ - класс, v_- переменная, s_структура, m_ - контейнеры(списки, массивы и другие) f_ - приватный метод класса
 class Paint {
     //In the graph, the edges are represented by requirements and the vertices are represented by objects.
-    Graph<ID, ID> c_graph;
+    //Graph<ID, ID> c_graph;
 
     UndoRedo<ActionsInfo> c_undoRedo;
     std::map<ID, List<point>::iterator> m_pointIDs;
@@ -37,6 +37,7 @@ class Paint {
     std::map<ID, List<circle>::iterator> m_circleIDs;
     std::map<ID, List<IReq*>::iterator> m_reqIDs;
     ID s_maxID;
+    List<RequirementData> m_reqD;
     List<IReq*> m_reqStorage;
     List<point> m_pointStorage;
     List<section> m_sectionStorage;
