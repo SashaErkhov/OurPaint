@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <stdexcept>
-
+#include <cmath>
 template <typename T>
 class Matrix
 {
@@ -65,7 +65,33 @@ public:
         }
         return transposed;
     }
+    Matrix pseudoInv(unsigned int maxIterations = 1000, T tolerance = 1e-10) const {
+        Matrix A = *this;
+        Matrix A_T = A.transpose();
+        Matrix A_TA = A_T * A;
+        Matrix I(A_TA.rows_size(), A_TA.cols_size());
+        for (size_t i = 0; i < I.rows_size(); ++i) {
+            I.setElement(i, i, 1.0);
+        }
 
+        Matrix Y = A_TA;
+        Matrix Z = I;
+        T alpha = 1.0 / A.norm();
+        Y *= alpha;
+        Z *= alpha;
+
+        for (unsigned int k = 0; k < maxIterations; ++k) {
+            Matrix Y_new = Y * (I * 2.0 - A * Z * Y);
+            Matrix Z_new = (I * 2.0 - A * Z * Y) * Z;
+            if ((Y_new - Y).norm() < tolerance && (Z_new - Z).norm() < tolerance) {
+                break;
+            }
+            Y = Y_new;
+            Z = Z_new;
+        }
+
+        return Z * A_T;
+    }
     Matrix& operator*=(const Matrix& other) {
         if (cols != other.rows) {
             throw std::invalid_argument("Matrices must have compatible dimensions for multiplication.");
@@ -130,6 +156,16 @@ public:
 
     [[nodiscard]] inline unsigned int rows_size() const { return rows; }
     [[nodiscard]] inline unsigned int cols_size() const { return cols; }
+
+    T norm() const {
+        T sum = 0;
+        for (size_t i = 0; i < rows; ++i) {
+            for (size_t j = 0; j < cols; ++j) {
+                sum += matrix[i][j] * matrix[i][j];
+            }
+        }
+        return std::sqrt(sum);
+    }
 
     void setElement(unsigned int rowI, unsigned int colI, T value) {
         if (rowI >= rows || colI >= cols) {
@@ -308,5 +344,9 @@ Matrix<T> operator-(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
     Matrix<T> result(matrix1);
     return result -= matrix2;
 }
-
+template <typename T>
+Matrix<T> operator*(const Matrix<T>& matrix, const T& scalar){
+    Matrix<T> tmp = matrix;
+    return tmp *= scalar;
+}
 #endif // MATRIX
