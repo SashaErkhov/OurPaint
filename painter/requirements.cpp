@@ -87,6 +87,10 @@ double ReqPointSecDist::getDerivative(PARAMID param) {
     }
 
     return 0;
+}
+
+rectangle ReqPointSecDist::getRectangle() {
+    return m_s->rect() || m_p->rect();
 };
 
 
@@ -171,6 +175,9 @@ double ReqPointOnSec::getDerivative(PARAMID param) {
     return 0;
 }
 
+rectangle ReqPointOnSec::getRectangle() {
+    return m_s->rect() || m_p ->rect();
+}
 
 
 // 3
@@ -211,6 +218,9 @@ double ReqPointPointDist::getDerivative(double* p) {
     }
 }
 
+rectangle ReqPointPointDist::getRectangle() {
+    return m_p1->rect() || m_p2->rect();
+}
 
 
 // 4
@@ -250,6 +260,9 @@ double ReqPointOnPoint::getDerivative(PARAMID p) {
     }
 }
 
+rectangle ReqPointOnPoint::getRectangle() {
+    return m_p2->rect() || m_p1->rect();
+}
 
 
 // 5
@@ -337,6 +350,9 @@ double ReqSecCircleDist::getDerivative(PARAMID p) {
     return 0;
 }
 
+rectangle ReqSecCircleDist::getRectangle() {
+    return m_s->rect() || m_c->rect();
+}
 
 
 // 6
@@ -423,6 +439,9 @@ double ReqSecOnCircle::getDerivative(double* p) {
     return 0.0;
 }
 
+rectangle ReqSecOnCircle::getRectangle() {
+    return m_s->rect() || m_c->rect();
+}
 
 
 // 7
@@ -502,6 +521,9 @@ double ReqSecInCircle::getDerivative(PARAMID p) {
     return 0.0;
 }
 
+rectangle ReqSecInCircle::getRectangle() {
+    return m_s->rect() || m_c->rect();
+}
 
 
 // 8
@@ -560,6 +582,9 @@ double ReqSecSecParallel::getDerivative(PARAMID p) {
     return 0.0;
 }
 
+rectangle ReqSecSecParallel::getRectangle() {
+    return m_s1->rect() || m_s2->rect();
+}
 
 
 // 9
@@ -614,6 +639,9 @@ double ReqSecSecPerpendicular::getDerivative(PARAMID p) {
     return 0.0;
 }
 
+rectangle ReqSecSecPerpendicular::getRectangle() {
+    return m_s1->rect() || m_s2->rect();
+}
 
 
 // 10
@@ -685,4 +713,8 @@ double ReqSecSecAngel::getDerivative(PARAMID p) {
     }
 
     return 0.0;
+}
+
+rectangle ReqSecSecAngel::getRectangle() {
+    return m_s1->rect() || m_s2->rect();
 }
