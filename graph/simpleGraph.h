@@ -34,6 +34,7 @@ class Graph {
     }
 
 public:
+    Graph(): m_vertices(), m_adjacencyList(), m_edges(){}
     void addVertex(const vertex& v) {
         m_vertices.insert(v);
     }
