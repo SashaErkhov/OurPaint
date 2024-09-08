@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 project(ourpainttest)
 
 # GoogleTest requires at least C++14
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FetchContent)
@@ -15,7 +15,7 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 enable_testing()
-set(SOURCES ../painter/paint.cpp ../painter/objects.cpp ../painter/BMPpainter.cpp)
+set(SOURCES ../painter/paint.cpp ../painter/objects.cpp ../painter/BMPpainter.cpp "../Matrix/Matrix.h" "../graph/simpleGraph.h" ../painter/requirements.cpp ../painter/requirements.h ../painter/enums.h)
 include_directories(../additions)
 include_directories(../BMPfile/code)
 add_subdirectory(../BMPfile build)

@@ -1,127 +1,70 @@
 #include <gtest/gtest.h>
 #include "../painter/paint.h"
 
-TEST(PaintTest, AddingElems){
-  Paint paint;
-  // Заполним параметры добавляемого элемента
-  ElementData ed;
-  ed.et = ET_POINT;
-  ed.params.addElement(1.0);
-  ed.params.addElement(2.0);
-  // Добавим элемент
-  ID pointid = paint.addElement(ed);
-  // Проверка???  
-  ElementData e = paint.getElementInfo(pointid);
-  ASSERT_EQ(ed.et, ET_POINT);
-  ASSERT_EQ(ed.params.getElement(0),1.0);
-  ASSERT_EQ(ed.params.getElement(1),2.0); 
-}
-/*
-TEST(PaintTest, save_and_load){
-  Paint paint;
-  ElementData in;
-  in.et=ET_POINT;
-  in.params.addElement(3.0);
-  in.params.addElement(2.0);
-  paint.addElement(in);
-  in=ElementData();
-  in.et=ET_POINT;
-  in.params.addElement(8.0);
-  in.params.addElement(7.0);
-  paint.addElement(in);
-  in=ElementData();
-  in.et=ET_SECTION;
-  in.params.addElement(87.0);
-  in.params.addElement(77.0);
-  in.params.addElement(78.0);
-  in.params.addElement(87.0);
-  paint.addElement(in);
-  in=ElementData();
-  in.et=ET_SECTION;
-  in.params.addElement(57.0);
-  in.params.addElement(75.0);
-  in.params.addElement(9.0);
-  in.params.addElement(1.0);
-  paint.addElement(in);
-  in=ElementData();
-  in.et=ET_CIRCLE;
-  in.params.addElement(83.0);
-  in.params.addElement(37.0);
-  in.params.addElement(38.0);
-  paint.addElement(in);
-  in=ElementData();
-  in.et=ET_CIRCLE;
-  in.params.addElement(54.0);
-  in.params.addElement(45.0);
-  in.params.addElement(4.0);
-  paint.addElement(in);
-  paint.saveToFile("piculi.pt");
-  Paint road;
-  road.loadFromFile("piculi.pt");
-  EXPECT_EQ(road, paint);
-}*/
-TEST(SimpleTests, GetElementInfo){
+
+TEST(PaintTest, PointSecDist) {
     Paint screen;
-    ElementData p;
-    p.et = ET_POINT;
-    p.params.addElement(10);
-    p.params.addElement(10);
-    ID pt = screen.addElement(p);
-    ElementData e = screen.getElementInfo(pt);
-    EXPECT_EQ(e.params[0], 10);
-    EXPECT_EQ(e.params[1], 10);
-    ElementData s;
-    s.et = ET_SECTION;
-    s.params.addElement(100);
-    s.params.addElement(100);
-    s.params.addElement(200);
-    s.params.addElement(200);
-    ID sect = screen.addElement(s);
-    ElementData s1 = screen.getElementInfo(pt);
-    EXPECT_EQ(s1.params[0], 100);
-    EXPECT_EQ(s1.params[1], 100);
-    EXPECT_EQ(s1.params[2], 200);
-    EXPECT_EQ(s1.params[3], 200);
-    ElementData c;
-    c.et = ET_CIRCLE;
-    c.params.addElement(10);
-    c.params.addElement(10);
-    c.params.addElement(10);
-    ID circ = screen.addElement(c);
-    ElementData m = screen.getElementInfo(circ);
-    EXPECT_EQ(m.params[0], 10);
-    EXPECT_EQ(m.params[1], 10);
-    EXPECT_EQ(m.params[2], 10);
+    ElementData data1;
+    data1.et = ET_POINT;
+    data1.params[0] = 10;
+    data1.params[1] = 10;
+    ElementData data_s;
+    data_s.et = ET_SECTION;
+    data_s.params[0] = -10;
+    data_s.params[1] = 20;
+    data_s.params[2] = 20;
+    data_s.params[3] = 30;
+    screen.addElement(data1);
+    screen.addElement(data_s);
+    RequirementData req;
+    req.req = ET_POINTSECTIONDIST;
+    req.objects[0] = ID(1);
+    req.objects[1] = ID(4);
+    req.params[0] = 20;
+    screen.addRequirement(req);
+    double xp = screen.getElementInfo(ID(1)).params[0];
+    double yp = screen.getElementInfo(ID(1)).params[1];
+    double xo_s = screen.getElementInfo(ID(4)).params[0];
+    double yo_s = screen.getElementInfo(ID(4)).params[1];
+    double xs_s = screen.getElementInfo(ID(4)).params[2];
+    double ys_s = screen.getElementInfo(ID(4)).params[3];
+    EXPECT_EQ(abs((yo_s - ys_s)*xp - (xo_s - xs_s)*yp +xo_s*ys_s - yo_s*xs_s)/sqrt((xo_s-xs_s)*(xo_s-xs_s) +(yo_s-ys_s)*(yo_s-ys_s)), 20);
 }
-TEST(SimpleTests, PointSegDistTest){
-    Paint screen;
-    ElementData p;
-    p.et = ET_POINT;
-    p.params.addElement(10);
-    p.params.addElement(10);
-    ID pt = screen.addElement(p);
-    ElementData s;
-    s.et = ET_SECTION;
-    s.params.addElement(100);
-    s.params.addElement(100);
-    s.params.addElement(200);
-    s.params.addElement(200);
-    ID sect = screen.addElement(s);
-    ElementData e = screen.getElementInfo(pt);
-    EXPECT_EQ(e.params[0], 10);
-    EXPECT_EQ(e.params[1], 10);
-    e = screen.getElementInfo(sect);
-    EXPECT_EQ(e.params[0], 100);
-    EXPECT_EQ(e.params[1], 100);
-    EXPECT_EQ(e.params[2], 200);
-    EXPECT_EQ(e.params[3], 200);
-    RequirementData r;
-    r.req = ET_POINTSECTIONDIST;
-    r.objects.addElement(pt);
-    r.objects.addElement(sect);
-    r.params = 10;
-    screen.addRequirement(r);
-    ElementData ex = screen.getElementInfo(sect);
-    EXPECT_NE(ex.params[0], 10);
-    EXPECT_NE(ex.params[1], 10);
+TEST(PaintTest, DoublePointSecDist) {
+Paint screen;
+ElementData data1;
+data1.et = ET_POINT;
+data1.params[0] = 10;
+data1.params[1] = 10;
+ElementData data1;
+data1.et = ET_POINT;
+data1.params[0] = 0;
+data1.params[1] = 20;
+ElementData data_s;
+data_s.et = ET_SECTION;
+data_s.params[0] = -10;
+data_s.params[1] = 20;
+data_s.params[2] = 20;
+data_s.params[3] = 30;
+screen.addElement(data1);
+screen.addElement(data_s);
+RequirementData req1;
+req1.req = ET_POINTSECTIONDIST;
+req1.objects[0] = ID(1);
+req1.objects[1] = ID(5);
+req1.params[0] = 20;
+screen.addRequirement(req1);
+RequirementData req2;
+req2.req = ET_POINTSECTIONDIST;
+req2.objects[0] = ID(2);
+req2.objects[1] = ID(5);
+req2.params[0] = 20;
+screen.addRequirement(req1);
+double xp = screen.getElementInfo(ID(1)).params[0];
+double yp = screen.getElementInfo(ID(1)).params[1];
+double xo_s = screen.getElementInfo(ID(4)).params[0];
+double yo_s = screen.getElementInfo(ID(4)).params[1];
+double xs_s = screen.getElementInfo(ID(4)).params[2];
+double ys_s = screen.getElementInfo(ID(4)).params[3];
+EXPECT_EQ(abs((yo_s - ys_s)*xp - (xo_s - xs_s)*yp +xo_s*ys_s - yo_s*xs_s)/sqrt((xo_s-xs_s)*(xo_s-xs_s) +(yo_s-ys_s)*(yo_s-ys_s)), 20);
 }

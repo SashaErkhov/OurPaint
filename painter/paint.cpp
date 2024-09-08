@@ -147,8 +147,8 @@ ID Paint::addRequirement(const RequirementData &rd) {
         }
         info.m_paramsBefore.addElement(beforeValues);
         info.m_paramsAfter.addElement(afterValues);
+        s_allFigures = s_allFigures || req->getRectangle();
     }
-
     // Clear
     for (auto requirement : allRequirements) {
         delete requirement;

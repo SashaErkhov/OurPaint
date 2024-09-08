@@ -41,6 +41,7 @@ protected:
 public:
     virtual double getError() = 0;
     virtual Arry<PARAMID> getParams() = 0;
+    virtual rectangle getRectangle() = 0;
     virtual double getDerivative(PARAMID p) = 0;
 };
 
@@ -55,6 +56,7 @@ public:
     ReqPointSecDist(point* p, section* s, double dist);
     double getError() override;
     Arry<PARAMID> getParams() override;
+    rectangle getRectangle() override;
     double getDerivative(PARAMID p) override;
 };
 
@@ -66,6 +68,7 @@ public:
     ReqPointOnSec(point* p, section* s);
     double getError() override;
     Arry<PARAMID> getParams() override;
+    rectangle getRectangle() override;
     double getDerivative(PARAMID param) override;
 };
 
@@ -78,6 +81,7 @@ public:
     ReqPointPointDist(point* p1, point* p2, double dist);
     double getError() override;
     Arry<PARAMID> getParams() override;
+    rectangle getRectangle() override;
     double getDerivative(PARAMID p) override;
 };
 
@@ -89,6 +93,7 @@ public:
     ReqPointOnPoint(point* p1, point* p2);
     double getError() override;
     Arry<PARAMID> getParams() override;
+    rectangle getRectangle() override;
     double getDerivative(PARAMID p) override;
 };
 
@@ -101,6 +106,7 @@ public:
     ReqSecCircleDist(section* m_s, circle* m_c, double dist);
     double getError() override;
     Arry<PARAMID> getParams() override;
+    rectangle getRectangle() override;
     double getDerivative(PARAMID p) override;
 };
 
@@ -112,6 +118,7 @@ public:
     ReqSecOnCircle(section* m_s, circle* m_c);
     double getError() override;
     Arry<PARAMID> getParams() override;
+    rectangle getRectangle() override;
     double getDerivative(PARAMID p) override;
 };
 
@@ -123,6 +130,7 @@ public:
     ReqSecInCircle(section* m_s, circle* m_c);
     double getError() override;
     Arry<PARAMID> getParams() override;
+    rectangle getRectangle() override;
     double getDerivative(PARAMID p) override;
 };
 
@@ -134,6 +142,7 @@ public:
     ReqSecSecParallel(section* m_s1, section* m_s2);
     double getError() override;
     Arry<PARAMID> getParams() override;
+    rectangle getRectangle() override;
     double getDerivative(PARAMID p) override;
 };
 
@@ -145,6 +154,7 @@ public:
     ReqSecSecPerpendicular(section* m_s1, section* m_s2);
     double getError() override;
     Arry<PARAMID> getParams() override;
+    rectangle getRectangle() override;
     double getDerivative(PARAMID p) override;
 };
 
@@ -157,6 +167,7 @@ public:
     ReqSecSecAngel(section* m_s1, section* m_s2, double desired_dist);
     double getError() override;
     Arry<PARAMID> getParams() override;
+    rectangle getRectangle() override;
     double getDerivative(PARAMID p) override;
 };
 
