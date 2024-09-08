@@ -12,7 +12,7 @@ ID Paint::addRequirement(const RequirementData &rd) {
 
     m_reqD.addElement(rd);
     Arry<IReq*> allRequirements;
-    std::unordered_map<PARAMID, double*> allParams;
+    std::map<PARAMID, double*> allParams;
     Arry<double> allParamValues;
 
     // Сбор всех требований и их параметров
@@ -115,14 +115,13 @@ ID Paint::addRequirement(const RequirementData &rd) {
         
         Matrix<double> jacobiTra = jacobiMatrix.transpose(); // Jacobi transpose
         Matrix<double> normalMatrix = jacobiTra * jacobiMatrix; // normal 
-        double lambda = 5.0; 
+        double lambda = 5; 
         for (int i = 0; i < normalMatrix.cols_size(); ++i) {
             normalMatrix.setElement(i, i, normalMatrix.getElement(i, i) + lambda);
         }
         Matrix<double> inverseNormalMatrix = normalMatrix.invMatrix();
-        Matrix<double> delta = inverseNormalMatrix;
-        jacobiTra *= errors;
-        delta *= jacobiTra;
+        Matrix<double> delta = inverseNormalMatrix * jacobiTra;
+        delta *= errors;
 
         double alpha = 0.01;
         size_t index = 0;
