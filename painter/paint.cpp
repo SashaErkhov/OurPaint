@@ -98,7 +98,8 @@ ID Paint::addRequirement(const RequirementData &rd) {
     for (const auto& req : allRequirements) {
         error += std::pow(req->getError(), 2);
     }
-    
+    double lambda = 5;
+    double prevError = std::numeric_limits<double>::max();
     while (error > 10e-2) {
 
         Matrix<double> jacobiMatrix(allRequirements.getSize(), allParams.size());
@@ -112,17 +113,20 @@ ID Paint::addRequirement(const RequirementData &rd) {
             }
             errors.setElement(i, 0, allRequirements[i]->getError());
         }
-        
-        Matrix<double> jacobiTra = jacobiMatrix.transpose(); // Jacobi transpose
-        Matrix<double> normalMatrix = jacobiTra * jacobiMatrix; // normal 
-        double lambda = 5; 
+
+        Matrix<double> jacobiTra = jacobiMatrix.transpose();
+        Matrix<double> normalMatrix = jacobiTra * jacobiMatrix;
+        if (error > prevError) {
+            lambda *= 2;
+        } else {
+            lambda /= 2;
+        }
+        prevError = error;
         for (int i = 0; i < normalMatrix.cols_size(); ++i) {
             normalMatrix.setElement(i, i, normalMatrix.getElement(i, i) + lambda);
         }
         Matrix<double> inverseNormalMatrix = normalMatrix.invMatrix();
-        Matrix<double> delta = inverseNormalMatrix * jacobiTra;
-        delta *= errors;
-
+        Matrix<double> delta = inverseNormalMatrix * jacobiTra * errors;
         double alpha = 0.01;
         size_t index = 0;
         for (auto& param : allParams) {
@@ -134,6 +138,7 @@ ID Paint::addRequirement(const RequirementData &rd) {
         for (const auto& req : allRequirements) {
             error += std::pow(req->getError(), 2);
         }
+        if (prevError - error < 10e-6) throw std::runtime_error("UNKNOWN ERROR");
     }
 
     
