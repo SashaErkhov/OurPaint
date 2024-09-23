@@ -10,21 +10,7 @@
 #include "objects.h"
 #include <cmath>
 #include "enums.h"
-
-/* EXAMPLE
-ReqPointSegDist req;
-Arry<PARAMID> params = req.getParams();
-Arry<double> paramValue(params.getSize());
-Arry<double> derivatives(params.getSize());
-// вычислить все частные производные
-for(param in params) {
-    derivatives[k] = req.getDerivative(param);
-}
-//изменили текущие состояние объектов
-paramValues += (-alpha* derivatives);
-// Вычислить ошибку для нового состояния
-double e = req.getError();
-// В зависимоти от величины ошибки продолжить или остановиться */
+#define h 0.000001
 
 struct RequirementData {
     Requirement req;
@@ -42,7 +28,45 @@ public:
     virtual double getError() = 0;
     virtual Arry<PARAMID> getParams() = 0;
     virtual rectangle getRectangle() = 0;
-    virtual double getDerivative(PARAMID p) = 0;
+    virtual double getDerivative(PARAMID p) {
+        double origValue = *p;
+        *p += h;
+        double f1 = getError();
+        *p -= 2 * h;
+        double f2 = getError();
+        *p = origValue;
+        return (f1 - f2) / (2 * h);
+    }
+
+    virtual double getSecondDerivative(PARAMID p) {
+        double origValue = *p;
+        *p += h;
+        double f1 = getError();
+        *p = origValue;
+        double f0 = getError();
+        *p -= h;
+        double f2 = getError();
+        *p = origValue;
+        return (f1 - 2 * f0 + f2) / (h * h);
+    }
+
+    virtual double getMixedDerivative(PARAMID p1, PARAMID p2) {
+        double origValue1 = *p1;
+        double origValue2 = *p2;
+        *p1 += h;
+        *p2 += h;
+        double f1 = getError();
+        *p2 -= 2 * h;
+        double f2 = getError();
+        *p1 -= 2 * h;
+        *p2 += 2 * h;
+        double f3 = getError();
+        *p2 -= 2 * h;
+        double f4 = getError();
+        *p1 = origValue1;
+        *p2 = origValue2;
+        return (f1 - f2 - f3 + f4) / (4 * h * h);
+    }
 };
 
 
@@ -57,7 +81,6 @@ public:
     double getError() override;
     Arry<PARAMID> getParams() override;
     rectangle getRectangle() override;
-    double getDerivative(PARAMID p) override;
 };
 
 // 2
@@ -69,7 +92,6 @@ public:
     double getError() override;
     Arry<PARAMID> getParams() override;
     rectangle getRectangle() override;
-    double getDerivative(PARAMID param) override;
 };
 
 // 3
@@ -82,7 +104,6 @@ public:
     double getError() override;
     Arry<PARAMID> getParams() override;
     rectangle getRectangle() override;
-    double getDerivative(PARAMID p) override;
 };
 
 // 4
@@ -94,7 +115,6 @@ public:
     double getError() override;
     Arry<PARAMID> getParams() override;
     rectangle getRectangle() override;
-    double getDerivative(PARAMID p) override;
 };
 
 // 5
@@ -107,7 +127,6 @@ public:
     double getError() override;
     Arry<PARAMID> getParams() override;
     rectangle getRectangle() override;
-    double getDerivative(PARAMID p) override;
 };
 
 // 6
@@ -119,7 +138,6 @@ public:
     double getError() override;
     Arry<PARAMID> getParams() override;
     rectangle getRectangle() override;
-    double getDerivative(PARAMID p) override;
 };
 
 // 7
@@ -131,7 +149,6 @@ public:
     double getError() override;
     Arry<PARAMID> getParams() override;
     rectangle getRectangle() override;
-    double getDerivative(PARAMID p) override;
 };
 
 // 8
@@ -143,7 +160,6 @@ public:
     double getError() override;
     Arry<PARAMID> getParams() override;
     rectangle getRectangle() override;
-    double getDerivative(PARAMID p) override;
 };
 
 // 9
@@ -155,7 +171,6 @@ public:
     double getError() override;
     Arry<PARAMID> getParams() override;
     rectangle getRectangle() override;
-    double getDerivative(PARAMID p) override;
 };
 
 // 10
@@ -168,7 +183,6 @@ public:
     double getError() override;
     Arry<PARAMID> getParams() override;
     rectangle getRectangle() override;
-    double getDerivative(PARAMID p) override;
 };
 
 

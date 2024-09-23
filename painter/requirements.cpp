@@ -31,63 +31,6 @@ ReqPointSecDist::ReqPointSecDist(point* p, section* s, double dist) {
     d = dist;
 
 }
-double ReqPointSecDist::getDerivative(PARAMID param) {
-    double x0 = m_p->x;
-    double y0 = m_p->y;
-
-    double x1 = m_s->beg->x;
-    double y1 = m_s->beg->y;
-
-    double x2 = m_s->end->x;
-    double y2 = m_s->end->y;
-
-    if (param == &m_p->x) { // x0
-        double num = -y1 + y2;
-        double den = std::hypot(-x1 + x2, -y1 + y2);
-
-        return num / den;
-    }
-    else if (param == &m_p->y) { // y0
-        double num = x1 - x2;
-        double den = std::hypot(-x1 + x2, -y1 + y2);
-
-        return num / den;
-    }
-    else if (param == &m_s->beg->x) { // x1
-        double num1 = (-x1 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
-        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
-        double num2 = y0 - y2;
-        double den2 = std::hypot(-x1 + x2, -y1 + y2);
-
-        return num1 / den1 + num2 / den2;
-    }
-    else if (param == &m_s->beg->y) { // y1
-        double num1 = (-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
-        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
-        double num2 = -x0 + x2;
-        double den2 = std::hypot(-x1 + x2, -y1 + y2);
-
-        return num1 / den1 + num2 / den2;
-    }
-    else if (param == &m_s->end->x) { // x2
-        double num1 = -(-x1 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
-        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
-        double num2 = -y0 + y1;
-        double den2 = std::hypot(-x1 + x2, -y1 + y2);
-
-        return num1 / den1 + num2 / den2;
-    }
-    else if (param == &m_s->end->y) { // y2
-        double num1 = -(-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
-        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
-        double num2 = x0 - x1;
-        double den2 = std::hypot(-x1 + x2, -y1 + y2);
-
-        return num1 / den1 + num2 / den2;
-    }
-
-    return 0;
-}
 
 rectangle ReqPointSecDist::getRectangle() {
     return m_s->rect() || m_p->rect();
@@ -117,63 +60,6 @@ Arry<PARAMID> ReqPointOnSec::getParams() {
     res.addElement(&(m_s->end->y));
     return res;
 }
-double ReqPointOnSec::getDerivative(PARAMID param) {
-    double x0 = m_p->x;
-    double y0 = m_p->y;
-
-    double x1 = m_s->beg->x;
-    double y1 = m_s->beg->y;
-
-    double x2 = m_s->end->x;
-    double y2 = m_s->end->y;
-
-    if (param == &m_p->x) { // x0
-        double num = -y1 + y2;
-        double den = std::hypot(-x1 + x2, -y1 + y2);
-
-        return num / den;
-    }
-    else if (param == &m_p->y) { // y0
-        double num = x1 - x2;
-        double den = std::hypot(-x1 + x2, -y1 + y2);
-
-        return num / den;
-    }
-    else if (param == &m_s->beg->x) { // x1
-        double num1 = (-x1 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
-        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
-        double num2 = y0 - y2;
-        double den2 = std::hypot(-x1 + x2, -y1 + y2);
-
-        return num1 / den1 + num2 / den2;
-    }
-    else if (param == &m_s->beg->y) { // y1
-        double num1 = (-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
-        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
-        double num2 = -x0 + x2;
-        double den2 = std::hypot(-x1 + x2, -y1 + y2);
-
-        return num1 / den1 + num2 / den2;
-    }
-    else if (param == &m_s->end->x) { // x2
-        double num1 = -(-x1 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
-        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
-        double num2 = -y0 + y1;
-        double den2 = std::hypot(-x1 + x2, -y1 + y2);
-
-        return num1 / den1 + num2 / den2;
-    }
-    else if (param == &m_s->end->y) { // y2
-        double num1 = -(-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
-        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
-        double num2 = x0 - x1;
-        double den2 = std::hypot(-x1 + x2, -y1 + y2);
-
-        return num1 / den1 + num2 / den2;
-    }
-
-    return 0;
-}
 
 rectangle ReqPointOnSec::getRectangle() {
     return m_s->rect() || m_p ->rect();
@@ -187,7 +73,7 @@ ReqPointPointDist::ReqPointPointDist(point* p1, point* p2, double dist) {
     v_dist = dist;
 }
 double ReqPointPointDist::getError() {
-    return std::abs(sqrt((m_p2->x - m_p1->x) * (m_p2->x - m_p1->x) + (m_p2->y - m_p1->y) * (m_p2->y - m_p1->y)) - v_dist);
+    return std::abs(hypot(m_p1->x - m_p2->x, m_p1->y - m_p2->y) - v_dist);
 }
 Arry<PARAMID> ReqPointPointDist::getParams() {
     Arry<PARAMID> res;
@@ -196,26 +82,6 @@ Arry<PARAMID> ReqPointPointDist::getParams() {
     res.addElement(&(m_p2->x));
     res.addElement(&(m_p2->y));
     return res;
-}
-double ReqPointPointDist::getDerivative(double* p) {
-    double dx = m_p1->x - m_p2->x;
-    double dy = m_p1->y - m_p2->y;
-    double d = getError();
-    if (p == &(m_p1->x)) {
-        return dx / d;
-    }
-    else if (p == &(m_p1->y)) {
-        return dy / d;
-    }
-    else if (p == &(m_p2->x)) {
-        return -dx / d;
-    }
-    else if (p == &(m_p2->y)) {
-        return -dy / d;
-    }
-    else {
-        return 0;
-    }
 }
 
 rectangle ReqPointPointDist::getRectangle() {
@@ -238,26 +104,6 @@ Arry<PARAMID> ReqPointOnPoint::getParams() {
     res.addElement(&(m_p2->x));
     res.addElement(&(m_p2->y));
     return res;
-}
-double ReqPointOnPoint::getDerivative(PARAMID p) {
-    double dx = m_p1->x - m_p2->x;
-    double dy = m_p1->y - m_p2->y;
-    double d = getError();
-    if (p == &(m_p1->x)) {
-        return dx / d;
-    }
-    else if (p == &(m_p1->y)) {
-        return dy / d;
-    }
-    else if (p == &(m_p2->x)) {
-        return -dx / d;
-    }
-    else if (p == &(m_p2->y)) {
-        return -dy / d;
-    }
-    else {
-        return 0;
-    }
 }
 
 rectangle ReqPointOnPoint::getRectangle() {
@@ -289,66 +135,6 @@ Arry<PARAMID> ReqSecCircleDist::getParams() {
     res.addElement(&(m_s->end->y));
     return res;
 }
-double ReqSecCircleDist::getDerivative(PARAMID p) {
-    double x0 = m_c->center->x;
-    double y0 = m_c->center->y;
-
-    double x1 = m_s->beg->x;
-    double y1 = m_s->beg->y;
-
-    double x2 = m_s->end->x;
-    double y2 = m_s->end->y;
-
-    if (p == &m_c->center->x) { // x0
-        double num = -y1 + y2;
-        double den = std::hypot(-x1 + x2, -y1 + y2);
-
-        return num / den;
-    }
-    else if (p == &m_c->center->y) { // y0
-        double num = x1 - x2;
-        double den = std::hypot(-x1 + x2, -y1 + y2);
-
-        return num / den;
-    }
-    else if (p == &m_c->R) { // R
-        return -0.5;
-    }
-    else if (p == &m_s->beg->x) { // x1
-        double num1 = (-x1 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
-        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
-        double num2 = y0 - y2;
-        double den2 = std::hypot(-x1 + x2, -y1 + y2);
-
-        return num1 / den1 + num2 / den2;
-    }
-    else if (p == &m_s->beg->y) { // y1
-        double num1 = (-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
-        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
-        double num2 = -x0 + x2;
-        double den2 = std::hypot(-x1 + x2, -y1 + y2);
-
-        return num1 / den1 + num2 / den2;
-    }
-    else if (p == &m_s->end->x) { // x2
-        double num1 = -(-x1 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
-        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
-        double num2 = -y0 + y1;
-        double den2 = std::hypot(-x1 + x2, -y1 + y2);
-
-        return num1 / den1 + num2 / den2;
-    }
-    else if (p == &m_s->end->y) { // y2
-        double num1 = -(-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
-        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
-        double num2 = x0 - x1;
-        double den2 = std::hypot(-x1 + x2, -y1 + y2);
-
-        return num1 / den1 + num2 / den2;
-    }
-
-    return 0;
-}
 
 rectangle ReqSecCircleDist::getRectangle() {
     return m_s->rect() || m_c->rect();
@@ -377,66 +163,6 @@ Arry<PARAMID> ReqSecOnCircle::getParams() {
     res.addElement(&(m_s->end->x));
     res.addElement(&(m_s->end->y));
     return res;
-}
-double ReqSecOnCircle::getDerivative(double* p) {
-    double x0 = m_c->center->x;
-    double y0 = m_c->center->y;
-
-    double x1 = m_s->beg->x;
-    double y1 = m_s->beg->y;
-
-    double x2 = m_s->end->x;
-    double y2 = m_s->end->y;
-
-    if (p == &m_c->center->x) { // x0
-        double num = -y1 + y2;
-        double den = std::hypot(-x1 + x2, -y1 + y2);
-
-        return num / den;
-    }
-    else if (p == &m_c->center->y) { // y0
-        double num = x1 - x2;
-        double den = std::hypot(-x1 + x2, -y1 + y2);
-
-        return num / den;
-    }
-    else if (p == &m_c->R) { // R
-        return -0.5;
-    }
-    else if (p == &m_s->beg->x) { // x1
-        double num1 = (-x1 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
-        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
-        double num2 = y0 - y2;
-        double den2 = std::hypot(-x1 + x2, -y1 + y2);
-
-        return num1 / den1 + num2 / den2;
-    }
-    else if (p == &m_s->beg->y) { // y1
-        double num1 = (-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
-        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
-        double num2 = -x0 + x2;
-        double den2 = std::hypot(-x1 + x2, -y1 + y2);
-
-        return num1 / den1 + num2 / den2;
-    }
-    else if (p == &m_s->end->x) { // x2
-        double num1 = -(-x1 + x2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
-        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
-        double num2 = -y0 + y1;
-        double den2 = std::hypot(-x1 + x2, -y1 + y2);
-
-        return num1 / den1 + num2 / den2;
-    }
-    else if (p == &m_s->end->y) { // y2
-        double num1 = -(-y1 + y2) * (-((-x1 + x2) * y0) + x2 * y1 - x1 * y2 + x0 * (-y1 + y2));
-        double den1 = sqrt(pow((pow((-x1 + x2), 2) + pow((-y1 + y2), 2)), 3));
-        double num2 = x0 - x1;
-        double den2 = std::hypot(-x1 + x2, -y1 + y2);
-
-        return num1 / den1 + num2 / den2;
-    }
-
-    return 0.0;
 }
 
 rectangle ReqSecOnCircle::getRectangle() {
@@ -477,49 +203,6 @@ Arry<PARAMID> ReqSecInCircle::getParams() {
     res.addElement(&(m_s->end->y));
     return res;
 }
-double ReqSecInCircle::getDerivative(PARAMID p) {
-    double x0 = m_c->center->x;
-    double y0 = m_c->center->y;
-
-    double r = m_c->R;
-
-    double x1 = m_s->beg->x;
-    double y1 = m_s->beg->y;
-
-    double x2 = m_s->end->x;
-    double y2 = m_s->end->y;
-
-    double dist1 = std::hypot(x1 - x0, y1 - y0);
-    double dist2 = std::hypot(x2 - x0, y2 - y0);
-
-    double grad_x1 = 0, grad_y1 = 0, grad_x2 = 0, grad_y2 = 0, grad_x0 = 0, grad_y0 = 0, grad_r = 0;
-
-    if (dist1 > r) {
-        grad_x1 = (x1 - x0) / dist1;
-        grad_y1 = (y1 - y0) / dist1;
-        grad_x0 -= (x1 - x0) / dist1;
-        grad_y0 -= (y1 - y0) / dist1;
-        grad_r -= 1;
-    }
-
-    if (dist2 > r) {
-        grad_x2 = (x2 - x0) / dist2;
-        grad_y2 = (y2 - y0) / dist2;
-        grad_x0 -= (x2 - x0) / dist2;
-        grad_y0 -= (y2 - y0) / dist2;
-        grad_r -= 0.01;
-    }
-
-    if (p == &m_s->beg->x) return grad_x1;
-    if (p == &m_s->beg->y) return grad_y1;
-    if (p == &m_s->end->x) return grad_x2;
-    if (p == &m_s->end->y) return grad_y2;
-    if (p == &m_c->center->x) return grad_x0;
-    if (p == &m_c->center->y) return grad_y0;
-    if (p == &m_c->R) return grad_r;
-
-    return 0.0;
-}
 
 rectangle ReqSecInCircle::getRectangle() {
     return m_s->rect() || m_c->rect();
@@ -552,35 +235,6 @@ Arry<PARAMID> ReqSecSecParallel::getParams() {
     return res;
 }
 //  (x2-x1)*(y4-y3)-(y2-y1)*(x4-x3)
-double ReqSecSecParallel::getDerivative(PARAMID p) {
-    double x1 = m_s1->beg->x;
-    double y1 = m_s1->beg->y;
-    double x2 = m_s1->end->x;
-    double y2 = m_s1->end->y;
-
-    double x3 = m_s2->beg->x;
-    double y3 = m_s2->beg->y;
-    double x4 = m_s2->end->x;
-    double y4 = m_s2->end->y;
-
-    double v1 = x2 - x1;
-    double v2 = y2 - y1;
-    double w1 = x4 - x3;
-    double w2 = y4 - y3;
-
-    double sign = (v1 * w2 - w1 * v2 >= 0) ? 1 : -1;
-
-    if (p == &(m_s1->beg->x)) return -w2 * sign;
-    else if (p == &(m_s1->beg->y)) return w1 * sign;
-    else if (p == &(m_s1->end->x)) return w2 * sign;
-    else if (p == &(m_s1->end->y)) return -w1 * sign;
-    else if (p == &(m_s2->beg->x)) return v2 * sign;
-    else if (p == &(m_s2->beg->y)) return -v1 * sign;
-    else if (p == &(m_s2->end->x)) return -v2 * sign;
-    else if (p == &(m_s2->end->y)) return v1 * sign;
-
-    return 0.0;
-}
 
 rectangle ReqSecSecParallel::getRectangle() {
     return m_s1->rect() || m_s2->rect();
@@ -610,33 +264,6 @@ Arry<PARAMID> ReqSecSecPerpendicular::getParams() {
     res.addElement(&(m_s2->end->x));
     res.addElement(&(m_s2->end->y));
     return res;
-}
-double ReqSecSecPerpendicular::getDerivative(PARAMID p) {
-    double x1 = m_s1->beg->x;
-    double y1 = m_s1->beg->y;
-    double x2 = m_s1->end->x;
-    double y2 = m_s1->end->y;
-
-    double x3 = m_s2->beg->x;
-    double y3 = m_s2->beg->y;
-    double x4 = m_s2->end->x;
-    double y4 = m_s2->end->y;
-
-    double v1 = x2 - x1;
-    double v2 = y2 - y1;
-    double w1 = x4 - x3;
-    double w2 = y4 - y3;
-
-    if (p == &(m_s1->beg->x)) return -w1;
-    else if (p == &(m_s1->beg->y)) return -w2;
-    else if (p == &(m_s1->end->x)) return w1;
-    else if (p == &(m_s1->end->y)) return w2;
-    else if (p == &(m_s2->beg->x)) return -v1;
-    else if (p == &(m_s2->beg->y)) return -v2;
-    else if (p == &(m_s2->end->x)) return v1;
-    else if (p == &(m_s2->end->y)) return v2;
-
-    return 0.0;
 }
 
 rectangle ReqSecSecPerpendicular::getRectangle() {
@@ -675,44 +302,6 @@ Arry<PARAMID> ReqSecSecAngel::getParams() {
     res.addElement(&(m_s2->end->x));
     res.addElement(&(m_s2->end->y));
     return res;
-}
-double ReqSecSecAngel::getDerivative(PARAMID p) {
-    double dx1 = m_s1->end->x - m_s1->beg->x;
-    double dy1 = m_s1->end->y - m_s1->beg->y;
-    double dx2 = m_s2->end->x - m_s2->beg->x;
-    double dy2 = m_s2->end->y - m_s2->beg->y;
-
-    double length1 = std::hypot(dx1, dy1);
-    double length2 = std::hypot(dx2, dy2);
-    double dotProduct = dx1 * dx2 + dy1 * dy2;
-    double cur = sqrt(1 - pow(dotProduct / (length1 * length2), 2));
-    
-    if (p == &(m_s1->beg->x)) {
-        return (dx2 / (length1 * length2) - (dx1 * dotProduct) / (pow(length1, 1.5) * length2)) / cur;
-    }
-    else if (p == &(m_s1->beg->y)) {
-        return (dy2 / (length1 * length2) - (dy1 * dotProduct) / (pow(length1, 1.5) * length2)) / cur;
-    }
-    else if (p == &(m_s1->end->x)) {
-        return (-dx2 / (length1 * length2) - (-dx1 * dotProduct) / (pow(length1, 1.5) * length2)) / cur;
-    }
-    else if (p == &(m_s1->end->y)) {
-        return (-dy2 / (length1 * length2) - (-dy1 * dotProduct) / (pow(length1, 1.5) * length2)) / cur;
-    }
-    else if (p == &(m_s2->beg->x)) {
-        return (dx1 / (length1 * length2) - (dx2 * dotProduct) / (pow(length1, 1.5) * length2)) / cur;
-    }
-    else if (p == &(m_s2->beg->y)) {
-        return (dy1 / (length1 * length2) - (dy2 * dotProduct) / (pow(length1, 1.5) * length2)) / cur;
-    }
-    else if (p == &(m_s2->end->x)) {
-        return (-dx1 / (length1 * length2) - (-dx2 * dotProduct) / (pow(length1, 1.5) * length2)) / cur;
-    }
-    else if (p == &(m_s2->end->y)) {
-        return (-dy1 / (length1 * length2) - (-dy2 * dotProduct) / (pow(length1, 1.5) * length2)) / cur;
-    }
-
-    return 0.0;
 }
 
 rectangle ReqSecSecAngel::getRectangle() {
