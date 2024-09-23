@@ -65,6 +65,21 @@ public:
         }
         return transposed;
     }
+    void setIdentity() {
+        if (rows != cols) {
+            throw std::runtime_error("Matrix must be square to set as identity");
+        }
+        for (unsigned int i = 0; i < rows; ++i) {
+            for (unsigned int j = 0; j < cols; ++j) {
+                if (i == j) {
+                    matrix[i][j] = static_cast<T>(1);
+                } else {
+                    matrix[i][j] = static_cast<T>(0);
+                }
+            }
+        }
+    }
+
     Matrix pseudoInv(unsigned int maxIterations = 1000, T tolerance = 1e-10) const {
         Matrix A = *this;
         Matrix A_T = A.transpose();
@@ -120,11 +135,27 @@ public:
 
         return *this;
     }
-
+    Matrix& operator-(){
+        for (size_t i = 0; i < rows; i++) {
+            for (size_t j = 0; j < cols; j++) {
+                matrix[i][j] = -matrix[i][j];
+            }
+        }
+        return *this;
+    }
     Matrix& operator*=(T scalar) {
         for (size_t i = 0; i < rows; i++) {
             for (size_t j = 0; j < cols; j++) {
                 matrix[i][j] *= scalar;
+            }
+        }
+        return *this;
+    }
+
+    Matrix& operator/=(T scalar) {
+        for (size_t i = 0; i < rows; i++) {
+            for (size_t j = 0; j < cols; j++) {
+                matrix[i][j] /= scalar;
             }
         }
         return *this;
@@ -209,6 +240,14 @@ public:
 
         return result;
     }
+    inline void print() const {
+        for (size_t i = 0; i < rows; i++) {
+            for (size_t j = 0; j < cols; j++) {
+                std::cout << matrix[i][j] << " ";
+            }
+            std::cout << std::endl;
+        }
+    }
 
 private:
     T** matrix;
@@ -223,7 +262,7 @@ private:
     }
 
     void inverseMatrix(T** matrix, T** inverse, int size) {
-        // Создание копии исходной матрицы, чтобы не изменять ее
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ
         T** tempMatrix = new T * [size];
         for (size_t i = 0; i < size; ++i) {
             tempMatrix[i] = new T[size];
@@ -232,16 +271,16 @@ private:
             }
         }
 
-        // Создание единичной матрицы
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         for (size_t i = 0; i < size; ++i) {
             for (size_t j = 0; j < size; ++j) {
                 inverse[i][j] = (i == j) ? 1.0 : 0.0;
             }
         }
 
-        // Применение метода Гаусса-Жордана
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         for (size_t i = 0; i < size; ++i) {
-            // Обеспечение ненулевого элемента на диагонали
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             if (tempMatrix[i][i] == 0.0) {
                 for (size_t j = i + 1; j < size; ++j) {
                     if (tempMatrix[j][i] != 0.0) {
@@ -254,14 +293,14 @@ private:
                 }
             }
 
-            // Нормализация строки так, чтобы диагональный элемент стал равен 1
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 1
             T factor = tempMatrix[i][i];
             for (size_t j = 0; j < size; ++j) {
                 tempMatrix[i][j] /= factor;
                 inverse[i][j] /= factor;
             }
 
-            // Обнуление всех элементов в текущем столбце, кроме диагонального
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             for (size_t j = 0; j < size; ++j) {
                 if (j != i) {
                     factor = tempMatrix[j][i];
@@ -273,7 +312,7 @@ private:
             }
         }
 
-        // Очистка временной матрицы
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         freeMatrix(tempMatrix, size);
     }
 
@@ -287,7 +326,7 @@ private:
         }
 
         T d = 1;
-        T eps = 1e-10;
+        T eps = 10e-20;
         for (size_t i = 0; i < s; ++i) {
             if (std::abs(tempMatrix[i][i]) < eps) {
                 for (size_t k = i + 1; k < s; ++k) {
@@ -348,5 +387,10 @@ template <typename T>
 Matrix<T> operator*(const Matrix<T>& matrix, const T& scalar){
     Matrix<T> tmp = matrix;
     return tmp *= scalar;
+}
+template <typename T>
+Matrix<T> operator/(const Matrix<T>& matrix, const T& scalar){
+    Matrix<T> tmp = matrix;
+    return tmp /= scalar;
 }
 #endif // MATRIX
