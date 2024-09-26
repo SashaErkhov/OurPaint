@@ -1,10 +1,37 @@
 cmake_minimum_required(VERSION 3.20)
 set(CMAKE_CXX_STANDARD 20)
+
 project(ourpaint)
-add_executable(ourpaint main.cpp painter/paint.cpp painter/BMPpainter.cpp painter/objects.cpp "Matrix/Matrix.h" "graph/simpleGraph.h" painter/requirements.cpp painter/requirements.h painter/enums.h)
+
+# Поиск Qt6 и указание необходимых модулей
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
+
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+
+# Укажите все ваши исходные файлы
+add_executable(ourpaint
+        main.cpp
+        painter/paint.cpp
+        painter/BMPpainter.cpp
+        painter/objects.cpp
+        painter/requirements.cpp
+        GUI/mainwindow.cpp
+        painter/Painter.h
+        painter/QTPainter.h
+)
+
 include_directories(additions)
 include_directories(UndoRedo)
 include_directories(BMPfile/code)
+
 add_subdirectory(BMPfile)
 target_link_libraries(ourpaint bitmap)
-add_subdirectory(test)
+
+target_link_libraries(ourpaint
+        Qt6::Core
+        Qt6::Gui
+        Qt6::Widgets
+)
+
+# add_subdirectory(test)
