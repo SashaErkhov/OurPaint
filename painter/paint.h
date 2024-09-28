@@ -6,8 +6,10 @@
 #include "List.h"
 #include "objects.h"
 #include "BMPpainter.h"
+#include "QTPainter.h"
 #include "Assoc.h"
 #include "../Matrix/Matrix.h"
+
 //#include "../graph/simpleGraph.h"
 #include "enums.h"
 #include "requirements.h"
@@ -42,7 +44,7 @@ class Paint {
     List<point> m_pointStorage;
     List<section> m_sectionStorage;
     List<circle> m_circleStorage;
-    BMPpainter c_bmpPainter;
+    Painter* c_bmpPainter;
     rectangle s_allFigures;
     /*
     * TODO
@@ -51,7 +53,7 @@ class Paint {
     */
 
 public:
-    Paint() : s_maxID(0), c_bmpPainter(), m_pointIDs(), m_sectionIDs(), m_circleIDs(), m_pointStorage(),
+    Paint(Painter* p) : s_maxID(0), m_pointIDs(),c_bmpPainter(p), m_sectionIDs(), m_circleIDs(), m_pointStorage(),
         m_sectionStorage(), m_circleStorage() {
         s_allFigures.x_1 = -10;
         s_allFigures.x_2 = 10;

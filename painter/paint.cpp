@@ -7,7 +7,7 @@ ElementData::ElementData() {
 }
 
 ID Paint::addRequirement(const RequirementData &rd) {
-    c_bmpPainter = BMPpainter();
+
     ActionsInfo info;
 
     m_reqD.addElement(rd);
@@ -141,7 +141,7 @@ ID Paint::addRequirement(const RequirementData &rd) {
         if (prevError - error < 10e-6) throw std::runtime_error("UNKNOWN ERROR");
     }
 
-    
+
     // undo/redo
     for (const auto& req : allRequirements) {
         Arry<PARAMID> params = req->getParams();
@@ -275,17 +275,20 @@ RequirementData Paint::getRequirementInfo(ID id) {
 }
 
 void Paint::paint() {
-    c_bmpPainter.changeSize(s_allFigures);
+
+    c_bmpPainter->changeSize(s_allFigures);
     for (auto point = m_pointStorage.begin(); point != m_pointStorage.end(); ++point) {
-        c_bmpPainter.drawPoint(*point, false);
+        c_bmpPainter->drawPoint(*point, false);
     }
     for (auto circle = m_circleStorage.begin(); circle != m_circleStorage.end(); ++circle) {
-        c_bmpPainter.drawCircle(*circle, false);
+        c_bmpPainter->drawCircle(*circle, false);
     }
     for (auto section = m_sectionStorage.begin(); section != m_sectionStorage.end(); ++section) {
-        c_bmpPainter.drawSection(*section, false);
+        c_bmpPainter->drawSection(*section, false);
     }
 }
+
+
 
 /*
 void Paint::saveToFile(const char* file) {
@@ -408,7 +411,7 @@ void Paint::loadFromFile(const char* filename) {
 void Paint::exportToBMP(const char *file) {
     paint();
     try {
-        c_bmpPainter.saveBMP(file);
+        //c_bmpPainter.saveBMP(file);
     }
     catch (...) {
         throw std::invalid_argument("Can not opened file!");
@@ -461,13 +464,7 @@ void Paint::makeMyCircleEqual(const ElementData& ed, ElementData& changing) {
 */
 
 
-void Paint::changeBMP(const BMPfile &file) {
-    c_bmpPainter = BMPpainter(file);
-}
 
-void Paint::changeBMP(const char *filename) {
-    c_bmpPainter = BMPpainter(BMPfile(filename));
-}
 
 
 void Paint::deleteRequirement(ID req) {

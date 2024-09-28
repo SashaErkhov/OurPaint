@@ -19,6 +19,7 @@ add_executable(ourpaint
         GUI/mainwindow.cpp
         painter/Painter.h
         painter/QTPainter.h
+        painter/QTPainter.cpp
 )
 
 include_directories(additions)

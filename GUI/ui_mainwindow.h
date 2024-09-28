@@ -21,6 +21,7 @@
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QWidget>
+#include <QTextBrowser>
 
 QT_BEGIN_NAMESPACE
 
@@ -125,6 +126,7 @@ public:
         workWindow->setFrameShape(QFrame::Shape::StyledPanel);
         workWindow->setFrameShadow(QFrame::Shadow::Raised);
 
+
         gridLayout->addWidget(workWindow, 0, 1, 1, 1);
 
 
@@ -174,7 +176,13 @@ public:
         actionJoin_server->setText(QCoreApplication::translate("MainWindow", "Join server", nullptr));
         actionJoin_local_server->setText(QCoreApplication::translate("MainWindow", "Join local server", nullptr));
         actionExit_from_session->setText(QCoreApplication::translate("MainWindow", "Exit from session", nullptr));
-        action_help->setText(QCoreApplication::translate("MainWindow", "\320\222\320\260\320\274 \320\275\320\265 \320\275\321\203\320\266\320\265\320\275 help", nullptr));
+        action_help->setText(QCoreApplication::translate("MainWindow",
+                                                         "Консольные команды:\n"
+                                                         "point X Y\n"
+                                                         "circle X Y R\n"
+                                                         "section X1 Y1 X2 Y2",
+                                                         nullptr));
+
 
         const bool __sortingEnabled = leftMenu->isSortingEnabled();
         leftMenu->setSortingEnabled(false);
@@ -184,11 +192,11 @@ public:
         ___qtreewidgetitem1->setText(0, QCoreApplication::translate("MainWindow", "Requirements", nullptr));
         leftMenu->setSortingEnabled(__sortingEnabled);
 
-        console->setText(QCoreApplication::translate("MainWindow", ">", nullptr));
+        console->setText(QCoreApplication::translate("MainWindow", "", nullptr));
         menuCollaboration->setTitle(QCoreApplication::translate("MainWindow", "Project", nullptr));
         menuProject->setTitle(QCoreApplication::translate("MainWindow", "Collaboration", nullptr));
         menuHelp->setTitle(QCoreApplication::translate("MainWindow", "Help", nullptr));
-    } // retranslateUi
+    }
 
 };
 

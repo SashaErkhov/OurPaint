@@ -2,9 +2,10 @@
 #define OURPAINT_BMPPAINTER_H
 #include "BMPfile.h"
 #include "objects.h"
+#include "Painter.h"
 #include <cmath>
 
-class BMPpainter {
+class BMPpainter : public Painter{
     BMPfile c_file;
     unsigned int v_weight;
     unsigned int v_height;
