@@ -11,7 +11,7 @@
 
 class FileOurP {
     std::vector<objectInFile> m_objects;
-private:
+public:
     FileOurP();
 
     explicit FileOurP(const std::vector<objectInFile> &obj);
