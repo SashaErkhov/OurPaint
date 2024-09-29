@@ -15,17 +15,14 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 enable_testing()
-set(SOURCES ../painter/paint.cpp ../painter/objects.cpp ../painter/BMPpainter.cpp "../Matrix/Matrix.h" "../graph/simpleGraph.h" ../painter/requirements.cpp ../painter/requirements.h ../painter/enums.h)
-include_directories(../additions)
-include_directories(../BMPfile/code)
-add_subdirectory(../BMPfile build)
+set(SOURCES  ../painter/objects.cpp  ../painter/saveload/objectInFile.cpp ../painter/saveload/FileOurP.cpp)
 add_executable(
   ourpainttest
-  test.cpp
+  savergtests.cpp
   ${SOURCES}
 )
 target_link_libraries(
-  ourpainttest bitmap
+  ourpainttest
   GTest::gtest_main
 )
 
