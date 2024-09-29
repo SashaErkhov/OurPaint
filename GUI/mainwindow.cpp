@@ -1,3 +1,4 @@
+#include <QPushButton>
 #include "mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),ui(new Ui::MainWindow),Index(-1) {
@@ -11,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),ui(new Ui::MainWin
         emit EnterPressed(input);
         ui->console->clear();
     });
+
 }
 
 void MainWindow::Print_LeftMenu(const std::string &text, const std::vector<int> &object) {
@@ -87,6 +89,9 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
     QWidget::keyPressEvent(event);
 }
 
+
 MainWindow::~MainWindow() {
     delete ui;
 }
+
+

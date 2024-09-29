@@ -14,6 +14,8 @@ void QTPainter::clear() {
     points.clear();
     circles.clear();
     sections.clear();
+    scale=0;
+    koef=0;
     update();
 }
 

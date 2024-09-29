@@ -10,7 +10,7 @@
 #include "objects.h"
 #include <cmath>
 #include "enums.h"
-#define h 0.000001
+#define eps 0.000001
 
 struct RequirementData {
     Requirement req;
@@ -30,42 +30,42 @@ public:
     virtual rectangle getRectangle() = 0;
     virtual double getDerivative(PARAMID p) {
         double origValue = *p;
-        *p += h;
+        *p += eps;
         double f1 = getError();
-        *p -= 2 * h;
+        *p -= 2 * eps;
         double f2 = getError();
         *p = origValue;
-        return (f1 - f2) / (2 * h);
+        return (f1 - f2) / (2 * eps);
     }
 
     virtual double getSecondDerivative(PARAMID p) {
         double origValue = *p;
-        *p += h;
+        *p += eps;
         double f1 = getError();
         *p = origValue;
         double f0 = getError();
-        *p -= h;
+        *p -= eps;
         double f2 = getError();
         *p = origValue;
-        return (f1 - 2 * f0 + f2) / (h * h);
+        return (f1 - 2 * f0 + f2) / (eps * eps);
     }
 
     virtual double getMixedDerivative(PARAMID p1, PARAMID p2) {
         double origValue1 = *p1;
         double origValue2 = *p2;
-        *p1 += h;
-        *p2 += h;
+        *p1 += eps;
+        *p2 += eps;
         double f1 = getError();
-        *p2 -= 2 * h;
+        *p2 -= 2 * eps;
         double f2 = getError();
-        *p1 -= 2 * h;
-        *p2 += 2 * h;
+        *p1 -= 2 * eps;
+        *p2 += 2 * eps;
         double f3 = getError();
-        *p2 -= 2 * h;
+        *p2 -= 2 * eps;
         double f4 = getError();
         *p1 = origValue1;
         *p2 = origValue2;
-        return (f1 - f2 - f3 + f4) / (4 * h * h);
+        return (f1 - f2 - f3 + f4) / (4 * eps * eps);
     }
 };
 

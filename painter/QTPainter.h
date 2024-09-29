@@ -26,6 +26,9 @@ private:
     const double margin = 0.05;  // 5% запаса
 
 public:
+    double getScale(){return scale;}
+    void setScale(double scale);
+
     QTPainter(Ui::MainWindow *ui, QWidget *parent);
     void clear();
 

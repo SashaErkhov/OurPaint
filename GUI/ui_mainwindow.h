@@ -54,7 +54,6 @@ public:
             MainWindow->setObjectName("MainWindow");
         MainWindow->resize(1024, 576);
         MainWindow->setMinimumSize(QSize(640, 360));
-        MainWindow->setMaximumSize(QSize(1920, 1080));
         MainWindow->setStyleSheet(QString::fromUtf8("background: \"#978897\""));
         actionSave_project_to = new QAction(MainWindow);
         actionSave_project_to->setObjectName("actionSave_project_to");
@@ -104,7 +103,8 @@ public:
         sizePolicy.setHeightForWidth(leftMenu->sizePolicy().hasHeightForWidth());
         leftMenu->setSizePolicy(sizePolicy);
         leftMenu->setMinimumSize(QSize(50, 320));
-        leftMenu->setStyleSheet(QString::fromUtf8("background: \"#494850\""));
+        leftMenu->setStyleSheet(QString::fromUtf8(R"(background: "#494850";color: "#D8D8F6")"));
+
 
         gridLayout->addWidget(leftMenu, 0, 0, 2, 1, Qt::AlignmentFlag::AlignLeft);
 
@@ -114,7 +114,7 @@ public:
         console->setFont(font2);
         console->setCursor(QCursor(Qt::CursorShape::IBeamCursor));
         console->setAutoFillBackground(false);
-        console->setStyleSheet(QString::fromUtf8("background:\"#3e3d3d\""));
+        console->setStyleSheet(QString::fromUtf8(R"(background:"#3e3d3d";color: "#D8D8F6")"));
 
         gridLayout->addWidget(console, 1, 1, 1, 1);
 
@@ -137,6 +137,7 @@ public:
         upMenu->setObjectName("upMenu");
         upMenu->setGeometry(QRect(0, 0, 1024, 25));
         upMenu->setFont(font);
+
         menuCollaboration = new QMenu(upMenu);
         menuCollaboration->setObjectName("menuCollaboration");
         menuCollaboration->setFont(font);
@@ -149,6 +150,7 @@ public:
         upMenu->addAction(menuCollaboration->menuAction());
         upMenu->addAction(menuProject->menuAction());
         upMenu->addAction(menuHelp->menuAction());
+        upMenu->setStyleSheet(QString::fromUtf8(R"(background: "#494850";color: "#D8D8F6")"));
         menuCollaboration->addAction(actionSave_project_to);
         menuCollaboration->addAction(actionImport_project);
         menuCollaboration->addAction(actionExport_bmp);
