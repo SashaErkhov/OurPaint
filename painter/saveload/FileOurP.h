@@ -8,9 +8,12 @@
 #include <fstream>
 #include <vector>
 #include "objectInFile.h"
+#include <sstream>
 
 class FileOurP {
     std::vector<objectInFile> m_objects;
+    std::vector<objectInFile> parseFile(const std::ifstream & file);
+
 public:
     FileOurP();
 
@@ -27,6 +30,9 @@ public:
     void addObject(std::pair<ID, primitive*> &obj);
 
     void saveToOurP(const std::string &fileName) const;
+
+    void loadFromOurP(const std::string &fileName);
+
     const std::vector<objectInFile>& getObjects() const;
 };
 

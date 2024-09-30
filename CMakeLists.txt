@@ -2,14 +2,12 @@ cmake_minimum_required(VERSION 3.20)
 set(CMAKE_CXX_STANDARD 20)
 
 project(ourpaint)
-
-# Поиск Qt6 и указание необходимых модулей
+# for using this app, you need to download QT6. If you have question, ask @ardrasss
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 
-# Укажите все ваши исходные файлы
 add_executable(ourpaint
         main.cpp
         painter/paint.cpp

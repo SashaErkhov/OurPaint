@@ -14,7 +14,6 @@ class objectInFile {
 public:
     explicit objectInFile(std::pair<ID, primitive *> &obj);
 
-
     objectInFile(const objectInFile &other);
 
     objectInFile(objectInFile &&other) noexcept;
