@@ -134,17 +134,29 @@ TEST(FileOurPTest, SaveToOurP) {
     FileOurP file;
     ID id{1};
     point pt;
-    pt.x = 0;
-    pt.y = 0;
+    pt.x = 1;
+    pt.y = 1;
     primitive* prim = &pt;
     std::pair<ID, primitive*> obj(id, prim);
     file.addObject(obj);
-
+    ID id2{2};
+    section sec;
+    point beg1;
+    beg1.x = 3;
+    beg1.y = 4;
+    point end1;
+    end1.x = 5;
+    end1.y = 6;
+    sec.beg = &beg1;
+    sec.end = &end1;
+    primitive* prim2 = &sec;
+    std::pair<ID, primitive*> obj1(id2, prim2);
+    file.addObject(obj1);
     std::string fileName = "test_file";
     file.saveToOurP(fileName);
 
     std::string content = readFile(fileName + ".ourp");
-    std::string expectedContent = "Elements: {\n{\nID 1\npoint 0.000000 0.000000\n}\n}\n";
+    std::string expectedContent = "Elements: {\n{\nID 1\npoint 1.000000 1.000000\n}\n{\nID 2\nsection 3.000000 4.000000 5.000000 6.000000\n}\n}\n";
 
     EXPECT_EQ(content, expectedContent);
 }
@@ -216,3 +228,42 @@ TEST(FileOurPTest, CopyAssignment) {
     EXPECT_EQ(file2.getObjects().size(), 1);
     EXPECT_EQ(file1.getObjects().size(), 1);
 }
+TEST(FileOurPTest, loadFromOurPTest) {
+    FileOurP file;
+    ID id{1};
+    point pt;
+    pt.x = 1;
+    pt.y = 2;
+    primitive* prim = &pt;
+    std::pair<ID, primitive*> obj(id, prim);
+    file.addObject(obj);
+    ID id2{2};
+    section sec;
+    point beg1;
+    beg1.x = 3;
+    beg1.y = 4;
+    point end1;
+    end1.x = 5;
+    end1.y = 6;
+    sec.beg = &beg1;
+    sec.end = &end1;
+    primitive* prim2 = &sec;
+    std::pair<ID, primitive*> obj1(id2, prim2);
+    file.addObject(obj1);
+    std::string fileName = "test_file";
+    file.saveToOurP(fileName);
+    FileOurP fileOurP;
+    fileOurP.loadFromOurP("test_file");
+    ASSERT_EQ(fileOurP.getObjects().size(), 2);
+
+    ASSERT_EQ(fileOurP.getObjects()[0].to_pair().first.id, 1);
+    ASSERT_EQ(dynamic_cast<point*>(fileOurP.getObjects()[0].to_pair().second)->x, 1);
+    ASSERT_EQ(dynamic_cast<point*>(fileOurP.getObjects()[0].to_pair().second)->y, 2);
+
+    ASSERT_EQ(fileOurP.getObjects()[1].to_pair().first.id, 2);
+    ASSERT_EQ(dynamic_cast<section*>(fileOurP.getObjects()[1].to_pair().second)->beg->x, 3);
+    ASSERT_EQ(dynamic_cast<section*>(fileOurP.getObjects()[1].to_pair().second)->beg->y, 4);
+    ASSERT_EQ(dynamic_cast<section*>(fileOurP.getObjects()[1].to_pair().second)->end->x, 5);
+    ASSERT_EQ(dynamic_cast<section*>(fileOurP.getObjects()[1].to_pair().second)->end->y, 6);
+}
+
