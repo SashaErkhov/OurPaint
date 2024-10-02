@@ -12,7 +12,7 @@
 
 class FileOurP {
     std::vector<objectInFile> m_objects;
-    std::vector<objectInFile> parseFile(const std::ifstream & file);
+    std::vector<objectInFile> parseFile(std::ifstream& file);
 
 public:
     FileOurP();

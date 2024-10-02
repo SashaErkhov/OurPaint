@@ -4,11 +4,14 @@
 
 #include "FileOurP.h"
 
-std::vector<objectInFile> FileOurP::parseFile(const std::ifstream& file) {
+std::vector<objectInFile> FileOurP::parseFile(std::ifstream& file) {
     std::vector<objectInFile> objects;
     std::string line;
 
     while (std::getline(file, line)) {
+        if (file.fail()) {
+            throw std::runtime_error("Failed to read line from file");
+        }
         if (line.find("ID") != std::string::npos) {
             std::stringstream ss(line);
             std::string id_str;
@@ -106,7 +109,7 @@ void FileOurP::loadFromOurP(const std::string &fileName) {
     if (!file.is_open()) {
         throw std::runtime_error("File not found");
     }
-    parseFile(file);
+    m_objects = parseFile(file);
 }
 const std::vector<objectInFile> &FileOurP::getObjects() const {
         return m_objects;
