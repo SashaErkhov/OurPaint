@@ -25,6 +25,7 @@ include_directories(UndoRedo)
 include_directories(BMPfile/code)
 
 add_subdirectory(BMPfile)
+add_subdirectory(test)
 target_link_libraries(ourpaint bitmap)
 
 target_link_libraries(ourpaint
@@ -33,4 +34,4 @@ target_link_libraries(ourpaint
         Qt6::Widgets
 )
 
-# add_subdirectory(test)
+

@@ -17,13 +17,35 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 set(SOURCES  ../painter/objects.cpp  ../painter/saveload/objectInFile.cpp ../painter/saveload/FileOurP.cpp)
 add_executable(
-  ourpainttest
+  savergtest
   savergtests.cpp
   ${SOURCES}
+)
+add_executable(
+        ourpainttest
+        test.cpp
+        ${SOURCES}
+)
+add_executable(
+        graphgtest
+        graphgtests.cpp
+        ${SOURCES}
 )
 target_link_libraries(
   ourpainttest
   GTest::gtest_main
+)
+target_link_libraries(
+        graphgtest
+        GTest::gtest_main
+)
+target_link_libraries(
+        savergtest
+        GTest::gtest_main
+)
+target_link_libraries(
+        ourpainttest
+        GTest::gtest_main
 )
 
 include(GoogleTest)
