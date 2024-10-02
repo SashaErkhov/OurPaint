@@ -51,6 +51,8 @@ objectInFile &objectInFile::operator=(objectInFile &&other) noexcept {
     return *this;
 }
 
+std::pair<ID, primitive *> objectInFile::to_pair() const { return std::make_pair(id, s_obj); };
+
 objectInFile::objectInFile(std::pair<ID, primitive *> &obj) {
     s_obj = obj.second;
     id = obj.first;

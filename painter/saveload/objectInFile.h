@@ -21,6 +21,7 @@ public:
     objectInFile &operator=(const objectInFile &other);
 
     objectInFile &operator=(objectInFile &&other) noexcept;
+    std::pair<ID, primitive *> to_pair() const;
 
     std::string to_string() const;
 };
