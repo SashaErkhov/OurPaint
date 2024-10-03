@@ -588,3 +588,68 @@ void Paint::redo() {
         }
     }
 }
+
+void Paint::saveToFile(const char *filename) {
+    FileOurP saver;
+    for (auto i = m_pointIDs.begin(); i!= m_pointIDs.end(); ++i){
+        point *p = &(*i->second);
+        std::pair<ID, primitive*> m{i->first, p};
+        saver.addObject(m);
+    }
+    for (auto i = m_sectionIDs.begin(); i!= m_sectionIDs.end(); ++i){
+        section *s = &(*i->second);
+        std::pair<ID, primitive*> m{i->first, s};
+        saver.addObject(m);
+    }
+    for (auto i = m_circleIDs.begin(); i!= m_circleIDs.end(); ++i){
+        circle *c = &(*i->second);
+        std::pair<ID, primitive*> m{i->first, c};
+        saver.addObject(m);
+    }
+    saver.saveToOurP(filename);
+}
+
+void Paint::loadFromFile(const char *file) {
+    FileOurP loader;
+    loader.loadFromOurP(file);
+    clear();
+    for (const auto & i : loader.getObjects()){
+        if (i.to_pair().second->type() == ET_POINT){
+            point *p = static_cast<point*>(i.to_pair().second);
+            m_pointIDs[i.to_pair().first] = m_pointStorage.addElement(*p);
+            s_allFigures = s_allFigures || p->rect();
+        }
+        else if (i.to_pair().second->type() == ET_CIRCLE){
+            circle *c = static_cast<circle*>(i.to_pair().second);
+            m_circleIDs[i.to_pair().first] = m_circleStorage.addElement(*c);
+            s_allFigures = s_allFigures || c->rect();
+        }
+        else if (i.to_pair().second->type() == ET_SECTION){
+            section *s = static_cast<section*>(i.to_pair().second);
+            m_sectionIDs[i.to_pair().first] = m_sectionStorage.addElement(*s);
+            s_allFigures = s_allFigures || s->rect();
+        }
+    }
+}
+
+void Paint::clear() {
+    m_pointIDs.clear();
+    m_sectionIDs.clear();
+    m_circleIDs.clear();
+    m_reqIDs.clear();
+    for (auto i = m_reqStorage.begin(); i!= m_reqStorage.end(); ++i){
+        m_reqStorage.remove(i);
+    }
+    for (auto i = m_pointStorage.begin(); i!= m_pointStorage.end(); ++i){
+        m_pointStorage.remove(i);
+    }
+    for (auto i = m_sectionStorage.begin(); i!= m_sectionStorage.end(); ++i){
+        m_sectionStorage.remove(i);
+    }
+    for (auto i = m_circleStorage.begin(); i!= m_circleStorage.end(); ++i){
+        m_circleStorage.remove(i);
+    }
+    s_allFigures = rectangle(10, 10, 10, 10);
+    s_maxID = ID(0);
+
+}

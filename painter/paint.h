@@ -9,6 +9,7 @@
 #include "QTPainter.h"
 #include "Assoc.h"
 #include "../Matrix/Matrix.h"
+#include "saveload/FileOurP.h"
 
 //#include "../graph/simpleGraph.h"
 #include "enums.h"
@@ -82,11 +83,12 @@ public:
     void loadFromFile(const char *file);
     
     // Задает фон(изменяет filename файл)
-    void changeBMP(const BMPfile& file);
-    void changeBMP(const char* filename);
+    // void changeBMP(const BMPfile& file);
+    // void changeBMP(const char* filename);
 
     void deleteElement(ID elem);
     void deleteRequirement(ID req);
+    void clear();
 
     void undo();
     void redo();
