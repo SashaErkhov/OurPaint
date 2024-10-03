@@ -7,6 +7,7 @@
 std::vector<objectInFile> FileOurP::parseFile(std::ifstream& file) {
     std::vector<objectInFile> objects;
     std::string line;
+    std::queue<std::pair<ID, primitive*>> q;
 
     while (std::getline(file, line)) {
         if (file.fail()) {
@@ -32,34 +33,41 @@ std::vector<objectInFile> FileOurP::parseFile(std::ifstream& file) {
                 p->x = x;
                 p->y = y;
                 std::pair<ID,primitive*> a = {object_id, p};
-                objects.push_back(objectInFile(a));
+                if (q.size() == 2) {
+                    objects.emplace_back(q.front());
+                    q.pop();
+                }
+                q.push(a);
+
             }
             else if (type == "section") {
-                double x1, y1, x2, y2;
-                data >> x1 >> y1 >> x2 >> y2;
-                point* p1 = new point;
-                p1->x = x1;
-                p1->y = y1;
-                point* p2 = new point;
-                p2->x = x2;
-                p2->y = y2;
+                if (q.size() != 2){
+                    throw std::runtime_error("Invalid file format. Check instruction on rules.md");
+                }
+
+                primitive* p1 = q.front().second;
+                objects.emplace_back(q.front());
+                q.pop();
+                primitive* p2 = q.front().second;
+                objects.emplace_back(q.front());
+                q.pop();
                 section* sec = new section;
-                sec->beg = p1;
-                sec->end = p2;
+                sec->beg = dynamic_cast<point*>(p1);
+                sec->end = dynamic_cast<point*>(p2);
                 std::pair<ID,primitive*> a = {object_id, sec};
-                objects.push_back(objectInFile(a));
+                objects.emplace_back(a);
             }
             else if (type == "circle") {
-                double x, y, r;
-                data >> x >> y >> r;
-                point* center = new point;
-                center->x = x;
-                center->y = y;
+                double r;
+                data >> r;
+                primitive* center = q.front().second;
+                objects.emplace_back(q.front());
+                q.pop();
                 circle* c = new circle;
-                c->center = center;
+                c->center = dynamic_cast<point*>(center);
                 c->R = r;
                 std::pair<ID,primitive*> a = {object_id, c};
-                objects.push_back(objectInFile(a));;
+                objects.emplace_back(a);;
             }
         }
     }
@@ -95,8 +103,12 @@ void FileOurP::saveToOurP(const std::string &fileName) const {
     if (!file.is_open()) {
         throw std::runtime_error("File not found");
     }
+    std::vector<objectInFile> sort_objects = m_objects;
+    std::sort(sort_objects.begin(), sort_objects.end(), [](const objectInFile &a, const objectInFile &b) {
+        return a.to_pair().first < b.to_pair().first;
+    });
     file << "Elements: {\n";
-    for (const auto &obj: m_objects) {
+    for (const auto &obj: sort_objects) {
         file << obj.to_string() << "\n";
     }
     file << "}\n";

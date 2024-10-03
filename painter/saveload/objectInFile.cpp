@@ -11,12 +11,10 @@ std::string objectInFile::to_string() const {
                "\n}";
     } else if (s_obj->type() == ET_SECTION) {
         section *s = dynamic_cast<section *>(s_obj);
-        return "{\nID " + std::to_string(id.id) + "\nsection " + std::to_string(s->beg->x) + " " +
-               std::to_string(s->beg->y) + " " + std::to_string(s->end->x) + " " + std::to_string(s->end->y) + "\n}";
+        return "{\nID " + std::to_string(id.id) + "\nsection" + "\n}";
     } else if (s_obj->type() == ET_CIRCLE) {
         circle *s = dynamic_cast<circle *>(s_obj);
-        return "\nID " + std::to_string(id.id) + "\ncircle " + std::to_string(s->center->x) + " " +
-               std::to_string(s->center->y) + " " + std::to_string(s->R) + "\n}";
+        return "\nID " + std::to_string(id.id) + "\ncircle " + std::to_string(s->R) + "\n}";
     }
     return "error";
 }

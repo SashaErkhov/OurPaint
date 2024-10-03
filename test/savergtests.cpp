@@ -12,7 +12,6 @@ TEST(ObjectInFileTest, TestPointToString) {
     p.x = 1.0;
     p.y = 2.0;
     std::pair<ID, primitive*> obj{ID{1}, &p};
-
     objectInFile objInFile(obj);
 
     EXPECT_EQ(objInFile.to_string(), "{\nID 1\npoint 1.000000 2.000000\n}");
@@ -31,7 +30,7 @@ TEST(ObjectInFileTest, TestSectionToString) {
 
     objectInFile objInFile(obj);
 
-    EXPECT_EQ(objInFile.to_string(), "{\nID 2\nsection 1.000000 2.000000 3.000000 4.000000\n}");
+    EXPECT_EQ(objInFile.to_string(), "{\nID 2\nsection\n}");
 }
 
 TEST(ObjectInFileTest, TestCircleToString) {
@@ -45,7 +44,7 @@ TEST(ObjectInFileTest, TestCircleToString) {
 
     objectInFile objInFile(obj);
 
-    EXPECT_EQ(objInFile.to_string(), "\nID 3\ncircle 1.000000 2.000000 5.000000\n}");
+    EXPECT_EQ(objInFile.to_string(), "\nID 3\ncircle 5.000000\n}");
 }
 
 TEST(ObjectInFileTest, TestCopyConstructor) {
@@ -140,13 +139,19 @@ TEST(FileOurPTest, SaveToOurP) {
     std::pair<ID, primitive*> obj(id, prim);
     file.addObject(obj);
     ID id2{2};
-    section sec;
     point beg1;
     beg1.x = 3;
     beg1.y = 4;
+    std::pair<ID, primitive*> obj2(id2, prim);
+    file.addObject(obj2);
+    ID id3{3};
     point end1;
     end1.x = 5;
     end1.y = 6;
+    std::pair<ID, primitive*> obj3(id3, prim);
+    file.addObject(obj3);
+    ID id4{4};
+    section sec;
     sec.beg = &beg1;
     sec.end = &end1;
     primitive* prim2 = &sec;
@@ -156,7 +161,7 @@ TEST(FileOurPTest, SaveToOurP) {
     file.saveToOurP(fileName);
 
     std::string content = readFile(fileName + ".ourp");
-    std::string expectedContent = "Elements: {\n{\nID 1\npoint 1.000000 1.000000\n}\n{\nID 2\nsection 3.000000 4.000000 5.000000 6.000000\n}\n}\n";
+    std::string expectedContent = "Elements: {\n{\nID 1\npoint 1.000000 1.000000\n}\n{\nID 2\npoint 1.000000 1.000000\n}\n{\nID 2\nsection\n}\n{\nID 3\npoint 1.000000 1.000000\n}\n}\n";
 
     EXPECT_EQ(content, expectedContent);
 }
@@ -237,33 +242,39 @@ TEST(FileOurPTest, loadFromOurPTest) {
     primitive* prim = &pt;
     std::pair<ID, primitive*> obj(id, prim);
     file.addObject(obj);
-    ID id2{2};
-    section sec;
-    point beg1;
-    beg1.x = 3;
-    beg1.y = 4;
+    ID id3{3};
     point end1;
     end1.x = 5;
     end1.y = 6;
+    std::pair<ID, primitive*> obj3(id3, &end1);
+    file.addObject(obj3);
+    ID id2{2};
+    point beg1;
+    beg1.x = 3;
+    beg1.y = 4;
+    std::pair<ID, primitive*> obj2(id2, &beg1);
+    file.addObject(obj2);
+    ID id4{4};
+    section sec;
     sec.beg = &beg1;
     sec.end = &end1;
     primitive* prim2 = &sec;
-    std::pair<ID, primitive*> obj1(id2, prim2);
-    file.addObject(obj1);
+    std::pair<ID, primitive*> obj4(id4, prim2);
+    file.addObject(obj4);
     std::string fileName = "test_file";
     file.saveToOurP(fileName);
     FileOurP fileOurP;
     fileOurP.loadFromOurP("test_file");
-    ASSERT_EQ(fileOurP.getObjects().size(), 2);
+    ASSERT_EQ(fileOurP.getObjects().size(), 4);
 
     ASSERT_EQ(fileOurP.getObjects()[0].to_pair().first.id, 1);
     ASSERT_EQ(dynamic_cast<point*>(fileOurP.getObjects()[0].to_pair().second)->x, 1);
     ASSERT_EQ(dynamic_cast<point*>(fileOurP.getObjects()[0].to_pair().second)->y, 2);
 
-    ASSERT_EQ(fileOurP.getObjects()[1].to_pair().first.id, 2);
-    ASSERT_EQ(dynamic_cast<section*>(fileOurP.getObjects()[1].to_pair().second)->beg->x, 3);
-    ASSERT_EQ(dynamic_cast<section*>(fileOurP.getObjects()[1].to_pair().second)->beg->y, 4);
-    ASSERT_EQ(dynamic_cast<section*>(fileOurP.getObjects()[1].to_pair().second)->end->x, 5);
-    ASSERT_EQ(dynamic_cast<section*>(fileOurP.getObjects()[1].to_pair().second)->end->y, 6);
+    ASSERT_EQ(fileOurP.getObjects()[3].to_pair().first.id, 4);
+    ASSERT_EQ(dynamic_cast<section*>(fileOurP.getObjects()[3].to_pair().second)->beg->x, 3);
+    ASSERT_EQ(dynamic_cast<section*>(fileOurP.getObjects()[3].to_pair().second)->beg->y, 4);
+    ASSERT_EQ(dynamic_cast<section*>(fileOurP.getObjects()[3].to_pair().second)->end->x, 5);
+    ASSERT_EQ(dynamic_cast<section*>(fileOurP.getObjects()[3].to_pair().second)->end->y, 6);
 }
 

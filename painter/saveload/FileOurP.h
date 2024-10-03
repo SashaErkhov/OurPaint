@@ -9,6 +9,7 @@
 #include <vector>
 #include "objectInFile.h"
 #include <sstream>
+#include <queue>
 
 class FileOurP {
     std::vector<objectInFile> m_objects;
