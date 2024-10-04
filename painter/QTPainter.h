@@ -26,6 +26,11 @@ private:
     const double margin = 0.05;  // 5% запаса
 
 public:
+
+    void draw() {
+        update();
+    }
+
     double getScale(){return scale;}
     void setScale(double scale);
 

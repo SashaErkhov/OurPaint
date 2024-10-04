@@ -14,8 +14,8 @@ void QTPainter::clear() {
     points.clear();
     circles.clear();
     sections.clear();
-    scale=0;
-    koef=0;
+    scale=1.0;
+    koef=1.0;
     update();
 }
 
@@ -23,22 +23,22 @@ void QTPainter::resizeEvent(QResizeEvent *event) {
     // При изменении размера окна отца, меняем размер окна
     QFrame::resizeEvent(event);
     resize(ui->workWindow->size());
-    update();
+ //   update();
 }
 
 void QTPainter::drawPoint(point pt, bool isWhite) {
     points.push_back(pt);
-    update();
+    //update();
 }
 
 void QTPainter::drawCircle(circle c, bool isWhite) {
     circles.push_back(c);
-    update();
+  //  update();
 }
 
 void QTPainter::drawSection(section sec, bool isWhite) {
     sections.push_back(sec);
-    update();
+   // update();
 }
 
 void QTPainter::paintEvent(QPaintEvent *event) {
@@ -77,6 +77,7 @@ void QTPainter::paintEvent(QPaintEvent *event) {
         int EndY = static_cast<int>(-sec.end->y * scale + height() / 2);
         painter.drawLine(BegX, BegY, EndX, EndY);
     }
+
 }
 
 void QTPainter::changeSize(const rectangle &allObjects) {
@@ -94,7 +95,7 @@ void QTPainter::changeSize(const rectangle &allObjects) {
         koef = static_cast<double>(height()) / (2 * maxY) - margin * koef;
     }
 
-    update();
+  //  update();
 }
 
 unsigned long long QTPainter::getWeight() {
@@ -108,5 +109,5 @@ unsigned long long QTPainter::getHeight() {
 void QTPainter::onWorkWindowResized() {
     // При изменении размера окна отца меняем размер
     resize(ui->workWindow->size());
-    update();
+  //  update();
 }

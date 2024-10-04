@@ -33,19 +33,16 @@ int main(int argc, char *argv[]) {
                 point.params.addElement(y);
                 ID id = screen.addElement(point);
                 w.Print_LeftMenu("Point", {x, y});
+                screen.paint();
+                painter->draw();
             }
 
         } else if (commandParts[0] == "exit") {
             exit(0);
-        } else if (commandParts[0] == "save") {
-
-        } else if (commandParts[0] == "load") {
-
-        } else if (commandParts[0] == "clear") {
+        }  else if (commandParts[0] == "clear") {
             painter->clear();
             w.Print_LeftMenu("Clear", {});
-            //  id->clear();
-
+            screen.clear();
         } else if (commandParts[0] == "circle" && commandParts.size() == 4) {
             bool xOk, yOk, rOk;
             int x = (int) commandParts[1].toDouble(&xOk);
@@ -61,6 +58,8 @@ int main(int argc, char *argv[]) {
                 circle.params.addElement(r);
                 ID id = screen.addElement(circle);
                 w.Print_LeftMenu("Circle", {x, y, r});
+                screen.paint();
+                painter->draw();
             }
 
         } else if (commandParts[0] == "section" && commandParts.size() == 5) {
@@ -78,23 +77,29 @@ int main(int argc, char *argv[]) {
                 section.params.addElement(r);
                 ID id = screen.addElement(section);
                 w.Print_LeftMenu("Section", {x, y, z, r});
+                screen.paint();
+                painter->draw();
             }
 
         } else if (commandParts[0] == "addreq") {
 
         }
-        screen.paint();
+
+
     });
 
 
     QObject::connect(&w, &MainWindow::projectSaved, [&screen](const QString &fileName) {
-        std::string File=fileName.toStdString();
+        std::string File = fileName.toStdString();
         screen.saveToFile(File.c_str());
     });
 
-    QObject::connect(&w, &MainWindow::LoadFile, [&screen](const QString &fileName) {
-        std::string File=fileName.toStdString();
+    QObject::connect(&w, &MainWindow::LoadFile, [&screen,&painter](const QString &fileName) {
+        painter->clear();
+        std::string File = fileName.toStdString();
         screen.loadFromFile(File.c_str());
+        screen.paint();
+        painter->draw();
     });
 
 

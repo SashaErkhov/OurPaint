@@ -22,7 +22,7 @@ QString MainWindow::LoadProjectFile() {
                                                     tr("Project Files (*.ourp);;All Files (*)"));
 
     if (!fileName.isEmpty()) {
-        QFile file(fileName);
+        emit LoadFile(fileName);
         return fileName;
     }
 
