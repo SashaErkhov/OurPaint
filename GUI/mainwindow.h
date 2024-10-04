@@ -50,6 +50,7 @@ public:
 
 public slots:
     QString saveProjectToFile();
+    QString LoadProjectFile();
 
 
 protected:
@@ -59,6 +60,7 @@ signals:
     void EnterPressed(const QString &command); // При нажатии кнопки
     void resized(); // При изменении размера окна для QTPAinter
     void projectSaved(const QString &fileName);
+    void LoadFile(const QString &fileName);
 
 };
 

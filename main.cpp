@@ -92,6 +92,11 @@ int main(int argc, char *argv[]) {
         screen.saveToFile(File.c_str());
     });
 
+    QObject::connect(&w, &MainWindow::LoadFile, [&screen](const QString &fileName) {
+        std::string File=fileName.toStdString();
+        screen.loadFromFile(File.c_str());
+    });
+
 
 
     /*while (true) {
@@ -378,14 +383,3 @@ int main(int argc, char *argv[]) {
 
 
 
-
-/*int main()
-{
-
-    std::cout << "-------------------------------------OurPaint-------------------------------------" << std::endl;
-    std::cout << "This programm will help you to make different shapes, like such as line, point, circle." << std::endl;
-    std::cout << "To find out the commands, write \"help\"" << std::endl;
-
-
-}
-*/
