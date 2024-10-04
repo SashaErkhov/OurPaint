@@ -9,16 +9,20 @@
 #include <QTreeWidgetItem>
 #include <vector>
 #include <string>
+#include <QWidget>
+#include <QFileDialog>
+#include <QPushButton>
+#include <QDebug>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
-class MainWindow;
+    class MainWindow;
 }
 QT_END_NAMESPACE
 
-class MainWindow : public QMainWindow
-{
-    Q_OBJECT
+class MainWindow : public QMainWindow {
+Q_OBJECT
+
 private:
     Ui::MainWindow *ui;
     std::vector<QString> commands; // Список команд
@@ -26,15 +30,16 @@ private:
 
 public:
     MainWindow(QWidget *parent = nullptr);
+
     ~MainWindow();
 
-    void Print_LeftMenu(const std::string& text, const std::vector<int>& object); // Добавление элементов в меню
+    void Print_LeftMenu(const std::string &text, const std::vector<int> &object); // Добавление элементов в меню
 
-    QWidget* getWorkWindow() const {
+    QWidget *getWorkWindow() const {
         return ui->workWindow;
     }
 
-    Ui::MainWindow* getUi() const {
+    Ui::MainWindow *getUi() const {
         return ui;
     }
 
@@ -43,6 +48,9 @@ public:
         emit resized();
     }
 
+public slots:
+    QString saveProjectToFile();
+
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
@@ -50,6 +58,8 @@ protected:
 signals:
     void EnterPressed(const QString &command); // При нажатии кнопки
     void resized(); // При изменении размера окна для QTPAinter
+    void projectSaved(const QString &fileName);
 
 };
+
 #endif // MAINWINDOW_H

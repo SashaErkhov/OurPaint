@@ -9,6 +9,7 @@
 #include <vector>
 #include "objectInFile.h"
 #include <sstream>
+#include <algorithm>
 #include <queue>
 
 class FileOurP {

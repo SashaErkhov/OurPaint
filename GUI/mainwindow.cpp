@@ -1,18 +1,54 @@
-#include <QPushButton>
 #include "mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),ui(new Ui::MainWindow),Index(-1) {
 
     ui->setupUi(this);
+
     commands = {"exit", "point 0 0", "circle 0 0 10", "section 0 0 10 10", "clear"};
 
+
+    connect(ui->actionSave_project_to, &QAction::triggered, this, &MainWindow::saveProjectToFile);
+
     connect(ui->console, &QLineEdit::returnPressed, this, [this]() {
-        // Отслеживаем нажатие кнопки Enter
         QString input = ui->console->text();
         emit EnterPressed(input);
         ui->console->clear();
     });
+}
 
+QString MainWindow::saveProjectToFile() {
+    QString baseName = "project";
+    QString extension = ".ourp";
+    QString fileName;
+    int index = 1;
+
+    // Set the default directory
+    QString defaultDir = QDir::homePath() + "/OurPaint/project";
+
+    // Create the directory if it doesn't exist
+    QDir dir(defaultDir);
+    if (!dir.exists()) {
+        dir.mkpath("."); // Create the directory structure
+    }
+
+    // Generate the default file name
+    fileName = QString("%1/%2%3").arg(defaultDir, baseName, extension);
+
+    // Check if the file already exists and adjust the name if necessary
+    while (QFile::exists(fileName)) {
+        fileName = QString("%1/%2_%3%4").arg(defaultDir).arg(baseName).arg(index).arg(extension);
+        index++;
+    }
+
+    // Open the file dialog
+    QString selectedFileName = QFileDialog::getSaveFileName(this, tr("Save Project"), fileName, tr("Project Files (*.ourp);;All Files (*)"));
+
+    if (!selectedFileName.isEmpty()) {
+        emit projectSaved(selectedFileName); // Emit the signal with the filename
+        return selectedFileName;
+    }
+
+    return QString(); // Return an empty string if no file was selected
 }
 
 void MainWindow::Print_LeftMenu(const std::string &text, const std::vector<int> &object) {
@@ -93,5 +129,3 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
 MainWindow::~MainWindow() {
     delete ui;
 }
-
-

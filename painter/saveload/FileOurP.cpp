@@ -99,7 +99,7 @@ void FileOurP::addObject(std::pair<ID, primitive*> &obj) {
 
 
 void FileOurP::saveToOurP(const std::string &fileName) const {
-    std::ofstream file(fileName + ".ourp");
+    std::ofstream file(fileName);
     if (!file.is_open()) {
         throw std::runtime_error("File not found");
     }
@@ -117,7 +117,7 @@ void FileOurP::saveToOurP(const std::string &fileName) const {
 }
 
 void FileOurP::loadFromOurP(const std::string &fileName) {
-    std::ifstream file(fileName + ".ourp");
+    std::ifstream file(fileName);
     if (!file.is_open()) {
         throw std::runtime_error("File not found");
     }

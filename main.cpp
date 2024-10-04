@@ -18,28 +18,13 @@ int main(int argc, char *argv[]) {
     painter->show();
     Paint screen(painter.get());
 
-    /*QObject::connect(&w, &MainWindow::EnterPressed, [&w](const QString &command) {
-        if (command.startsWith("point")) {
-            QStringList parts = command.split(' ');
-            if (parts.size() == 3) {
-                bool xOk, yOk;
-                double x = parts[1].toDouble(&xOk);
-                double y = parts[2].toDouble(&yOk);
-
-                if (xOk && yOk) {
-                    w.drawPoint(x, y);  // Рисуем точку с координатами (x, y)
-                }
-            }
-        }
-    });*/
-
-    QObject::connect(&w, &MainWindow::EnterPressed, [&w, &screen,&painter](const QString &command) {
+    QObject::connect(&w, &MainWindow::EnterPressed, [&w, &screen, &painter](const QString &command) {
         QStringList commandParts = command.split(' ');
 
         if (commandParts[0] == "point" && commandParts.size() == 3) {
             bool xOk, yOk;
-            int x = (int)commandParts[1].toDouble(&xOk);
-            int y = (int)commandParts[2].toDouble(&yOk);
+            int x = (int) commandParts[1].toDouble(&xOk);
+            int y = (int) commandParts[2].toDouble(&yOk);
 
             if (xOk && yOk) {
                 ElementData point;
@@ -47,7 +32,7 @@ int main(int argc, char *argv[]) {
                 point.params.addElement(x);
                 point.params.addElement(y);
                 ID id = screen.addElement(point);
-                w.Print_LeftMenu("Point",{x,y});
+                w.Print_LeftMenu("Point", {x, y});
             }
 
         } else if (commandParts[0] == "exit") {
@@ -58,14 +43,14 @@ int main(int argc, char *argv[]) {
 
         } else if (commandParts[0] == "clear") {
             painter->clear();
-            w.Print_LeftMenu("Clear",{});
-          //  id->clear();
+            w.Print_LeftMenu("Clear", {});
+            //  id->clear();
 
         } else if (commandParts[0] == "circle" && commandParts.size() == 4) {
             bool xOk, yOk, rOk;
-            int x = (int)commandParts[1].toDouble(&xOk);
-            int y = (int)commandParts[2].toDouble(&yOk);
-            int r = (int)commandParts[3].toDouble(&rOk);
+            int x = (int) commandParts[1].toDouble(&xOk);
+            int y = (int) commandParts[2].toDouble(&yOk);
+            int r = (int) commandParts[3].toDouble(&rOk);
 
             if (xOk && yOk && rOk) {
 
@@ -75,15 +60,15 @@ int main(int argc, char *argv[]) {
                 circle.params.addElement(y);
                 circle.params.addElement(r);
                 ID id = screen.addElement(circle);
-                w.Print_LeftMenu("Circle",{x,y,r});
+                w.Print_LeftMenu("Circle", {x, y, r});
             }
 
         } else if (commandParts[0] == "section" && commandParts.size() == 5) {
             bool xOk, yOk, zOk, rOk;
-            int x = (int)commandParts[1].toDouble(&xOk);
-            int y =(int) commandParts[2].toDouble(&yOk);
-            int z = (int)commandParts[3].toDouble(&zOk);
-            int r =(int) commandParts[4].toDouble(&rOk);
+            int x = (int) commandParts[1].toDouble(&xOk);
+            int y = (int) commandParts[2].toDouble(&yOk);
+            int z = (int) commandParts[3].toDouble(&zOk);
+            int r = (int) commandParts[4].toDouble(&rOk);
             if (xOk && yOk && zOk && rOk) {
                 ElementData section;
                 section.et = ET_SECTION;
@@ -92,7 +77,7 @@ int main(int argc, char *argv[]) {
                 section.params.addElement(z);
                 section.params.addElement(r);
                 ID id = screen.addElement(section);
-                w.Print_LeftMenu("Section",{x,y,z,r});
+                w.Print_LeftMenu("Section", {x, y, z, r});
             }
 
         } else if (commandParts[0] == "addreq") {
@@ -102,7 +87,10 @@ int main(int argc, char *argv[]) {
     });
 
 
-
+    QObject::connect(&w, &MainWindow::projectSaved, [&screen](const QString &fileName) {
+        std::string File=fileName.toStdString();
+        screen.saveToFile(File.c_str());
+    });
 
 
 
