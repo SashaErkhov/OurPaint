@@ -97,6 +97,7 @@ int main(int argc, char *argv[]) {
 
     QObject::connect(&w, &MainWindow::LoadFile, [&screen,&painter, &w](const QString &fileName) {
         painter->clear();
+        w.Print_LeftMenu("Clear", {});
         std::string File = fileName.toStdString();
         screen.loadFromFile(File.c_str());
         screen.paint();
