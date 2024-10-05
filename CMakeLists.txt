@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_POLICY_DEFAULT_CMP0135 NEW)
 
 project(ourpaint)
 # for using this app, you need to download QT6. If you have question, ask @ardrasss

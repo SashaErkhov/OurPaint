@@ -70,7 +70,7 @@ public:
 
     // Получение информации об объекте    
     ElementData getElementInfo(ID id);
-    std::vector<ElementData> getAllElementsInfo();
+    std::vector<std::pair<ID, ElementData>> getAllElementsInfo();
     RequirementData getRequirementInfo(ID id);
 
     // Сохранение данных в файл

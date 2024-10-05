@@ -654,15 +654,15 @@ void Paint::clear() {
 
 }
 
-std::vector<ElementData> Paint::getAllElementsInfo() {
-    std::vector<ElementData> data;
+std::vector<std::pair<ID, ElementData>> Paint::getAllElementsInfo() {
+    std::vector<std::pair<ID, ElementData>> data;
     for (auto i = m_pointIDs.begin(); i!= m_pointIDs.end(); ++i) {
         point *p = &(*i->second);
         ElementData info;
         info.et = ET_POINT;
         info.params.addElement(p->x);
         info.params.addElement(p->y);
-        data.push_back(info);
+        data.emplace_back(i->first,info);
     }
     for (auto i = m_sectionIDs.begin(); i!= m_sectionIDs.end(); ++i) {
         section *s = &(*i->second);
@@ -672,7 +672,7 @@ std::vector<ElementData> Paint::getAllElementsInfo() {
         info.params.addElement(s->beg->y);
         info.params.addElement(s->end->x);
         info.params.addElement(s->end->y);
-        data.push_back(info);
+        data.emplace_back(i->first,info);
     }
     for (auto i = m_circleIDs.begin(); i!= m_circleIDs.end(); ++i) {
         circle *c = &(*i->second);
@@ -681,7 +681,7 @@ std::vector<ElementData> Paint::getAllElementsInfo() {
         info.params.addElement(c->center->x);
         info.params.addElement(c->center->y);
         info.params.addElement(c->R);
-        data.push_back(info);
+        data.emplace_back(i->first,info);
     }
     return data;
 }
