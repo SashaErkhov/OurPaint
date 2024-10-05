@@ -86,9 +86,7 @@ void MainWindow::LoadProjectFile() {
 
         if (result == QMessageBox::Yes) {
             saveProjectToFile();
-        } else if (result == QMessageBox::No) {
-            return;
-        } else {
+        } else if (result == QMessageBox::Cancel) {
             return;
         }
     }
