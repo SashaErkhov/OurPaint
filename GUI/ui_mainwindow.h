@@ -104,6 +104,7 @@ public:
         leftMenu->setSizePolicy(sizePolicy);
         leftMenu->setMinimumSize(QSize(50, 320));
         leftMenu->setStyleSheet(QString::fromUtf8(R"(background: "#494850";color: "#D8D8F6")"));
+        leftMenu->setStyleSheet(QString::fromUtf8(R"(background: "#494850"; color: "#D8D8F6"; QHeaderView::section { background: "#494850"; color: "#D8D8F6"; } )"));
 
 
         gridLayout->addWidget(leftMenu, 0, 0, 2, 1, Qt::AlignmentFlag::AlignLeft);
@@ -114,7 +115,7 @@ public:
         console->setFont(font2);
         console->setCursor(QCursor(Qt::CursorShape::IBeamCursor));
         console->setAutoFillBackground(false);
-        console->setStyleSheet(QString::fromUtf8(R"(background:"#3e3d3d";color: "#D8D8F6")"));
+       // console->setStyleSheet(QString::fromUtf8(R"(background:"#3e3d3d";color: "#D8D8F6")"));
         console->setStyleSheet(QString::fromUtf8(R"(background: "#3e3d3d"; color: "#D8D8F6"; border: 1px solid black; border-radius: 3px;)"));
 
         gridLayout->addWidget(console, 1, 1, 1, 1);
