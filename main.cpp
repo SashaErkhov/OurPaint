@@ -6,7 +6,6 @@
 #include "GUI/mainwindow.h"
 #include <memory>
 #include <QApplication>
-#include <QLocale>
 #include <QTranslator>
 
 int main(int argc, char *argv[]) {
@@ -32,18 +31,12 @@ int main(int argc, char *argv[]) {
                 point.params.addElement(x);
                 point.params.addElement(y);
                 ID id = screen.addElement(point);
-                w.Print_LeftMenu(id.id,"Point", {x, y});
+                w.Print_LeftMenu(id.id, "Point", {x, y});
                 screen.paint();
                 painter->draw();
                 w.setSave(false);
             }
 
-        } else if (commandParts[0] == "exit") {
-            w.close();
-        }  else if (commandParts[0] == "clear") {
-            painter->clear();
-            w.Print_LeftMenu(0,"Clear", {});
-            screen.clear();
         } else if (commandParts[0] == "circle" && commandParts.size() == 4) {
             bool xOk, yOk, rOk;
             double x = commandParts[1].toDouble(&xOk);
@@ -58,7 +51,8 @@ int main(int argc, char *argv[]) {
                 circle.params.addElement(y);
                 circle.params.addElement(r);
                 ID id = screen.addElement(circle);
-                w.Print_LeftMenu(id.id,"Circle", {x, y, r});
+                w.Print_LeftMenu(id.id-1, "Point", {x, y});
+                w.Print_LeftMenu(id.id, "Circle", {x, y, r});
                 screen.paint();
                 painter->draw();
                 w.setSave(false);
@@ -78,50 +72,56 @@ int main(int argc, char *argv[]) {
                 section.params.addElement(z);
                 section.params.addElement(r);
                 ID id = screen.addElement(section);
-                w.Print_LeftMenu(id.id,"Section", {x, y, z, r});
+                w.Print_LeftMenu(id.id-2, "Point", {x, y});
+                w.Print_LeftMenu(id.id-1, "Point", {z, r});
+                w.Print_LeftMenu(id.id, "Section", {x, y, z, r});
                 screen.paint();
                 painter->draw();
                 w.setSave(false);
             }
 
-        } else if (commandParts[0] == "addreq") {
+        }  else if (commandParts[0] == "exit") {
+            w.close();
+        } else if (commandParts[0] == "clear") {
+            w.setSave(true);
+            painter->clear();
+            w.Print_LeftMenu(0, "Clear", {});
+            screen.clear();
+        }else if (commandParts[0] == "addreq") {
 
         }
-
-
     });
 
 
-    QObject::connect(&w, &MainWindow::projectSaved, [&screen,&w](const QString &fileName) {
+    QObject::connect(&w, &MainWindow::projectSaved, [&screen, &w](const QString &fileName) {
         std::string File = fileName.toStdString();
         screen.saveToFile(File.c_str());
-        w.setSave(true);
     });
 
-    QObject::connect(&w, &MainWindow::LoadFile, [&screen,&painter, &w](const QString &fileName) {
+    QObject::connect(&w, &MainWindow::LoadFile, [&screen, &painter, &w](const QString &fileName) {
         painter->clear();
-        w.Print_LeftMenu(0,"Clear", {});
+        w.Print_LeftMenu(0, "Clear", {});
         std::string File = fileName.toStdString();
         screen.loadFromFile(File.c_str());
         screen.paint();
         std::vector<std::pair<ID, ElementData>> elements = screen.getAllElementsInfo();
         painter->draw();
-        for (auto element : elements) {
+        for (auto element: elements) {
             if (element.second.et == ET_POINT) {
                 double x = element.second.params.getElement(0);
                 double y = element.second.params.getElement(1);
-                w.Print_LeftMenu(element.first.id ,"Point", {x, y});
+                w.Print_LeftMenu(element.first.id, "Point", {x, y});
             } else if (element.second.et == ET_CIRCLE) {
                 double x = element.second.params.getElement(0);
                 double y = element.second.params.getElement(1);
                 double r = element.second.params.getElement(2);
-                w.Print_LeftMenu(element.first.id,"Circle", {x, y, r});
-            }else if (element.second.et == ET_SECTION) {
+                w.Print_LeftMenu(element.first.id, "Circle", {x, y, r});
+            } else if (element.second.et == ET_SECTION) {
                 double x1 = element.second.params.getElement(0);
                 double y1 = element.second.params.getElement(1);
                 double x2 = element.second.params.getElement(2);
                 double y2 = element.second.params.getElement(3);
-                w.Print_LeftMenu(element.first.id,"Section", {x1, y1, x2, y2});
+                w.Print_LeftMenu(element.first.id, "Section", {x1, y1, x2, y2});
             }
         }
     });

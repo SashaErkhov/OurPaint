@@ -49,17 +49,23 @@ public:
     QMenu *menuHelp;
 
     void setupUi(QMainWindow *MainWindow)
-    {
+    { // 1.25 для workWindow
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName("MainWindow");
-        MainWindow->resize(1024, 576);
-        MainWindow->setMinimumSize(QSize(640, 360));
+
+        int width = 1280;
+        int height = 720;
+        MainWindow->resize(width, height);
+        MainWindow->setMinimumSize(QSize(672, 378));
         MainWindow->setStyleSheet(QString::fromUtf8("background: \"#978897\""));
+
+        // Настройка действий
         actionSave_project_to = new QAction(MainWindow);
         actionSave_project_to->setObjectName("actionSave_project_to");
         QFont font;
         font.setPointSize(9);
         actionSave_project_to->setFont(font);
+
         actionImport_project = new QAction(MainWindow);
         actionImport_project->setObjectName("actionImport_project");
         actionExport_bmp = new QAction(MainWindow);
@@ -76,12 +82,15 @@ public:
         actionExit_from_session->setObjectName("actionExit_from_session");
         action_help = new QAction(MainWindow);
         action_help->setObjectName("action_help");
+
         centralwindow = new QWidget(MainWindow);
         centralwindow->setObjectName("centralwindow");
         gridLayout_2 = new QGridLayout(centralwindow);
         gridLayout_2->setObjectName("gridLayout_2");
         gridLayout = new QGridLayout();
         gridLayout->setObjectName("gridLayout");
+
+        // Настройка leftMenu
         leftMenu = new QTreeWidget(centralwindow);
         QFont font1;
         font1.setKerning(true);
@@ -98,47 +107,46 @@ public:
         __qtreewidgetitem2->setFont(0, font2);
         leftMenu->setObjectName("leftMenu");
         QSizePolicy sizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(leftMenu->sizePolicy().hasHeightForWidth());
         leftMenu->setSizePolicy(sizePolicy);
-        leftMenu->setMinimumSize(QSize(50, 320));
-        leftMenu->setStyleSheet(QString::fromUtf8(R"(background: "#494850";color: "#D8D8F6")"));
         leftMenu->setStyleSheet(QString::fromUtf8(R"(background: "#494850"; color: "#D8D8F6"; QHeaderView::section { background: "#494850"; color: "#D8D8F6"; } )"));
-
 
         gridLayout->addWidget(leftMenu, 0, 0, 2, 1, Qt::AlignmentFlag::AlignLeft);
 
+        // Настройка console
         console = new QLineEdit(centralwindow);
         console->setObjectName("console");
-        console->setMinimumSize(QSize(0, 40));
         console->setFont(font2);
         console->setCursor(QCursor(Qt::CursorShape::IBeamCursor));
         console->setAutoFillBackground(false);
-       // console->setStyleSheet(QString::fromUtf8(R"(background:"#3e3d3d";color: "#D8D8F6")"));
+        console->setMinimumHeight(30);
         console->setStyleSheet(QString::fromUtf8(R"(background: "#3e3d3d"; color: "#D8D8F6"; border: 1px solid black; border-radius: 3px;)"));
-
         gridLayout->addWidget(console, 1, 1, 1, 1);
 
+        // Настройка workWindow
         workWindow = new QFrame(centralwindow);
         workWindow->setObjectName("workWindow");
-        workWindow->setMinimumSize(QSize(320, 180));
-        workWindow->setMaximumSize(QSize(1920, 1080));
+
+        // Установка размеров workWindow с соотношением 16:9
+        int workWidth = static_cast<int>(width / 1.25);
+        int workHeight = static_cast<int>(workWidth/16*9);
+        workWindow->setMinimumSize(QSize(544, 306));
+        workWindow->resize(workWidth, workHeight);
         workWindow->setStyleSheet(QString::fromUtf8("background: \"#ffffff\""));
         workWindow->setFrameShape(QFrame::Shape::StyledPanel);
         workWindow->setFrameShadow(QFrame::Shadow::Raised);
 
-
         gridLayout->addWidget(workWindow, 0, 1, 1, 1);
-
-
         gridLayout_2->addLayout(gridLayout, 0, 0, 1, 1);
 
         MainWindow->setCentralWidget(centralwindow);
+
+        // Настройка меню
         upMenu = new QMenuBar(MainWindow);
         upMenu->setObjectName("upMenu");
-        upMenu->setGeometry(QRect(0, 0, 1024, 25));
         upMenu->setFont(font);
+        MainWindow->setMenuBar(upMenu);
+
+        upMenu->setStyleSheet(QString::fromUtf8(R"(background: "#494850";color: "#D8D8F6")"));
 
         menuCollaboration = new QMenu(upMenu);
         menuCollaboration->setObjectName("menuCollaboration");

@@ -30,9 +30,11 @@ private:
     Ui::MainWindow *ui;
     std::vector<QString> commands; // Список команд
     int Index; // Индекс для вывода команд в консоль по стрелке
-    bool save = false;
+    bool save;
 
 public:
+    bool getSave(){return save;}
+
     void setSave(bool T){
         save=T;
     }
@@ -51,14 +53,14 @@ public:
         return ui;
     }
 
-    void resizeEvent(QResizeEvent *event) { // При изменении размера окна для QTPAinter
+    void resizeEvent(QResizeEvent *event) { // При изменении размера окна для QTPainter
         QMainWindow::resizeEvent(event);
         emit resized();
     }
 
 public slots:
-    QString saveProjectToFile();
-    QString LoadProjectFile();
+    void saveProjectToFile();
+    void LoadProjectFile();
 
 
 protected:

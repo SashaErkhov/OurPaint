@@ -23,7 +23,8 @@ void QTPainter::resizeEvent(QResizeEvent *event) {
     // При изменении размера окна отца, меняем размер окна
     QFrame::resizeEvent(event);
     resize(ui->workWindow->size());
- //   update();
+    qDebug()<<"ui "<<ui->workWindow->width()<<" "<<ui->workWindow->height();
+    //   update();
 }
 
 void QTPainter::drawPoint(point pt, bool isWhite) {
