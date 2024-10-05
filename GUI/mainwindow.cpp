@@ -1,5 +1,58 @@
 #include "mainwindow.h"
 
+class SaveDialog : public QDialog {
+public:
+    SaveDialog(QWidget *parent = nullptr) : QDialog(parent) {
+        setWindowTitle("Сохранение");
+
+        QVBoxLayout *layout = new QVBoxLayout(this);
+        QLabel *label = new QLabel("Сохранить изменения?", this);
+        layout->addWidget(label);
+
+        QHBoxLayout *buttonLayout = new QHBoxLayout();
+
+        QPushButton *yesButton = new QPushButton("Да", this);
+        QPushButton *noButton = new QPushButton("Нет", this);
+        QPushButton *cancelButton = new QPushButton("Отмена", this);
+
+        buttonLayout->addWidget(yesButton);
+        buttonLayout->addWidget(noButton);
+        buttonLayout->addWidget(cancelButton);
+
+        layout->addLayout(buttonLayout);
+
+        connect(yesButton, &QPushButton::clicked, this, [this]() {
+            done(QMessageBox::Yes);
+        });
+        connect(noButton, &QPushButton::clicked, this, [this]() {
+            done(QMessageBox::No);
+        });
+        connect(cancelButton, &QPushButton::clicked, this, [this]() {
+            done(QMessageBox::Cancel);
+        });
+    }
+};
+
+void MainWindow::closeEvent(QCloseEvent *event) {
+    if (!save) {
+        SaveDialog dialog(this);
+        int result = dialog.exec();
+
+        if (result == QMessageBox::Yes) {
+            QString fileName = saveProjectToFile();
+            emit projectSaved(fileName);
+            save = true;
+            event->accept();
+        } else if (result == QMessageBox::No) {
+            event->accept();
+        } else {
+            event->ignore();
+        }
+    } else {
+        event->accept();
+    }
+}
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow), Index(-1) {
 
     ui->setupUi(this);
@@ -40,6 +93,7 @@ QString MainWindow::saveProjectToFile() {
     QDir dir(defaultDir);
     if (!dir.exists()) {
         dir.mkpath(".");
+        save=true;
     }
 
     fileName = QString("%1/%2%3").arg(defaultDir, baseName, extension);

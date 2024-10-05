@@ -35,10 +35,11 @@ int main(int argc, char *argv[]) {
                 w.Print_LeftMenu("Point", {x, y});
                 screen.paint();
                 painter->draw();
+                w.setSave(false);
             }
 
         } else if (commandParts[0] == "exit") {
-            exit(0);
+            w.close();
         }  else if (commandParts[0] == "clear") {
             painter->clear();
             w.Print_LeftMenu("Clear", {});
@@ -60,6 +61,7 @@ int main(int argc, char *argv[]) {
                 w.Print_LeftMenu("Circle", {x, y, r});
                 screen.paint();
                 painter->draw();
+                w.setSave(false);
             }
 
         } else if (commandParts[0] == "section" && commandParts.size() == 5) {
@@ -79,6 +81,7 @@ int main(int argc, char *argv[]) {
                 w.Print_LeftMenu("Section", {x, y, z, r});
                 screen.paint();
                 painter->draw();
+                w.setSave(false);
             }
 
         } else if (commandParts[0] == "addreq") {
@@ -89,10 +92,10 @@ int main(int argc, char *argv[]) {
     });
 
 
-    QObject::connect(&w, &MainWindow::projectSaved, [&screen](const QString &fileName) {
+    QObject::connect(&w, &MainWindow::projectSaved, [&screen,&w](const QString &fileName) {
         std::string File = fileName.toStdString();
         screen.saveToFile(File.c_str());
-
+        w.setSave(true);
     });
 
     QObject::connect(&w, &MainWindow::LoadFile, [&screen,&painter, &w](const QString &fileName) {

@@ -13,6 +13,9 @@
 #include <QFileDialog>
 #include <QPushButton>
 #include <QDebug>
+#include <QMessageBox>
+#include <QLabel>
+#include <QHBoxLayout>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -27,8 +30,13 @@ private:
     Ui::MainWindow *ui;
     std::vector<QString> commands; // Список команд
     int Index; // Индекс для вывода команд в консоль по стрелке
+    bool save = false;
 
 public:
+    void setSave(bool T){
+        save=T;
+    }
+
     MainWindow(QWidget *parent = nullptr);
 
     ~MainWindow();
@@ -55,6 +63,8 @@ public slots:
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
+    void closeEvent(QCloseEvent *event) override ;
+
 
 signals:
     void EnterPressed(const QString &command); // При нажатии кнопки
