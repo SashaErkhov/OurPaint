@@ -92,14 +92,34 @@ int main(int argc, char *argv[]) {
     QObject::connect(&w, &MainWindow::projectSaved, [&screen](const QString &fileName) {
         std::string File = fileName.toStdString();
         screen.saveToFile(File.c_str());
+
     });
 
-    QObject::connect(&w, &MainWindow::LoadFile, [&screen,&painter](const QString &fileName) {
+    QObject::connect(&w, &MainWindow::LoadFile, [&screen,&painter, &w](const QString &fileName) {
         painter->clear();
         std::string File = fileName.toStdString();
         screen.loadFromFile(File.c_str());
         screen.paint();
+        std::vector<ElementData> elements = screen.getAllElementsInfo();
         painter->draw();
+        for (auto element : elements) {
+            if (element.et == ET_POINT) {
+                int x = element.params.getElement(0);
+                int y = element.params.getElement(1);
+                w.Print_LeftMenu("Point", {x, y});
+            } else if (element.et == ET_CIRCLE) {
+                int x = element.params.getElement(0);
+                int y = element.params.getElement(1);
+                int r = element.params.getElement(2);
+                w.Print_LeftMenu("Circle", {x, y, r});
+            }else if (element.et == ET_SECTION) {
+                int x1 = element.params.getElement(0);
+                int y1 = element.params.getElement(1);
+                int x2 = element.params.getElement(2);
+                int y2 = element.params.getElement(3);
+                w.Print_LeftMenu("Section", {x1, y1, x2, y2});
+            }
+        }
     });
 
 
