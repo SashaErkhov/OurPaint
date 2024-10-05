@@ -41,7 +41,7 @@ public:
 
     ~MainWindow();
 
-    void Print_LeftMenu(const std::string &text, const std::vector<int> &object); // Добавление элементов в меню
+    void Print_LeftMenu(unsigned long long id, const std::string &text, const std::vector<double> &object); // Добавление элементов в меню
 
     QWidget *getWorkWindow() const {
         return ui->workWindow;

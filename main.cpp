@@ -23,8 +23,8 @@ int main(int argc, char *argv[]) {
 
         if (commandParts[0] == "point" && commandParts.size() == 3) {
             bool xOk, yOk;
-            int x = (int) commandParts[1].toDouble(&xOk);
-            int y = (int) commandParts[2].toDouble(&yOk);
+            double x = commandParts[1].toDouble(&xOk);
+            double y = commandParts[2].toDouble(&yOk);
 
             if (xOk && yOk) {
                 ElementData point;
@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
                 point.params.addElement(x);
                 point.params.addElement(y);
                 ID id = screen.addElement(point);
-                w.Print_LeftMenu("Point", {x, y});
+                w.Print_LeftMenu(id.id,"Point", {x, y});
                 screen.paint();
                 painter->draw();
                 w.setSave(false);
@@ -42,13 +42,13 @@ int main(int argc, char *argv[]) {
             w.close();
         }  else if (commandParts[0] == "clear") {
             painter->clear();
-            w.Print_LeftMenu("Clear", {});
+            w.Print_LeftMenu(0,"Clear", {});
             screen.clear();
         } else if (commandParts[0] == "circle" && commandParts.size() == 4) {
             bool xOk, yOk, rOk;
-            int x = (int) commandParts[1].toDouble(&xOk);
-            int y = (int) commandParts[2].toDouble(&yOk);
-            int r = (int) commandParts[3].toDouble(&rOk);
+            double x = commandParts[1].toDouble(&xOk);
+            double y = commandParts[2].toDouble(&yOk);
+            double r = commandParts[3].toDouble(&rOk);
 
             if (xOk && yOk && rOk) {
 
@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
                 circle.params.addElement(y);
                 circle.params.addElement(r);
                 ID id = screen.addElement(circle);
-                w.Print_LeftMenu("Circle", {x, y, r});
+                w.Print_LeftMenu(id.id,"Circle", {x, y, r});
                 screen.paint();
                 painter->draw();
                 w.setSave(false);
@@ -66,10 +66,10 @@ int main(int argc, char *argv[]) {
 
         } else if (commandParts[0] == "section" && commandParts.size() == 5) {
             bool xOk, yOk, zOk, rOk;
-            int x = (int) commandParts[1].toDouble(&xOk);
-            int y = (int) commandParts[2].toDouble(&yOk);
-            int z = (int) commandParts[3].toDouble(&zOk);
-            int r = (int) commandParts[4].toDouble(&rOk);
+            double x = commandParts[1].toDouble(&xOk);
+            double y = commandParts[2].toDouble(&yOk);
+            double z = commandParts[3].toDouble(&zOk);
+            double r = commandParts[4].toDouble(&rOk);
             if (xOk && yOk && zOk && rOk) {
                 ElementData section;
                 section.et = ET_SECTION;
@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
                 section.params.addElement(z);
                 section.params.addElement(r);
                 ID id = screen.addElement(section);
-                w.Print_LeftMenu("Section", {x, y, z, r});
+                w.Print_LeftMenu(id.id,"Section", {x, y, z, r});
                 screen.paint();
                 painter->draw();
                 w.setSave(false);
@@ -100,28 +100,28 @@ int main(int argc, char *argv[]) {
 
     QObject::connect(&w, &MainWindow::LoadFile, [&screen,&painter, &w](const QString &fileName) {
         painter->clear();
-        w.Print_LeftMenu("Clear", {});
+        w.Print_LeftMenu(0,"Clear", {});
         std::string File = fileName.toStdString();
         screen.loadFromFile(File.c_str());
         screen.paint();
-        std::vector<ElementData> elements = screen.getAllElementsInfo();
+        std::vector<std::pair<ID, ElementData>> elements = screen.getAllElementsInfo();
         painter->draw();
         for (auto element : elements) {
-            if (element.et == ET_POINT) {
-                int x = element.params.getElement(0);
-                int y = element.params.getElement(1);
-                w.Print_LeftMenu("Point", {x, y});
-            } else if (element.et == ET_CIRCLE) {
-                int x = element.params.getElement(0);
-                int y = element.params.getElement(1);
-                int r = element.params.getElement(2);
-                w.Print_LeftMenu("Circle", {x, y, r});
-            }else if (element.et == ET_SECTION) {
-                int x1 = element.params.getElement(0);
-                int y1 = element.params.getElement(1);
-                int x2 = element.params.getElement(2);
-                int y2 = element.params.getElement(3);
-                w.Print_LeftMenu("Section", {x1, y1, x2, y2});
+            if (element.second.et == ET_POINT) {
+                double x = element.second.params.getElement(0);
+                double y = element.second.params.getElement(1);
+                w.Print_LeftMenu(element.first.id ,"Point", {x, y});
+            } else if (element.second.et == ET_CIRCLE) {
+                double x = element.second.params.getElement(0);
+                double y = element.second.params.getElement(1);
+                double r = element.second.params.getElement(2);
+                w.Print_LeftMenu(element.first.id,"Circle", {x, y, r});
+            }else if (element.second.et == ET_SECTION) {
+                double x1 = element.second.params.getElement(0);
+                double y1 = element.second.params.getElement(1);
+                double x2 = element.second.params.getElement(2);
+                double y2 = element.second.params.getElement(3);
+                w.Print_LeftMenu(element.first.id,"Section", {x1, y1, x2, y2});
             }
         }
     });

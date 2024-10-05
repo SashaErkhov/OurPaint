@@ -114,7 +114,7 @@ QString MainWindow::saveProjectToFile() {
     return QString();
 }
 
-void MainWindow::Print_LeftMenu(const std::string &text, const std::vector<int> &object) {
+void MainWindow::Print_LeftMenu(unsigned long long id,const std::string &text, const std::vector<double> &object) {
     // Добавление элементов в левое меню
 
     QTreeWidgetItem *itemFigures = ui->leftMenu->topLevelItem(0);
@@ -151,16 +151,20 @@ void MainWindow::Print_LeftMenu(const std::string &text, const std::vector<int> 
     std::vector<QString> paramNames;
 
     if (text == "Point" && object.size() == 2) {
-        paramNames = {"X", "Y"};
+        paramNames = {"ID", "X", "Y"};
     } else if (text == "Circle" && object.size() == 3) {
-        paramNames = {"X", "Y", "R"};
+        paramNames = {"ID","X", "Y", "R"};
     } else if (text == "Section" && object.size() == 4) {
-        paramNames = {"X1", "Y1", "X2", "Y2"};
+        paramNames = {"ID", "X1", "Y1", "X2", "Y2"};
     }
 
-    for (size_t i = 0; i < paramNames.size() && i < object.size(); ++i) {
+    for (size_t i = 0; i < paramNames.size() && i < object.size()+1; ++i) {
         QTreeWidgetItem *paramItem = new QTreeWidgetItem(itemFigure);
-        paramItem->setText(0, QString("%1: %2").arg(paramNames[i]).arg(object[i]));
+        if (paramNames[i] == "ID"){
+            paramItem->setText(0, QString("%1: %2").arg(paramNames[i]).arg(id));
+        }else{
+            paramItem->setText(0, QString("%1: %2").arg(paramNames[i]).arg(QString::number(object[i - 1], 'f', 6)));
+        }
         itemFigure->addChild(paramItem);
     }
 
