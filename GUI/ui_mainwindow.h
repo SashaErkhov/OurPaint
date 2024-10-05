@@ -115,6 +115,7 @@ public:
         console->setCursor(QCursor(Qt::CursorShape::IBeamCursor));
         console->setAutoFillBackground(false);
         console->setStyleSheet(QString::fromUtf8(R"(background:"#3e3d3d";color: "#D8D8F6")"));
+        console->setStyleSheet(QString::fromUtf8(R"(background: "#3e3d3d"; color: "#D8D8F6"; border: 1px solid black; border-radius: 3px;)"));
 
         gridLayout->addWidget(console, 1, 1, 1, 1);
 
