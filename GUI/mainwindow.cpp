@@ -92,129 +92,129 @@ void MainWindow::LoadProjectFile() {
     }
 
 
-        QString fileName = QFileDialog::getOpenFileName(this, tr("Open Project"),
-                                                        QDir::homePath() + "/OurPaint/project",
-                                                        tr("Project Files (*.ourp);;All Files (*)"));
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Project"),
+                                                    QDir::homePath() + "/OurPaint/project",
+                                                    tr("Project Files (*.ourp);;All Files (*)"));
 
-        if (!fileName.isEmpty()) {
-            emit LoadFile(fileName);
-        }
-
+    if (!fileName.isEmpty()) {
+        emit LoadFile(fileName);
     }
 
-    void MainWindow::saveProjectToFile() {
-        QString baseName = "project";
-        QString extension = ".ourp";
-        QString fileName;
-        int index = 1;
+}
 
-        QString defaultDir = QDir::homePath() + "/OurPaint/project";
+void MainWindow::saveProjectToFile() {
+    QString baseName = "project";
+    QString extension = ".ourp";
+    QString fileName;
+    int index = 1;
 
-        QDir dir(defaultDir);
-        if (!dir.exists()) {
-            dir.mkpath(".");
-        }
+    QString defaultDir = QDir::homePath() + "/OurPaint/project";
 
-        fileName = QString("%1/%2%3").arg(defaultDir, baseName, extension);
-
-        while (QFile::exists(fileName)) {
-            fileName = QString("%1/%2_%3%4").arg(defaultDir).arg(baseName).arg(index).arg(extension);
-            index++;
-        }
-
-        QString selectedFileName = QFileDialog::getSaveFileName(this, tr("Save Project"), fileName,
-                                                                tr("Project Files (*.ourp);;All Files (*)"));
-
-        if (!selectedFileName.isEmpty()) {
-            save = true;
-            emit projectSaved(selectedFileName);
-        } else {
-            save = false;
-        }
-
-
+    QDir dir(defaultDir);
+    if (!dir.exists()) {
+        dir.mkpath(".");
     }
 
-    void MainWindow::Print_LeftMenu(unsigned long long id, const std::string &text, const std::vector<double> &object) {
-        // Добавление элементов в левое меню
+    fileName = QString("%1/%2%3").arg(defaultDir, baseName, extension);
 
-        QTreeWidgetItem *itemFigures = ui->leftMenu->topLevelItem(0);
+    while (QFile::exists(fileName)) {
+        fileName = QString("%1/%2_%3%4").arg(defaultDir).arg(baseName).arg(index).arg(extension);
+        index++;
+    }
 
-        if (text == "Clear") {
-            itemFigures->takeChildren();
-            return;
-        }
+    QString selectedFileName = QFileDialog::getSaveFileName(this, tr("Save Project"), fileName,
+                                                            tr("Project Files (*.ourp);;All Files (*)"));
 
-        QString figureName = QString::fromStdString(text);
-        int count = 1;
+    if (!selectedFileName.isEmpty()) {
+        save = true;
+        emit projectSaved(selectedFileName);
+    } else {
+        save = false;
+    }
 
-        while (true) {
-            bool ex = false;
-            for (int i = 0; i < itemFigures->childCount(); ++i) {
-                if (itemFigures->child(i)->text(0) == figureName) {
-                    ex = true;
-                    break;
-                }
-            }
 
-            if (!ex) {
+}
+
+void MainWindow::Print_LeftMenu(unsigned long long id, const std::string &text, const std::vector<double> &object) {
+    // Добавление элементов в левое меню
+
+    QTreeWidgetItem *itemFigures = ui->leftMenu->topLevelItem(0);
+
+    if (text == "Clear") {
+        itemFigures->takeChildren();
+        return;
+    }
+
+    QString figureName = QString::fromStdString(text);
+    int count = 1;
+
+    while (true) {
+        bool ex = false;
+        for (int i = 0; i < itemFigures->childCount(); ++i) {
+            if (itemFigures->child(i)->text(0) == figureName) {
+                ex = true;
                 break;
             }
-
-            figureName = QString("%1%2").arg(QString::fromStdString(text)).arg(count);
-            count++;
         }
 
-        QTreeWidgetItem *itemFigure = new QTreeWidgetItem(itemFigures);
-        itemFigure->setText(0, figureName);
-        itemFigures->addChild(itemFigure);
-
-        std::vector<QString> paramNames;
-
-        if (text == "Point" && object.size() == 2) {
-            paramNames = {"ID", "X", "Y"};
-        } else if (text == "Circle" && object.size() == 3) {
-            paramNames = {"ID", "X", "Y", "R"};
-        } else if (text == "Section" && object.size() == 4) {
-            paramNames = {"ID", "X1", "Y1", "X2", "Y2"};
+        if (!ex) {
+            break;
         }
 
-        for (size_t i = 0; i < paramNames.size() && i < object.size() + 1; ++i) {
-            QTreeWidgetItem *paramItem = new QTreeWidgetItem(itemFigure);
-            if (paramNames[i] == "ID") {
-                paramItem->setText(0, QString("%1: %2").arg(paramNames[i]).arg(id));
+        figureName = QString("%1%2").arg(QString::fromStdString(text)).arg(count);
+        count++;
+    }
+
+    QTreeWidgetItem *itemFigure = new QTreeWidgetItem(itemFigures);
+    itemFigure->setText(0, figureName);
+    itemFigures->addChild(itemFigure);
+
+    std::vector<QString> paramNames;
+
+    if (text == "Point" && object.size() == 2) {
+        paramNames = {"ID", "X", "Y"};
+    } else if (text == "Circle" && object.size() == 3) {
+        paramNames = {"ID", "X", "Y", "R"};
+    } else if (text == "Section" && object.size() == 4) {
+        paramNames = {"ID", "X1", "Y1", "X2", "Y2"};
+    }
+
+    for (size_t i = 0; i < paramNames.size() && i < object.size() + 1; ++i) {
+        QTreeWidgetItem *paramItem = new QTreeWidgetItem(itemFigure);
+        if (paramNames[i] == "ID") {
+            paramItem->setText(0, QString("%1: %2").arg(paramNames[i]).arg(id));
+        } else {
+            paramItem->setText(0, QString("%1: %2").arg(paramNames[i]).arg(QString::number(object[i - 1], 'f', 6)));
+        }
+        itemFigure->addChild(paramItem);
+    }
+
+    itemFigure->setExpanded(true);
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event) {
+    // Перелистывание команд стрелочкой
+    if (ui->console->isActiveWindow()) {
+        if (event->key() == Qt::Key_Up) {
+            if (Index < static_cast<int>(commands.size()) - 1) {
+                ++Index;
+                ui->console->setText(commands[commands.size() - 1 - Index]);
+            }
+        } else if (event->key() == Qt::Key_Down) {
+            if (Index > 0) {
+                --Index;
+                ui->console->setText(commands[commands.size() - 1 - Index]);
             } else {
-                paramItem->setText(0, QString("%1: %2").arg(paramNames[i]).arg(QString::number(object[i - 1], 'f', 6)));
-            }
-            itemFigure->addChild(paramItem);
-        }
-
-        itemFigure->setExpanded(true);
-    }
-
-    void MainWindow::keyPressEvent(QKeyEvent *event) {
-        // Перелистывание команд стрелочкой
-        if (ui->console->isActiveWindow()) {
-            if (event->key() == Qt::Key_Up) {
-                if (Index < static_cast<int>(commands.size()) - 1) {
-                    ++Index;
-                    ui->console->setText(commands[commands.size() - 1 - Index]);
-                }
-            } else if (event->key() == Qt::Key_Down) {
-                if (Index > 0) {
-                    --Index;
-                    ui->console->setText(commands[commands.size() - 1 - Index]);
-                } else {
-                    Index = -1;
-                    ui->console->clear();
-                }
+                Index = -1;
+                ui->console->clear();
             }
         }
-        QWidget::keyPressEvent(event);
     }
+    QWidget::keyPressEvent(event);
+}
 
 
-    MainWindow::~MainWindow()
-    {
-        delete ui;
-    }
+MainWindow::~MainWindow()
+{
+    delete ui;
+}

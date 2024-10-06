@@ -7,15 +7,33 @@
 #include <memory>
 #include <QApplication>
 #include <QTranslator>
+#include <QSplashScreen>
+#include <QMainWindow>
+#include <QTimer>
+#include <QPixmap>
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
+
+ /*   QPixmap splashPixmap("C:\\Users\\Tim\\CLionProjects\\OurPaint\\Static\\logo\\eye.png");
+ QPixmap scaledPixmap = splashPixmap.scaled(splashPixmap.width() * 10, splashPixmap.height() * 10, Qt::KeepAspectRatio);
+    QSplashScreen splash(splashPixmap);
+    splash.setWindowFlags(Qt::SplashScreen | Qt::WindowStaysOnTopHint);
+    splash.show();*/
+
     MainWindow w;
-    w.show();
+
     auto painter = std::make_unique<QTPainter>(w.getUi(), w.getWorkWindow());
     painter->setParent(w.getWorkWindow());
     painter->show();
     Paint screen(painter.get());
+
+  /*  QTimer::singleShot(1000, [&]() {
+        splash.finish(&w);
+
+    });*/
+    w.show();
+
 
     QObject::connect(&w, &MainWindow::EnterPressed, [&w, &screen, &painter](const QString &command) {
         QStringList commandParts = command.split(' ');
