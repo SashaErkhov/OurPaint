@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
                 point.params.addElement(x);
                 point.params.addElement(y);
                 ID id = screen.addElement(point);
-                w.Print_LeftMenu(id.id, "Point", {x, y});
+               // w.Print_LeftMenu(id.id, "Point", {x, y});
                 screen.paint();
                 painter->draw();
                 w.setSave(false);
@@ -69,8 +69,8 @@ int main(int argc, char *argv[]) {
                 circle.params.addElement(y);
                 circle.params.addElement(r);
                 ID id = screen.addElement(circle);
-                w.Print_LeftMenu(id.id-1, "Point", {x, y});
-                w.Print_LeftMenu(id.id, "Circle", {x, y, r});
+               // w.Print_LeftMenu(id.id-1, "Point", {x, y});
+              //  w.Print_LeftMenu(id.id, "Circle", {x, y, r});
                 screen.paint();
                 painter->draw();
                 w.setSave(false);
@@ -90,9 +90,9 @@ int main(int argc, char *argv[]) {
                 section.params.addElement(z);
                 section.params.addElement(r);
                 ID id = screen.addElement(section);
-                w.Print_LeftMenu(id.id-2, "Point", {x, y});
-                w.Print_LeftMenu(id.id-1, "Point", {z, r});
-                w.Print_LeftMenu(id.id, "Section", {x, y, z, r});
+               // w.Print_LeftMenu(id.id-2, "Point", {x, y});
+                //w.Print_LeftMenu(id.id-1, "Point", {z, r});
+                //w.Print_LeftMenu(id.id, "Section", {x, y, z, r});
                 screen.paint();
                 painter->draw();
                 w.setSave(false);
@@ -223,6 +223,28 @@ int main(int argc, char *argv[]) {
                     break;
             }
         }
+
+
+        std::vector<std::pair<ID, ElementData>> elements = screen.getAllElementsInfo();
+        for (auto element: elements) {
+            if (element.second.et == ET_POINT) {
+                double x = element.second.params.getElement(0);
+                double y = element.second.params.getElement(1);
+                w.Print_LeftMenu(element.first.id, "Point", {x, y});
+            } else if (element.second.et == ET_CIRCLE) {
+                double x = element.second.params.getElement(0);
+                double y = element.second.params.getElement(1);
+                double r = element.second.params.getElement(2);
+                w.Print_LeftMenu(element.first.id, "Circle", {x, y, r});
+            } else if (element.second.et == ET_SECTION) {
+                double x1 = element.second.params.getElement(0);
+                double y1 = element.second.params.getElement(1);
+                double x2 = element.second.params.getElement(2);
+                double y2 = element.second.params.getElement(3);
+                w.Print_LeftMenu(element.first.id, "Section", {x1, y1, x2, y2});
+            }
+        }
+
     });
 
 
