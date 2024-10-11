@@ -15,11 +15,11 @@
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
 
- /*   QPixmap splashPixmap("C:\\Users\\Tim\\CLionProjects\\OurPaint\\Static\\logo\\eye.png");
- QPixmap scaledPixmap = splashPixmap.scaled(splashPixmap.width() * 10, splashPixmap.height() * 10, Qt::KeepAspectRatio);
-    QSplashScreen splash(splashPixmap);
-    splash.setWindowFlags(Qt::SplashScreen | Qt::WindowStaysOnTopHint);
-    splash.show();*/
+    /*   QPixmap splashPixmap("C:\\Users\\Tim\\CLionProjects\\OurPaint\\Static\\logo\\eye.png");
+    QPixmap scaledPixmap = splashPixmap.scaled(splashPixmap.width() * 10, splashPixmap.height() * 10, Qt::KeepAspectRatio);
+       QSplashScreen splash(splashPixmap);
+       splash.setWindowFlags(Qt::SplashScreen | Qt::WindowStaysOnTopHint);
+       splash.show();*/
 
     MainWindow w;
 
@@ -28,10 +28,10 @@ int main(int argc, char *argv[]) {
     painter->show();
     Paint screen(painter.get());
 
-  /*  QTimer::singleShot(1000, [&]() {
-        splash.finish(&w);
+    /*  QTimer::singleShot(1000, [&]() {
+          splash.finish(&w);
 
-    });*/
+      });*/
     w.show();
 
 
@@ -105,8 +105,123 @@ int main(int argc, char *argv[]) {
             painter->clear();
             w.Print_LeftMenu(0, "Clear", {});
             screen.clear();
-        }else if (commandParts[0] == "addreq") {
+        }else if (commandParts[0] == "addreq" && commandParts.size() == 5) {
+            int req = commandParts[1].toInt();
+            ID obj1=commandParts[2].toInt();
+            ID obj2=commandParts[3].toInt();
+            double parameters=commandParts[4].toDouble();
+            RequirementData reqData;
+            Requirement type;
 
+            switch  (req)  {
+                case 1:
+                    type = ET_POINTSECTIONDIST;
+                    reqData.req = type;
+                    reqData.objects.addElement(obj1);
+                    reqData.objects.addElement(obj2);
+                    reqData.params.addElement(parameters);
+                    screen.addRequirement(reqData);
+                    screen.paint();
+                    painter->draw();
+                    w.setSave(false);
+                    break;
+                case 2:
+                    type = ET_POINTONSECTION;
+                    reqData.req = type;
+                    reqData.objects.addElement(obj1);
+                    reqData.objects.addElement(obj2);
+                    screen.addRequirement(reqData);
+                    screen.paint();
+                    painter->draw();
+                    w.setSave(false);
+                    break;
+                case 3:
+                    type = ET_POINTPOINTDIST;
+                    reqData.req = type;
+                    reqData.objects.addElement(obj1);
+                    reqData.objects.addElement(obj2);
+                    reqData.params.addElement(parameters);
+                    screen.addRequirement(reqData);
+                    screen.paint();
+                    painter->draw();
+                    w.setSave(false);
+                    break;
+                case 4:
+                    type = ET_POINTONPOINT;
+                    reqData.req = type;
+                    reqData.objects.addElement(obj1);
+                    reqData.objects.addElement(obj2);
+                    screen.addRequirement(reqData);
+                    screen.paint();
+                    painter->draw();
+                    w.setSave(false);
+                    break;
+                case 5:
+                    type = ET_SECTIONCIRCLEDIST;
+                    reqData.req = type;
+                    reqData.objects.addElement(obj1);
+                    reqData.objects.addElement(obj2);
+                    reqData.params.addElement(parameters);
+                    screen.addRequirement(reqData);
+                    screen.paint();
+                    painter->draw();
+                    w.setSave(false);
+                    break;
+                case 6:
+                    type = ET_SECTIONONCIRCLE;
+                    reqData.req = type;
+                    reqData.objects.addElement(obj1);
+                    reqData.objects.addElement(obj2);
+                    screen.addRequirement(reqData);
+                    screen.paint();
+                    painter->draw();
+                    w.setSave(false);
+                    break;
+                case 7:
+                    type = ET_SECTIONINCIRCLE;
+                    reqData.req = type;
+                    reqData.objects.addElement(obj1);
+                    reqData.objects.addElement(obj2);
+                    screen.addRequirement(reqData);
+                    screen.paint();
+                    painter->draw();
+                    w.setSave(false);
+                    break;
+                case 8:
+                    type = ET_SECTIONSECTIONPARALLEL;
+                    reqData.req = type;
+                    reqData.objects.addElement(obj1);
+                    reqData.objects.addElement(obj2);
+                    screen.addRequirement(reqData);
+                    screen.paint();
+                    painter->draw();
+                    w.setSave(false);
+                    break;
+                case 9:
+                    type = ET_SECTIONSECTIONPERPENDICULAR;
+                    reqData.req = type;
+                    reqData.objects.addElement(obj1);
+                    reqData.objects.addElement(obj2);
+                    screen.addRequirement(reqData);
+                    screen.paint();
+                    painter->draw();
+                    w.setSave(false);
+                    break;
+                case 10:
+                    type = ET_SECTIONSECTIONANGEL;
+                    reqData.req = type;
+                    reqData.objects.addElement(obj1);
+                    reqData.objects.addElement(obj2);
+                    reqData.params.addElement(parameters);
+                    screen.addRequirement(reqData);
+                    screen.paint();
+                    painter->draw();
+                    w.setSave(false);
+                    break;
+                default:
+                  //  std::cout << "Unknown requirement. Please read types of instructions by help command" << std::endl;
+                    break;
+            }
         }
     });
 
@@ -415,18 +530,3 @@ int main(int argc, char *argv[]) {
 
     return a.exec();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
