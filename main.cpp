@@ -97,6 +97,7 @@ int main(int argc, char *argv[]) {
             ID obj2=commandParts[3].toInt();
             RequirementData reqData;
             Requirement type;
+            double parameters=0;
 
             if(commandParts.size() ==5 ){
                 double parameters=commandParts[4].toDouble();
