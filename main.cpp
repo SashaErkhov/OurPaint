@@ -49,9 +49,6 @@ int main(int argc, char *argv[]) {
                 point.params.addElement(x);
                 point.params.addElement(y);
                 ID id = screen.addElement(point);
-               // w.Print_LeftMenu(id.id, "Point", {x, y});
-                screen.paint();
-                painter->draw();
                 w.setSave(false);
             }
 
@@ -69,10 +66,6 @@ int main(int argc, char *argv[]) {
                 circle.params.addElement(y);
                 circle.params.addElement(r);
                 ID id = screen.addElement(circle);
-               // w.Print_LeftMenu(id.id-1, "Point", {x, y});
-              //  w.Print_LeftMenu(id.id, "Circle", {x, y, r});
-                screen.paint();
-                painter->draw();
                 w.setSave(false);
             }
 
@@ -90,11 +83,6 @@ int main(int argc, char *argv[]) {
                 section.params.addElement(z);
                 section.params.addElement(r);
                 ID id = screen.addElement(section);
-               // w.Print_LeftMenu(id.id-2, "Point", {x, y});
-                //w.Print_LeftMenu(id.id-1, "Point", {z, r});
-                //w.Print_LeftMenu(id.id, "Section", {x, y, z, r});
-                screen.paint();
-                painter->draw();
                 w.setSave(false);
             }
 
@@ -121,9 +109,6 @@ int main(int argc, char *argv[]) {
                     reqData.objects.addElement(obj2);
                     reqData.params.addElement(parameters);
                     screen.addRequirement(reqData);
-                    painter->clear();
-                    screen.paint();
-                    painter->draw();
                     w.setSave(false);
                     break;
                 case 2:
@@ -132,9 +117,6 @@ int main(int argc, char *argv[]) {
                     reqData.objects.addElement(obj1);
                     reqData.objects.addElement(obj2);
                     screen.addRequirement(reqData);
-                    painter->clear();
-                    screen.paint();
-                    painter->draw();
                     w.setSave(false);
                     break;
                 case 3:
@@ -144,9 +126,6 @@ int main(int argc, char *argv[]) {
                     reqData.objects.addElement(obj2);
                     reqData.params.addElement(parameters);
                     screen.addRequirement(reqData);
-                    painter->clear();
-                    screen.paint();
-                    painter->draw();
                     w.setSave(false);
                     break;
                 case 4:
@@ -155,9 +134,6 @@ int main(int argc, char *argv[]) {
                     reqData.objects.addElement(obj1);
                     reqData.objects.addElement(obj2);
                     screen.addRequirement(reqData);
-                    painter->clear();
-                    screen.paint();
-                    painter->draw();
                     w.setSave(false);
                     break;
                 case 5:
@@ -167,9 +143,6 @@ int main(int argc, char *argv[]) {
                     reqData.objects.addElement(obj2);
                     reqData.params.addElement(parameters);
                     screen.addRequirement(reqData);
-                    painter->clear();
-                    screen.paint();
-                    painter->draw();
                     w.setSave(false);
                     break;
                 case 6:
@@ -178,9 +151,6 @@ int main(int argc, char *argv[]) {
                     reqData.objects.addElement(obj1);
                     reqData.objects.addElement(obj2);
                     screen.addRequirement(reqData);
-                    painter->clear();
-                    screen.paint();
-                    painter->draw();
                     w.setSave(false);
                     break;
                 case 7:
@@ -189,9 +159,6 @@ int main(int argc, char *argv[]) {
                     reqData.objects.addElement(obj1);
                     reqData.objects.addElement(obj2);
                     screen.addRequirement(reqData);
-                    painter->clear();
-                    screen.paint();
-                    painter->draw();
                     w.setSave(false);
                     break;
                 case 8:
@@ -200,9 +167,6 @@ int main(int argc, char *argv[]) {
                     reqData.objects.addElement(obj1);
                     reqData.objects.addElement(obj2);
                     screen.addRequirement(reqData);
-                    painter->clear();
-                    screen.paint();
-                    painter->draw();
                     w.setSave(false);
                     break;
                 case 9:
@@ -211,9 +175,6 @@ int main(int argc, char *argv[]) {
                     reqData.objects.addElement(obj1);
                     reqData.objects.addElement(obj2);
                     screen.addRequirement(reqData);
-                    painter->clear();
-                    screen.paint();
-                    painter->draw();
                     w.setSave(false);
                     break;
                 case 10:
@@ -223,9 +184,6 @@ int main(int argc, char *argv[]) {
                     reqData.objects.addElement(obj2);
                     reqData.params.addElement(parameters);
                     screen.addRequirement(reqData);
-                    painter->clear();
-                    screen.paint();
-                    painter->draw();
                     w.setSave(false);
                     break;
                 default:
@@ -254,6 +212,11 @@ int main(int argc, char *argv[]) {
                 w.Print_LeftMenu(element.first.id, "Section", {x1, y1, x2, y2});
             }
         }
+
+        screen.paint();
+        painter->draw();
+
+        //Такой же для требований!
 
     });
 
