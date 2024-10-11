@@ -95,9 +95,12 @@ int main(int argc, char *argv[]) {
             int req = commandParts[1].toInt();
             ID obj1=commandParts[2].toInt();
             ID obj2=commandParts[3].toInt();
-            double parameters=commandParts[4].toDouble();
             RequirementData reqData;
             Requirement type;
+
+            if(commandParts.size() ==5 ){
+                double parameters=commandParts[4].toDouble();
+            }
 
             switch  (req)  {
                 case 1:
