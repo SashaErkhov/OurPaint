@@ -255,6 +255,14 @@ int main(int argc, char *argv[]) {
                 w.Print_LeftMenu(element.first.id, "Section", {x1, y1, x2, y2});
             }
         }
+
+        // std::vector<std::pair<ID, ElementData>> req = screen.getAllReqInfo();
+        //for (auto element: elements) {
+        //   w.Requar_LeftMenu(unsigned long long id, const std::string &text);
+        // }
+
+        //Такой же для требований!
+
     });
 
 
