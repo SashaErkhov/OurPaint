@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
             painter->clear();
             w.Print_LeftMenu(0, "Clear", {});
             screen.clear();
-        }else if (commandParts[0] == "addreq" && commandParts.size() == 5) {
+        }else if (commandParts[0] == "addreq" && commandParts.size() >3) {
             int req = commandParts[1].toInt();
             ID obj1=commandParts[2].toInt();
             ID obj2=commandParts[3].toInt();
@@ -121,6 +121,7 @@ int main(int argc, char *argv[]) {
                     reqData.objects.addElement(obj2);
                     reqData.params.addElement(parameters);
                     screen.addRequirement(reqData);
+                    painter->clear();
                     screen.paint();
                     painter->draw();
                     w.setSave(false);
@@ -131,6 +132,7 @@ int main(int argc, char *argv[]) {
                     reqData.objects.addElement(obj1);
                     reqData.objects.addElement(obj2);
                     screen.addRequirement(reqData);
+                    painter->clear();
                     screen.paint();
                     painter->draw();
                     w.setSave(false);
@@ -142,6 +144,7 @@ int main(int argc, char *argv[]) {
                     reqData.objects.addElement(obj2);
                     reqData.params.addElement(parameters);
                     screen.addRequirement(reqData);
+                    painter->clear();
                     screen.paint();
                     painter->draw();
                     w.setSave(false);
@@ -152,6 +155,7 @@ int main(int argc, char *argv[]) {
                     reqData.objects.addElement(obj1);
                     reqData.objects.addElement(obj2);
                     screen.addRequirement(reqData);
+                    painter->clear();
                     screen.paint();
                     painter->draw();
                     w.setSave(false);
@@ -163,6 +167,7 @@ int main(int argc, char *argv[]) {
                     reqData.objects.addElement(obj2);
                     reqData.params.addElement(parameters);
                     screen.addRequirement(reqData);
+                    painter->clear();
                     screen.paint();
                     painter->draw();
                     w.setSave(false);
@@ -173,6 +178,7 @@ int main(int argc, char *argv[]) {
                     reqData.objects.addElement(obj1);
                     reqData.objects.addElement(obj2);
                     screen.addRequirement(reqData);
+                    painter->clear();
                     screen.paint();
                     painter->draw();
                     w.setSave(false);
@@ -183,6 +189,7 @@ int main(int argc, char *argv[]) {
                     reqData.objects.addElement(obj1);
                     reqData.objects.addElement(obj2);
                     screen.addRequirement(reqData);
+                    painter->clear();
                     screen.paint();
                     painter->draw();
                     w.setSave(false);
@@ -193,6 +200,7 @@ int main(int argc, char *argv[]) {
                     reqData.objects.addElement(obj1);
                     reqData.objects.addElement(obj2);
                     screen.addRequirement(reqData);
+                    painter->clear();
                     screen.paint();
                     painter->draw();
                     w.setSave(false);
@@ -203,6 +211,7 @@ int main(int argc, char *argv[]) {
                     reqData.objects.addElement(obj1);
                     reqData.objects.addElement(obj2);
                     screen.addRequirement(reqData);
+                    painter->clear();
                     screen.paint();
                     painter->draw();
                     w.setSave(false);
@@ -214,6 +223,7 @@ int main(int argc, char *argv[]) {
                     reqData.objects.addElement(obj2);
                     reqData.params.addElement(parameters);
                     screen.addRequirement(reqData);
+                    painter->clear();
                     screen.paint();
                     painter->draw();
                     w.setSave(false);
@@ -224,7 +234,7 @@ int main(int argc, char *argv[]) {
             }
         }
 
-
+        w.Print_LeftMenu(0, "Clear", {});
         std::vector<std::pair<ID, ElementData>> elements = screen.getAllElementsInfo();
         for (auto element: elements) {
             if (element.second.et == ET_POINT) {
