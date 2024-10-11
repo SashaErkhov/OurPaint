@@ -3,6 +3,7 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow), Index(-1),save(true) {
 
     ui->setupUi(this);
+    setMouseTracking(true); // Включаем отслеживание мыши
 
     setWindowTitle("Приложение Евгения Бычкова");
 
@@ -16,7 +17,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         emit EnterPressed(input);
         ui->console->clear();
     });
+
+
 }
+
+
+
 
 void MainWindow::closeEvent(QCloseEvent *event) {
     if (!save) {
@@ -38,6 +44,9 @@ void MainWindow::closeEvent(QCloseEvent *event) {
         event->accept();
     }
 }
+
+
+
 
 void MainWindow::LoadProjectFile() {
 
@@ -62,6 +71,9 @@ void MainWindow::LoadProjectFile() {
     }
 
 }
+
+
+
 
 void MainWindow::saveProjectToFile() {
     QString baseName = "project";
@@ -95,6 +107,9 @@ void MainWindow::saveProjectToFile() {
 
 
 }
+
+
+
 
 void MainWindow::Print_LeftMenu(unsigned long long id, const std::string &text, const std::vector<double> &object) {
     // Добавление элементов в левое меню
@@ -153,6 +168,30 @@ void MainWindow::Print_LeftMenu(unsigned long long id, const std::string &text, 
     itemFigure->setExpanded(true);
 }
 
+
+
+
+void MainWindow::Requar_LeftMenu(unsigned long long id, const std::string &text) {
+    // Добавление Требований в левое меню
+    QTreeWidgetItem *itemReq = ui->leftMenu->topLevelItem(0);
+
+    if (text == "Clear") {
+        itemReq->takeChildren();
+        return;
+    }
+
+    QString itemType = QString::fromStdString(std::to_string(id) + ": " + text);
+    QTreeWidgetItem *newItem = new QTreeWidgetItem(itemReq);
+    newItem->setText(0, itemType);
+
+    itemReq->addChild(newItem);
+    ui->leftMenu->expandAll();
+}
+
+
+
+
+
 void MainWindow::keyPressEvent(QKeyEvent *event) {
     // Перелистывание команд стрелочкой
     if (ui->console->isActiveWindow()) {
@@ -175,7 +214,77 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
 }
 
 
+
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+/*********************************************************************/
+
+void MainWindow::mouseMoveEvent(QMouseEvent *event) {
+    // Проверка, находится ли курсор на краю окна
+    if (event->x() >= width() - resizeMargin && event->y() >= height() - resizeMargin) {
+        setCursor(Qt::SizeFDiagCursor); // Правый нижний угол
+    } else if (event->x() >= width() - resizeMargin && event->y() <= resizeMargin) {
+        setCursor(Qt::SizeFDiagCursor); // Правый верхний угол
+    } else if (event->x() <= resizeMargin && event->y() >= height() - resizeMargin) {
+        setCursor(Qt::SizeFDiagCursor); // Левый нижний угол
+    } else if (event->x() <= resizeMargin && event->y() <= resizeMargin) {
+        setCursor(Qt::SizeFDiagCursor); // Левый верхний угол
+    } else if (event->x() >= width() - resizeMargin) {
+        setCursor(Qt::SizeHorCursor); // Правая сторона
+    } else if (event->x() <= resizeMargin) {
+        setCursor(Qt::SizeHorCursor); // Левая сторона
+    } else if (event->y() >= height() - resizeMargin) {
+        setCursor(Qt::SizeVerCursor); // Нижняя сторона
+    } else if (event->y() <= resizeMargin) {
+        setCursor(Qt::SizeVerCursor); // Верхняя сторона
+    } else {
+        setCursor(Qt::ArrowCursor); // Стандартный указатель
+    }
+
+    if (resizing) {
+        // Изменение размера окна
+        int dx = event->globalX() - lastMousePosition.x();
+        int dy = event->globalY() - lastMousePosition.y();
+        resize(width() + dx, height() + dy);
+        lastMousePosition = event->globalPosition().toPoint();
+        event->accept();
+    } else if (moving) {
+        // Перемещение окна
+        move(event->globalPosition().toPoint() - lastMousePosition);
+        event->accept();
+    }
+
+    QMainWindow::mouseMoveEvent(event);
+}
+
+
+
+
+
+void MainWindow::mousePressEvent(QMouseEvent *event) {
+    if (event->button() == Qt::LeftButton) {
+        // Проверка, находится ли курсор на краю окна
+        if (event->x() >= width() - resizeMargin && event->y() >= height() - resizeMargin) {
+            resizing = true; // Начинаем изменение размера
+        } else if (event->y() < resizeMargin) {
+            moving = true; // Начинаем перемещение
+        }
+        lastMousePosition = event->globalPosition().toPoint();
+        event->accept();
+    }
+}
+
+
+
+void MainWindow::mouseReleaseEvent(QMouseEvent *event) {
+    resizing = false; // Останавливаем изменение размера
+    moving = false; // Останавливаем перемещение
+    setCursor(Qt::ArrowCursor); // Возвращаем стандартный указатель
+    event->accept();
+}
+
+
+
+

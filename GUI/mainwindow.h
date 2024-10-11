@@ -1,3 +1,4 @@
+
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -16,6 +17,7 @@
 #include <QMessageBox>
 #include <QLabel>
 #include <QHBoxLayout>
+#include "SaveDialog.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -31,8 +33,19 @@ private:
     std::vector<QString> commands; // Список команд
     int Index; // Индекс для вывода команд в консоль по стрелке
     bool save;
+    bool isMousePressed = false;
+    QPoint lastMousePosition;
+    bool resizing = false;
+    const int resizeMargin = 10;
+    bool moving = false;
+
 
 public:
+    void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
+
+
     bool getSave(){return save;}
 
     void setSave(bool T){
@@ -44,6 +57,7 @@ public:
     ~MainWindow();
 
     void Print_LeftMenu(unsigned long long id, const std::string &text, const std::vector<double> &object); // Добавление элементов в меню
+    void Requar_LeftMenu(unsigned long long int id, const std::string &text); // Добавление требований
 
     QWidget *getWorkWindow() const {
         return ui->workWindow;
@@ -74,6 +88,10 @@ signals:
     void projectSaved(const QString &fileName);
     void LoadFile(const QString &fileName);
 
+
 };
+
+
+
 
 #endif // MAINWINDOW_H
