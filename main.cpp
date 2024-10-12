@@ -7,8 +7,6 @@
 #include <memory>
 #include <QApplication>
 #include <QTranslator>
-#include <QSplashScreen>
-#include <QMainWindow>
 #include <QTimer>
 #include <QPixmap>
 
@@ -97,9 +95,13 @@ int main(int argc, char *argv[]) {
             int req = commandParts[1].toInt();
             ID obj1=commandParts[2].toInt();
             ID obj2=commandParts[3].toInt();
-            double parameters=commandParts[4].toDouble();
             RequirementData reqData;
             Requirement type;
+            double parameters=0;
+
+            if(commandParts.size() ==5 ){
+                double parameters=commandParts[4].toDouble();
+            }
 
             switch  (req)  {
                 case 1:
@@ -216,6 +218,11 @@ int main(int argc, char *argv[]) {
         screen.paint();
         painter->draw();
 
+       // std::vector<std::pair<ID, ElementData>> req = screen.getAllReqInfo();
+        //for (auto element: elements) {
+        //   w.Requar_LeftMenu(unsigned long long id, const std::string &text);
+        // }
+
         //Такой же для требований!
 
     });
@@ -252,6 +259,14 @@ int main(int argc, char *argv[]) {
                 w.Print_LeftMenu(element.first.id, "Section", {x1, y1, x2, y2});
             }
         }
+
+        // std::vector<std::pair<ID, ElementData>> req = screen.getAllReqInfo();
+        //for (auto element: elements) {
+        //   w.Requar_LeftMenu(unsigned long long id, const std::string &text);
+        // }
+
+        //Такой же для требований!
+
     });
 
 
