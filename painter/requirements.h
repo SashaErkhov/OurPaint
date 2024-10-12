@@ -37,6 +37,15 @@ public:
         *p = origValue;
         return (f1 - f2) / (2 * eps);
     }
+    virtual Arry<double> getAntiGradient() {
+        Arry<PARAMID> params = getParams();
+        Arry<double> antiGrad;
+        for (int i = 0; i < params.getSize(); i++) {
+            double deriv = getDerivative(params[i]);
+            antiGrad.addElement(-deriv);
+        }
+        return antiGrad;
+    }
 
     virtual double getSecondDerivative(PARAMID p) {
         double origValue = *p;

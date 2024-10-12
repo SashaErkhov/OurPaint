@@ -15,68 +15,68 @@ ID Paint::addRequirement(const RequirementData &rd) {
     std::map<PARAMID, double*> allParams;
     Arry<double> allParamValues;
 
-    // Сбор всех требований и их параметров
-    for (const auto& rd : m_reqD) {
-        IReq* requirement = nullptr;
+// Сбор всех требований и их параметров
+    for (const auto &rd: m_reqD) {
+        IReq *requirement = nullptr;
 
-        // 1
+// 1
         if (rd.req == ET_POINTSECTIONDIST) {
-            point* p_it = &(*(m_pointIDs[rd.objects[0]]));
-            section* s_it = &(*(m_sectionIDs[rd.objects[1]]));
+            point *p_it = &(*(m_pointIDs[rd.objects[0]]));
+            section *s_it = &(*(m_sectionIDs[rd.objects[1]]));
             requirement = new ReqPointSecDist(p_it, s_it, rd.params[0]);
         }
-        // 2
+// 2
         else if (rd.req == ET_POINTONSECTION) {
-            point* p_it = &(*(m_pointIDs[rd.objects[0]]));
-            section* s_it = &(*(m_sectionIDs[rd.objects[1]]));
+            point *p_it = &(*(m_pointIDs[rd.objects[0]]));
+            section *s_it = &(*(m_sectionIDs[rd.objects[1]]));
             requirement = new ReqPointOnSec(p_it, s_it);
         }
-        // 3
+// 3
         else if (rd.req == ET_POINTPOINTDIST) {
-            point* p1_it = &(*(m_pointIDs[rd.objects[0]]));
-            point* p2_it = &(*(m_pointIDs[rd.objects[1]]));
+            point *p1_it = &(*(m_pointIDs[rd.objects[0]]));
+            point *p2_it = &(*(m_pointIDs[rd.objects[1]]));
             requirement = new ReqPointPointDist(p1_it, p2_it, rd.params[0]);
         }
-        // 4
+// 4
         else if (rd.req == ET_POINTONPOINT) {
-            point* p1_it = &(*(m_pointIDs[rd.objects[0]]));
-            point* p2_it = &(*(m_pointIDs[rd.objects[1]]));
+            point *p1_it = &(*(m_pointIDs[rd.objects[0]]));
+            point *p2_it = &(*(m_pointIDs[rd.objects[1]]));
             requirement = new ReqPointOnPoint(p1_it, p2_it);
         }
-        // 5
+// 5
         else if (rd.req == ET_SECTIONCIRCLEDIST) {
-            circle* c_it = &(*(m_circleIDs[rd.objects[0]]));
-            section* s_it = &(*(m_sectionIDs[rd.objects[0]]));
+            circle *c_it = &(*(m_circleIDs[rd.objects[0]]));
+            section *s_it = &(*(m_sectionIDs[rd.objects[0]]));
             requirement = new ReqSecCircleDist(s_it, c_it, rd.params[0]);
         }
-        // 6
+// 6
         else if (rd.req == ET_SECTIONONCIRCLE) {
-            circle* c_it = &(*(m_circleIDs[rd.objects[0]]));
-            section* s_it = &(*(m_sectionIDs[rd.objects[1]]));
+            circle *c_it = &(*(m_circleIDs[rd.objects[0]]));
+            section *s_it = &(*(m_sectionIDs[rd.objects[1]]));
             requirement = new ReqSecOnCircle(s_it, c_it);
         }
-        // 7
+// 7
         else if (rd.req == ET_SECTIONINCIRCLE) {
-            circle* c_it = &(*(m_circleIDs[rd.objects[0]]));
-            section* s_it = &(*(m_sectionIDs[rd.objects[1]]));
+            circle *c_it = &(*(m_circleIDs[rd.objects[0]]));
+            section *s_it = &(*(m_sectionIDs[rd.objects[1]]));
             requirement = new ReqSecInCircle(s_it, c_it);
         }
-        // 8
+// 8
         else if (rd.req == ET_SECTIONSECTIONPARALLEL) {
-            section* s1_it = &(*(m_sectionIDs[rd.objects[0]]));
-            section* s2_it = &(*(m_sectionIDs[rd.objects[1]]));
+            section *s1_it = &(*(m_sectionIDs[rd.objects[0]]));
+            section *s2_it = &(*(m_sectionIDs[rd.objects[1]]));
             requirement = new ReqSecSecParallel(s1_it, s2_it);
         }
-        // 9
+// 9
         else if (rd.req == ET_SECTIONSECTIONPERPENDICULAR) {
-            section* s1_it = &(*(m_sectionIDs[rd.objects[0]]));
-            section* s2_it = &(*(m_sectionIDs[rd.objects[1]]));
+            section *s1_it = &(*(m_sectionIDs[rd.objects[0]]));
+            section *s2_it = &(*(m_sectionIDs[rd.objects[1]]));
             requirement = new ReqSecSecPerpendicular(s1_it, s2_it);
         }
-        // 10
+// 10
         else if (rd.req == ET_SECTIONSECTIONANGEL) {
-            section* s1_it = &(*(m_sectionIDs[rd.objects[0]]));
-            section* s2_it = &(*(m_sectionIDs[rd.objects[1]]));
+            section *s1_it = &(*(m_sectionIDs[rd.objects[0]]));
+            section *s2_it = &(*(m_sectionIDs[rd.objects[1]]));
             requirement = new ReqSecSecAngel(s1_it, s2_it, rd.params[0]);
         }
 
@@ -92,58 +92,36 @@ ID Paint::addRequirement(const RequirementData &rd) {
             }
         }
     }
-
-    // Gauss-Newton algorithm
-    double error = 0.0;
-    for (const auto& req : allRequirements) {
-        error += std::pow(req->getError(), 2);
-    }
-    double lambda = 5;
-    double prevError = std::numeric_limits<double>::max();
-    while (error > 10e-2) {
-
-        Matrix<double> jacobiMatrix(allRequirements.getSize(), allParams.size());
-        Matrix<double> errors(allRequirements.getSize(), 1);
-
-        // Jacobi matrix
-        for (size_t i = 0; i < allRequirements.getSize(); ++i) {
-            Arry<PARAMID> params = allRequirements[i]->getParams();
-            for (size_t j = 0; j < params.getSize(); ++j) {
-                jacobiMatrix.setElement(i, j, allRequirements[i]->getDerivative(params[j]));
+    double factor = 1.0;
+    double oldError = 1.0;
+    for (size_t iter = 0; iter < 10000; ++iter) {
+        Arry<double> antiGradients;
+        double totalError = 0.0;
+        for (const auto &req : allRequirements) {
+            for (auto &grad: req->getAntiGradient()){
+                antiGradients.addElement(grad);
             }
-            errors.setElement(i, 0, allRequirements[i]->getError());
+            totalError += req->getError() * req->getError();
+            if (iter == 0){
+                oldError = totalError;
+            }
         }
+        factor = totalError / oldError;
 
-        Matrix<double> jacobiTra = jacobiMatrix.transpose();
-        Matrix<double> normalMatrix = jacobiTra * jacobiMatrix;
-        if (error > prevError) {
-            lambda *= 2;
-        } else {
-            lambda /= 2;
+        int i = 0;
+        for (auto &param: allParams) {
+            double value = antiGradients[i++];
+            *param.second += factor * value;  // Шаг градиентного спуска
         }
-        prevError = error;
-        for (int i = 0; i < normalMatrix.cols_size(); ++i) {
-            normalMatrix.setElement(i, i, normalMatrix.getElement(i, i) + lambda);
+        oldError = totalError;
+        if (totalError < 0.001) {
+            break;
         }
-        Matrix<double> inverseNormalMatrix = normalMatrix.invMatrix();
-        Matrix<double> delta = inverseNormalMatrix * jacobiTra * errors;
-        double alpha = 0.01;
-        size_t index = 0;
-        for (auto& param : allParams) {
-            *(param.second) -= alpha * delta.getElement(index++, 0);
-        }
-
-        // Check error
-        error = 0.0;
-        for (const auto& req : allRequirements) {
-            error += std::pow(req->getError(), 2);
-        }
-        if (prevError - error < 10e-6) throw std::runtime_error("UNKNOWN ERROR");
     }
 
 
-    // undo/redo
-    for (const auto& req : allRequirements) {
+// undo/redo
+    for (const auto &req: allRequirements) {
         Arry<PARAMID> params = req->getParams();
         Arry<double> beforeValues, afterValues;
         for (size_t i = 0; i < params.getSize(); ++i) {
@@ -154,8 +132,8 @@ ID Paint::addRequirement(const RequirementData &rd) {
         info.m_paramsAfter.addElement(afterValues);
         s_allFigures = s_allFigures || req->getRectangle();
     }
-    // Clear
-    for (auto requirement : allRequirements) {
+// Clear
+    for (auto requirement: allRequirements) {
         delete requirement;
     }
 
@@ -287,7 +265,6 @@ void Paint::paint() {
         c_bmpPainter->drawSection(*section, false);
     }
 }
-
 
 
 /*
@@ -484,9 +461,9 @@ void Paint::undo() {
         for (int i = 0; i < info.m_objects.getSize(); ++i) {
             if (m_pointIDs.contains(info.m_objects[i])) {
                 m_pointStorage.remove(m_pointIDs[info.m_objects[i]]);
-            }else if (m_sectionIDs.contains(info.m_objects[i])) {
+            } else if (m_sectionIDs.contains(info.m_objects[i])) {
                 m_sectionStorage.remove(m_sectionIDs[info.m_objects[i]]);
-            }else if (m_circleIDs.contains(info.m_objects[i])){
+            } else if (m_circleIDs.contains(info.m_objects[i])) {
                 m_circleStorage.remove(m_circleIDs[info.m_objects[i]]);
             } else {
                 std::cout << "No ID to undo" << std::endl;
@@ -527,7 +504,7 @@ void Paint::redo() {
     section *s = nullptr;
     circle *c = nullptr;
     if (info.m_paramsBefore.getSize() == 0) {
-        if (info.m_objects.getSize() == 3){
+        if (info.m_objects.getSize() == 3) {
             point beg;
             beg.x = info.m_paramsAfter[0][0];
             beg.y = info.m_paramsAfter[0][1];
@@ -543,7 +520,7 @@ void Paint::redo() {
             sec.end = &(*(p2));
             m_sectionIDs[info.m_objects[2]] = m_sectionStorage.addElement(sec);
             s_allFigures = s_allFigures || sec.rect();
-        }else if (info.m_objects.getSize() == 2){
+        } else if (info.m_objects.getSize() == 2) {
             point center;
             center.x = info.m_paramsAfter[0][0];
             center.y = info.m_paramsAfter[0][1];
@@ -554,7 +531,7 @@ void Paint::redo() {
             circ.R = info.m_paramsAfter[1][2];
             m_circleIDs[info.m_objects[1]] = m_circleStorage.addElement(circ);
             s_allFigures = s_allFigures || circ.rect();
-        } else if (info.m_objects.getSize() == 1){
+        } else if (info.m_objects.getSize() == 1) {
             point pt;
             pt.x = info.m_paramsAfter[0][0];
             pt.y = info.m_paramsAfter[0][1];
@@ -591,19 +568,19 @@ void Paint::redo() {
 
 void Paint::saveToFile(const char *filename) {
     FileOurP saver;
-    for (auto i = m_pointIDs.begin(); i!= m_pointIDs.end(); ++i){
+    for (auto i = m_pointIDs.begin(); i != m_pointIDs.end(); ++i) {
         point *p = &(*i->second);
-        std::pair<ID, primitive*> m{i->first, p};
+        std::pair<ID, primitive *> m{i->first, p};
         saver.addObject(m);
     }
-    for (auto i = m_sectionIDs.begin(); i!= m_sectionIDs.end(); ++i){
+    for (auto i = m_sectionIDs.begin(); i != m_sectionIDs.end(); ++i) {
         section *s = &(*i->second);
-        std::pair<ID, primitive*> m{i->first, s};
+        std::pair<ID, primitive *> m{i->first, s};
         saver.addObject(m);
     }
-    for (auto i = m_circleIDs.begin(); i!= m_circleIDs.end(); ++i){
+    for (auto i = m_circleIDs.begin(); i != m_circleIDs.end(); ++i) {
         circle *c = &(*i->second);
-        std::pair<ID, primitive*> m{i->first, c};
+        std::pair<ID, primitive *> m{i->first, c};
         saver.addObject(m);
     }
     saver.saveToOurP(filename);
@@ -613,19 +590,17 @@ void Paint::loadFromFile(const char *file) {
     FileOurP loader;
     loader.loadFromOurP(file);
     clear();
-    for (const auto & i : loader.getObjects()){
-        if (i.to_pair().second->type() == ET_POINT){
-            point *p = static_cast<point*>(i.to_pair().second);
+    for (const auto &i: loader.getObjects()) {
+        if (i.to_pair().second->type() == ET_POINT) {
+            point *p = static_cast<point *>(i.to_pair().second);
             m_pointIDs[i.to_pair().first] = m_pointStorage.addElement(*p);
             s_allFigures = s_allFigures || p->rect();
-        }
-        else if (i.to_pair().second->type() == ET_CIRCLE){
-            circle *c = static_cast<circle*>(i.to_pair().second);
+        } else if (i.to_pair().second->type() == ET_CIRCLE) {
+            circle *c = static_cast<circle *>(i.to_pair().second);
             m_circleIDs[i.to_pair().first] = m_circleStorage.addElement(*c);
             s_allFigures = s_allFigures || c->rect();
-        }
-        else if (i.to_pair().second->type() == ET_SECTION){
-            section *s = static_cast<section*>(i.to_pair().second);
+        } else if (i.to_pair().second->type() == ET_SECTION) {
+            section *s = static_cast<section *>(i.to_pair().second);
             m_sectionIDs[i.to_pair().first] = m_sectionStorage.addElement(*s);
             s_allFigures = s_allFigures || s->rect();
         }
@@ -637,16 +612,16 @@ void Paint::clear() {
     m_sectionIDs.clear();
     m_circleIDs.clear();
     m_reqIDs.clear();
-    for (auto i = m_reqStorage.begin(); i!= m_reqStorage.end(); ++i){
+    for (auto i = m_reqStorage.begin(); i != m_reqStorage.end(); ++i) {
         m_reqStorage.remove(i);
     }
-    for (auto i = m_pointStorage.begin(); i!= m_pointStorage.end(); ++i){
+    for (auto i = m_pointStorage.begin(); i != m_pointStorage.end(); ++i) {
         m_pointStorage.remove(i);
     }
-    for (auto i = m_sectionStorage.begin(); i!= m_sectionStorage.end(); ++i){
+    for (auto i = m_sectionStorage.begin(); i != m_sectionStorage.end(); ++i) {
         m_sectionStorage.remove(i);
     }
-    for (auto i = m_circleStorage.begin(); i!= m_circleStorage.end(); ++i){
+    for (auto i = m_circleStorage.begin(); i != m_circleStorage.end(); ++i) {
         m_circleStorage.remove(i);
     }
     s_allFigures = rectangle(10, 10, 10, 10);
@@ -656,15 +631,15 @@ void Paint::clear() {
 
 std::vector<std::pair<ID, ElementData>> Paint::getAllElementsInfo() {
     std::vector<std::pair<ID, ElementData>> data;
-    for (auto i = m_pointIDs.begin(); i!= m_pointIDs.end(); ++i) {
+    for (auto i = m_pointIDs.begin(); i != m_pointIDs.end(); ++i) {
         point *p = &(*i->second);
         ElementData info;
         info.et = ET_POINT;
         info.params.addElement(p->x);
         info.params.addElement(p->y);
-        data.emplace_back(i->first,info);
+        data.emplace_back(i->first, info);
     }
-    for (auto i = m_sectionIDs.begin(); i!= m_sectionIDs.end(); ++i) {
+    for (auto i = m_sectionIDs.begin(); i != m_sectionIDs.end(); ++i) {
         section *s = &(*i->second);
         ElementData info;
         info.et = ET_SECTION;
@@ -672,16 +647,16 @@ std::vector<std::pair<ID, ElementData>> Paint::getAllElementsInfo() {
         info.params.addElement(s->beg->y);
         info.params.addElement(s->end->x);
         info.params.addElement(s->end->y);
-        data.emplace_back(i->first,info);
+        data.emplace_back(i->first, info);
     }
-    for (auto i = m_circleIDs.begin(); i!= m_circleIDs.end(); ++i) {
+    for (auto i = m_circleIDs.begin(); i != m_circleIDs.end(); ++i) {
         circle *c = &(*i->second);
         ElementData info;
         info.et = ET_CIRCLE;
         info.params.addElement(c->center->x);
         info.params.addElement(c->center->y);
         info.params.addElement(c->R);
-        data.emplace_back(i->first,info);
+        data.emplace_back(i->first, info);
     }
     return data;
 }
