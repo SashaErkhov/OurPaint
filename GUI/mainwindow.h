@@ -87,6 +87,8 @@ signals:
     void resized(); // При изменении размера окна для QTPAinter
     void projectSaved(const QString &fileName);
     void LoadFile(const QString &fileName);
+    void REDO();
+    void UNDO();
 
 
 };

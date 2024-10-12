@@ -5,9 +5,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->setupUi(this);
     setMouseTracking(true); // Включаем отслеживание мыши
 
-    setWindowTitle("Приложение Евгения Бычкова");
+   // setWindowTitle("Приложение Евгения Бычкова");
 
-    commands = {"exit", "point 0 0", "circle 0 0 10", "section 0 0 10 10", "clear"};
+    commands = {"exit", "point 0 0", "circle 0 0 10", "section 0 0 10 10", "clear","addreq "};
 
     connect(ui->actionSave_project_to, &QAction::triggered, this, &MainWindow::saveProjectToFile);
     connect(ui->actionImport_project, &QAction::triggered, this, &MainWindow::LoadProjectFile);
@@ -208,6 +208,10 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
                 Index = -1;
                 ui->console->clear();
             }
+        }else if (event->key() == Qt::Key_Z && event->modifiers() & Qt::ControlModifier){
+            emit REDO();
+        }else if (event->key() == Qt::Key_W && event->modifiers() & Qt::ControlModifier){
+            emit UNDO();
         }
     }
     QWidget::keyPressEvent(event);

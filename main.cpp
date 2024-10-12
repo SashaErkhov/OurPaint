@@ -196,25 +196,25 @@ int main(int argc, char *argv[]) {
 
         w.Print_LeftMenu(0, "Clear", {});
         std::vector<std::pair<ID, ElementData>> elements = screen.getAllElementsInfo();
+
         for (auto element: elements) {
             if (element.second.et == ET_POINT) {
                 double x = element.second.params.getElement(0);
                 double y = element.second.params.getElement(1);
                 w.Print_LeftMenu(element.first.id, "Point", {x, y});
-            } else if (element.second.et == ET_CIRCLE) {
-                double x = element.second.params.getElement(0);
-                double y = element.second.params.getElement(1);
-                double r = element.second.params.getElement(2);
-                w.Print_LeftMenu(element.first.id, "Circle", {x, y, r});
-            } else if (element.second.et == ET_SECTION) {
+            }else if (element.second.et == ET_SECTION) {
                 double x1 = element.second.params.getElement(0);
                 double y1 = element.second.params.getElement(1);
                 double x2 = element.second.params.getElement(2);
                 double y2 = element.second.params.getElement(3);
                 w.Print_LeftMenu(element.first.id, "Section", {x1, y1, x2, y2});
+            }else  if (element.second.et == ET_CIRCLE) {
+                double x = element.second.params.getElement(0);
+                double y = element.second.params.getElement(1);
+                double r = element.second.params.getElement(2);
+                w.Print_LeftMenu(element.first.id, "Circle", {x, y, r});
             }
         }
-
         screen.paint();
         painter->draw();
 
@@ -227,6 +227,24 @@ int main(int argc, char *argv[]) {
 
     });
 
+
+    QObject::connect(&w, &MainWindow::REDO, [&screen]() {
+        try{
+            screen.redo();
+        }catch (std::exception& e){
+            qDebug() << e.what()<<"!";
+        }
+
+    });
+
+    QObject::connect(&w, &MainWindow::UNDO, [&screen]() {
+        try {
+            screen.undo();
+        }catch (std::exception& e){
+            qDebug() << e.what()<<"!";
+        }
+
+    });
 
     QObject::connect(&w, &MainWindow::projectSaved, [&screen, &w](const QString &fileName) {
         std::string File = fileName.toStdString();
