@@ -1,4 +1,3 @@
-
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -32,31 +31,21 @@ private:
     Ui::MainWindow *ui;
     std::vector<QString> commands; // Список команд
     int Index; // Индекс для вывода команд в консоль по стрелке
-    bool save;
-    bool isMousePressed = false;
+    bool save; // Для сохранения файла
     QPoint lastMousePosition;
-    bool resizing = false;
-    const int resizeMargin = 10;
-    bool moving = false;
-
+    bool resizing ;
+    const int resizeMargin = 10; // Закругление окна
+    bool moving ;  //Перемещение
+    Qt::Edges resizingEdges; // Объявление переменной resizingEdges
 
 public:
-    void mousePressEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
-
-
-    bool getSave(){return save;}
-
-    void setSave(bool T){
-        save=T;
-    }
-
     MainWindow(QWidget *parent = nullptr);
-
+    void setAllMouseTracking(QWidget *widget);
     ~MainWindow();
 
-    void Print_LeftMenu(unsigned long long id, const std::string &text, const std::vector<double> &object); // Добавление элементов в меню
+
+    void Print_LeftMenu(unsigned long long id, const std::string &text,
+                        const std::vector<double> &object); // Добавление элементов в меню
     void Requar_LeftMenu(unsigned long long int id, const std::string &text); // Добавление требований
 
     QWidget *getWorkWindow() const {
@@ -67,33 +56,35 @@ public:
         return ui;
     }
 
-    void resizeEvent(QResizeEvent *event) { // При изменении размера окна для QTPainter
+    void setSave(bool T){
+        save=T;
+    }
+
+    void resizeEvent(QResizeEvent *event) override {
         QMainWindow::resizeEvent(event);
         emit resized();
     }
 
-public slots:
-    void saveProjectToFile();
-    void LoadProjectFile();
-
-
 protected:
     void keyPressEvent(QKeyEvent *event) override;
-    void closeEvent(QCloseEvent *event) override ;
-
+    void closeEvent(QCloseEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
+    void paintEvent(QPaintEvent *event) override; // Отрисовка окна
 
 signals:
-    void EnterPressed(const QString &command); // При нажатии кнопки
-    void resized(); // При изменении размера окна для QTPAinter
+    void EnterPressed(const QString &command); // При нажатии Enter
+    void resized(); // При изменении размера окна для QPainter
     void projectSaved(const QString &fileName);
     void LoadFile(const QString &fileName);
     void REDO();
     void UNDO();
 
-
+public slots:
+    void saveProjectToFile();
+    void LoadProjectFile();
 };
-
-
-
 
 #endif // MAINWINDOW_H
