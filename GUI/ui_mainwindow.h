@@ -189,9 +189,15 @@ public:
         // Создание верхней панели
         topBar = new QWidget(MainWindow);
         topBar->setObjectName("topBar");
-        topBar->setStyleSheet("QWidget#topBar { background-color: #494850; color: #D8D8F6; border-top-left-radius: 3px; border-top-right-radius: 3px; "
-                              "  border-bottom-left-radius: 0px;\n"
-                              " border-bottom-right-radius: 0px; }");
+        topBar->setStyleSheet("QWidget#topBar { "
+                              "background-color: #494850; "
+                              "color: #D8D8F6; "
+                              "border-top-left-radius: 10px; "
+                              "border-top-right-radius: 10px; "
+                              "border-bottom-left-radius: 0px; "
+                              "border-bottom-right-radius: 0px; "
+                              "border: none; "
+                              "border-bottom: 1px solid #262222; }");
         topBar->setFixedHeight(30);
 
         // Макет для верхней панели
@@ -316,15 +322,15 @@ public:
     {
         // Кнопка "Закрыть"
         closeButton = new QPushButton("", topBar);
-        closeButton->setFixedSize(30, 30);
+        closeButton->setFixedSize(25, 25);
         closeButton->setIcon(QIcon("../Static/icons/close1.ico")); // Установка иконки
-        closeButton->setStyleSheet("QPushButton { background: none; border: none; color: white; border-radius: 5px; }"
+        closeButton->setStyleSheet("QPushButton { background: none; border: none; color: white; border-radius: 5px;}"
                                    "QPushButton:hover { background-color: rgba(255, 255, 255, 0.3); }"); // Подсветка при наведении
         QObject::connect(closeButton, &QPushButton::clicked, MainWindow, &QMainWindow::close);
 
         // Кнопка "Свернуть"
         minimizeButton = new QPushButton("", topBar);
-        minimizeButton->setFixedSize(30, 30);
+        minimizeButton->setFixedSize(25, 25);
         minimizeButton->setIcon(QIcon("../Static/icons/minus1.ico"));
         minimizeButton->setStyleSheet("QPushButton { background: none; border: none; color: white; border-radius: 5px; }"
                                       "QPushButton:hover { background-color: rgba(255, 255, 255, 0.3); }");// Подсветка при наведении
@@ -332,7 +338,7 @@ public:
 
         // Кнопка "Развернуть"
         maximizeButton = new QPushButton("", topBar);
-        maximizeButton->setFixedSize(30, 30);
+        maximizeButton->setFixedSize(25, 25);
         maximizeButton->setIcon(QIcon("../Static/icons/big1.ico"));
         maximizeButton->setStyleSheet("QPushButton { background: none; border: none; color: white; border-radius: 5px; }"
                                       "QPushButton:hover { background-color: rgba(255, 255, 255, 0.3); }"); // Подсветка при наведении

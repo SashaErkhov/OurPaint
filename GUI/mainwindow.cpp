@@ -423,10 +423,17 @@ void MainWindow::paintEvent(QPaintEvent *event) {
     if (!isMaximized() && !isFullScreen()) {
         path.addRoundedRect(0, 0, width(), height(), 10, 10);
 
-        ui->topBar->setStyleSheet("QWidget#topBar { background-color: #494850; color: #D8D8F6; border-top-left-radius: 10px; border-top-right-radius: 10px; "
-                                  "border-bottom-left-radius: 0px; border-bottom-right-radius: 0px; }");
+        ui->topBar->setStyleSheet("QWidget#topBar { "
+                                  "background-color: #494850; "
+                                  "color: #D8D8F6; "
+                                  "border-top-left-radius: 10px; "
+                                  "border-top-right-radius: 10px; "
+                                  "border-bottom-left-radius: 0px; "
+                                  "border-bottom-right-radius: 0px; "
+                                  "border: none; "
+                                  "border-bottom: 1px solid #262222; }");
 
-       ui->  leftMenu->setStyleSheet(QString::fromUtf8(R"(
+        ui->leftMenu->setStyleSheet(QString::fromUtf8(R"(
         background: #494850;
         color: #D8D8F6;
         border: none; /* Убираем все границы */
@@ -435,17 +442,23 @@ void MainWindow::paintEvent(QPaintEvent *event) {
     )"));
     } else {
         path.addRect(0, 0, width(), height());
-        ui->topBar->setStyleSheet("QWidget#topBar { background-color: #494850; color: #D8D8F6; border-radius: 0px; }");
+        ui->topBar->setStyleSheet("QWidget#topBar { "
+                                  "background-color: #494850; "
+                                  "color: #D8D8F6; "
+                                  "border-radius: 0px; "
+                                  "border: none; "
+                                  "border-bottom: 1px solid #262222; }");
 
         ui->leftMenu->setStyleSheet(QString::fromUtf8(R"(
-            background: "#494850";
-            color: "#D8D8F6";
-            QHeaderView::section {
-                background: "#494850";
-                color: "#D8D8F6";
-            }
-        )"));
+        background: #494850;
+        color: #D8D8F6;
+        QHeaderView::section {
+            background: #494850;
+            color: #D8D8F6;
+        }
+    )"));
     }
+
 
     painter.setClipPath(path);
     painter.fillPath(path, QColor("#978897"));
