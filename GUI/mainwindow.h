@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "ui_mainwindow.h"
+#include "FrameOverlay.h"
 #include <QKeyEvent>
 #include <QPainter>
 #include <QFrame>
@@ -17,6 +18,9 @@
 #include <QLabel>
 #include <QHBoxLayout>
 #include "SaveDialog.h"
+#include <QTimer>
+#include <QGuiApplication>
+#include <QScreen>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -29,58 +33,57 @@ Q_OBJECT
 
 private:
     Ui::MainWindow *ui;
-    std::vector<QString> commands; // Список команд
-    int Index; // Индекс для вывода команд в консоль по стрелке
-    bool save; // Для сохранения файла
-    QPoint lastMousePosition;
-    bool resizing ;
-    const int resizeMargin = 10; // Закругление окна
-    bool moving ;  //Перемещение
-    Qt::Edges resizingEdges; // Объявление переменной resizingEdges
+    std::vector<QString> commands; // Список команд для консоли
+    int Index; // Индекс для навигации по командам
+    bool resizing; // Флаг изменения размера окна
+    const int resizeMargin = 10; // Коэф для рисования закруглений
+    bool moving; // Флаг перемещения окна
+    bool drawingFrame; // Флаг отображения рамки
+    bool save; // Флаг сохранения проекта
+    Qt::Edges resizingEdges; // Грани, которые изменяются при изменении размера
+    QPoint lastMousePosition; // Последняя позиция мыши
+    QRect frameRect; // Геометрия рамки
+    FrameOverlay *frameOverlay; // Объект наложения рамки
 
 public:
     MainWindow(QWidget *parent = nullptr);
-    void setAllMouseTracking(QWidget *widget);
+    void setAllMouseTracking(QWidget *widget); // Отслеживание мыши
     ~MainWindow();
 
+    // Добавление элементов в левое меню
+    void Print_LeftMenu(unsigned long long id, const std::string &text, const std::vector<double> &object);
 
-    void Print_LeftMenu(unsigned long long id, const std::string &text,
-                        const std::vector<double> &object); // Добавление элементов в меню
-    void Requar_LeftMenu(unsigned long long int id, const std::string &text); // Добавление требований
+    // Добавление требований в левое меню
+    void Requar_LeftMenu(unsigned long long int id, const std::string &text);
 
-    QWidget *getWorkWindow() const {
-        return ui->workWindow;
-    }
+    QWidget *getWorkWindow() const { return ui->workWindow; }
+    Ui::MainWindow *getUi() const { return ui; }
+    void setSave(bool T) { save = T; }
 
-    Ui::MainWindow *getUi() const {
-        return ui;
-    }
-
-    void setSave(bool T){
-        save=T;
-    }
-
+    // Ловим сигнал изменения окна
     void resizeEvent(QResizeEvent *event) override {
         QMainWindow::resizeEvent(event);
-        emit resized();
+        emit resized(); // Сигнал
     }
 
 protected:
+    // Обработчики событий клавиатуры и мыши
     void keyPressEvent(QKeyEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;
-    void paintEvent(QPaintEvent *event) override; // Отрисовка окна
+
+    void paintEvent(QPaintEvent *event) override; // Обработка отрисовки окна
 
 signals:
-    void EnterPressed(const QString &command); // При нажатии Enter
-    void resized(); // При изменении размера окна для QPainter
-    void projectSaved(const QString &fileName);
-    void LoadFile(const QString &fileName);
-    void REDO();
-    void UNDO();
+    void EnterPressed(const QString &command); // Сигнал при нажатии Enter
+    void resized(); // Сигнал при изменении размера окна
+    void projectSaved(const QString &fileName); // Сигнал о сохранении проекта
+    void LoadFile(const QString &fileName); // Сигнал для загрузки файла
+    void REDO(); // Сигнал для повторения действия
+    void UNDO(); // Сигнал для отмены действия
 
 public slots:
     void saveProjectToFile();

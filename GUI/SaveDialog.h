@@ -1,6 +1,15 @@
 #ifndef OURPAINT_SAVEDIALOG_H
 #define OURPAINT_SAVEDIALOG_H
 
+/*
+ *
+ *  Кастомное окошко для вопроса сохранения окна
+ *
+ *
+ * */
+
+
+
 class SaveDialog : public QDialog {
 public:
     SaveDialog(QWidget *parent = nullptr) : QDialog(parent) {

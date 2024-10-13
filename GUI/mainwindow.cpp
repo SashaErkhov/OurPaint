@@ -7,26 +7,32 @@ MainWindow::MainWindow(QWidget *parent)
           save(true),
           moving(false),
           resizing(false),
-          resizeMargin(10) {
+          drawingFrame(false),
+          frameOverlay(new FrameOverlay()) {
 
     ui->setupUi(this);
-    setAllMouseTracking(this);
+    setAllMouseTracking(this); // Отслеживания мыши
 
+    // Инициализация команд по умолчанию
     commands = {"exit", "point 0 0", "circle 0 0 10", "section 0 0 10 10", "clear", "addreq "};
 
     connect(ui->actionSave_project_to, &QAction::triggered, this, &MainWindow::saveProjectToFile);
     connect(ui->actionImport_project, &QAction::triggered, this, &MainWindow::LoadProjectFile);
 
+    // Обработка ввода в консоли
     connect(ui->console, &QLineEdit::returnPressed, this, [this]() {
         QString input = ui->console->text();
         emit EnterPressed(input);
         ui->console->clear();
     });
+
+    frameOverlay->hide(); // Скрытие наложения рамки
 }
 
 
 
 
+// Отслеживание мыши
 void MainWindow::setAllMouseTracking(QWidget *widget) {
     widget->setMouseTracking(true);
     for (QObject *child : widget->children()) {
@@ -38,15 +44,18 @@ void MainWindow::setAllMouseTracking(QWidget *widget) {
 
 
 
+
+// Обработка события закрытия окна
 void MainWindow::closeEvent(QCloseEvent *event) {
     if (!save) {
         SaveDialog dialog(this);
-        int result = dialog.exec();
+        int result = dialog.exec(); // Показать окно
 
         if (result == QMessageBox::Yes) {
             saveProjectToFile();
-            if (save) { event->accept(); }
-            else{
+            if (save) {
+                event->accept();
+            } else {
                 event->ignore();
             }
         } else if (result == QMessageBox::No) {
@@ -62,11 +71,11 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 
 
 
+// Загрузка файла проекта
 void MainWindow::LoadProjectFile() {
-
     if (!save) {
         SaveDialog dialog(this);
-        int result = dialog.exec();
+        int result = dialog.exec(); // Показать диалог
 
         if (result == QMessageBox::Yes) {
             saveProjectToFile();
@@ -75,44 +84,52 @@ void MainWindow::LoadProjectFile() {
         }
     }
 
+    // Открытие диалога выбора файла проекта
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open Project"),
                                                     QDir::homePath() + "/OurPaint/project",
                                                     tr("Project Files (*.ourp);;All Files (*)"));
 
     if (!fileName.isEmpty()) {
-        emit LoadFile(fileName);
+        emit LoadFile(fileName); // Сигнал
     }
 }
 
 
 
 
+// Сохранение текущего проекта в файл
 void MainWindow::saveProjectToFile() {
     QString baseName = "project";
     QString extension = ".ourp";
     QString fileName;
-    int index = 1;
+    int index = 1; // Уникальности имени
 
+    // Директория по умолчанию
     QString defaultDir = QDir::homePath() + "/OurPaint/project";
 
     QDir dir(defaultDir);
     if (!dir.exists()) {
-        dir.mkpath(".");
+        dir.mkpath("."); // Создание директории, если она не существует
     }
 
-    fileName = QString("%1/%2%3").arg(defaultDir, baseName, extension);
 
-    while (QFile::exists(fileName)) {
+    fileName = QString("%1/%2%3").arg(defaultDir, baseName, extension); // Формирование полного имени файла
+
+
+    while (QFile::exists(fileName)) { // Проверка на существование файла
         fileName = QString("%1/%2_%3%4").arg(defaultDir).arg(baseName).arg(index).arg(extension);
         index++;
     }
 
+
+    // Открытие диалога для сохранения файла
     QString selectedFileName = QFileDialog::getSaveFileName(this, tr("Save Project"), fileName,
                                                             tr("Project Files (*.ourp);;All Files (*)"));
 
+
     if (!selectedFileName.isEmpty()) {
         save = true;
-        emit projectSaved(selectedFileName);
+        emit projectSaved(selectedFileName); //Сигнал
     } else {
         save = false;
     }
@@ -121,9 +138,8 @@ void MainWindow::saveProjectToFile() {
 
 
 
+// Добавление элементов в левое меню
 void MainWindow::Print_LeftMenu(unsigned long long id, const std::string &text, const std::vector<double> &object) {
-    // Добавление элементов в левое меню
-
     QTreeWidgetItem *itemFigures = ui->leftMenu->topLevelItem(0);
 
     if (text == "Clear") {
@@ -131,31 +147,33 @@ void MainWindow::Print_LeftMenu(unsigned long long id, const std::string &text, 
         return;
     }
 
-    QString figureName = QString::fromStdString(text);
+    QString figureName = QString::fromStdString(text); // Преобразование имени фигуры
     int count = 1;
 
-    while (true) {
-        bool ex = false;
+    while (true) { // Проверка уникальности имени фигуры
+        bool exists = false;
         for (int i = 0; i < itemFigures->childCount(); ++i) {
             if (itemFigures->child(i)->text(0) == figureName) {
-                ex = true;
+                exists = true;
                 break;
             }
         }
 
-        if (!ex) {
+        if (!exists) {
             break;
         }
 
-        figureName = QString("%1%2").arg(QString::fromStdString(text)).arg(count);
+        figureName = QString("%1%2").arg(QString::fromStdString(text)).arg(count); // Изменение имени
         count++;
     }
+
 
     QTreeWidgetItem *itemFigure = new QTreeWidgetItem(itemFigures);
     itemFigure->setText(0, figureName);
     itemFigures->addChild(itemFigure);
 
     std::vector<QString> paramNames;
+
 
     if (text == "Point" && object.size() == 2) {
         paramNames = {"ID", "X", "Y"};
@@ -170,19 +188,19 @@ void MainWindow::Print_LeftMenu(unsigned long long id, const std::string &text, 
         if (paramNames[i] == "ID") {
             paramItem->setText(0, QString("%1: %2").arg(paramNames[i]).arg(id));
         } else {
-            paramItem->setText(0, QString("%1: %2").arg(paramNames[i]).arg(QString::number(object[i - 1], 'f', 6)));
+            paramItem->setText(0, QString("%1: %2").arg(paramNames[i]).arg(QString::number(object[i - 1], 'f', 6))); // Установка параметра
         }
         itemFigure->addChild(paramItem);
     }
 
-    itemFigure->setExpanded(true);
+  //  itemFigure->setExpanded(true); Разворачивание
 }
 
 
 
 
+// Добавление требований в левое меню
 void MainWindow::Requar_LeftMenu(unsigned long long id, const std::string &text) {
-    // Добавление Требований в левое меню
     QTreeWidgetItem *itemReq = ui->leftMenu->topLevelItem(0);
 
     if (text == "Clear") {
@@ -195,22 +213,20 @@ void MainWindow::Requar_LeftMenu(unsigned long long id, const std::string &text)
     newItem->setText(0, itemType);
 
     itemReq->addChild(newItem);
-    ui->leftMenu->expandAll();
+   // ui->leftMenu->expandAll(); // Разворачивание
 }
 
 
 
-
-
+// Обработка нажатий клавиш
 void MainWindow::keyPressEvent(QKeyEvent *event) {
-    // Перелистывание команд стрелочкой
-    if (ui->console->isActiveWindow()) {
-        if (event->key() == Qt::Key_Up) {
+    if (ui->console->isActiveWindow()) { // Если консоль активна
+        if (event->key() == Qt::Key_Up) { // Кнопка вверх
             if (Index < static_cast<int>(commands.size()) - 1) {
                 ++Index;
                 ui->console->setText(commands[commands.size() - 1 - Index]);
             }
-        } else if (event->key() == Qt::Key_Down) {
+        } else if (event->key() == Qt::Key_Down) { // Кнопка вниз
             if (Index > 0) {
                 --Index;
                 ui->console->setText(commands[commands.size() - 1 - Index]);
@@ -218,13 +234,13 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
                 Index = -1;
                 ui->console->clear();
             }
-        } else if (event->key() == Qt::Key_W && event->modifiers() & Qt::ControlModifier) {
-            emit REDO();
-        } else if (event->key() == Qt::Key_Z && event->modifiers() & Qt::ControlModifier) {
-            emit UNDO();
+        } else if (event->key() == Qt::Key_W && event->modifiers() & Qt::ControlModifier) { // Ctrl+W
+            emit REDO(); // Сигнал
+        } else if (event->key() == Qt::Key_Z && event->modifiers() & Qt::ControlModifier) { // Ctrl+Z
+            emit UNDO(); // Сигнал
         }
 
-        if (event->key() == Qt::Key_F11) {
+        if (event->key() == Qt::Key_F11) { // F11 - Полный экран
             if (isFullScreen()) {
                 showNormal();
             } else {
@@ -233,91 +249,122 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
             event->accept();
         }
     }
-    QWidget::keyPressEvent(event);
+
+    QWidget::keyPressEvent(event); // Вызов базового обработчика
 }
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow() {
+    delete frameOverlay; // Наложения рамки
     delete ui;
 }
 
-/*********************
+/****************************************************************************************
  *
+ *  Функции перемещения и масштабирования
  *
- *        Функции перемещения
- *
- *
- *
- * ***************************************************************************************/
+ ***************************************************************************************/
 
-
+// Обработка нажатий мыши
 void MainWindow::mousePressEvent(QMouseEvent *event) {
-    if (event->button() == Qt::LeftButton) {
-        // Determine if we're on a resizing edge
-        resizingEdges = Qt::Edges();
+    if (event->button() == Qt::LeftButton) { // Если нажата левая кнопка мыши
+        resizingEdges = Qt::Edges(); // Сброс границ изменения размера
 
+        // Определение, на каких гранях происходит изменение размера
         if (event->pos().x() <= resizeMargin)
-            resizingEdges |= Qt::LeftEdge;
-        else if (event->pos().x() >= width() - resizeMargin)
-            resizingEdges |= Qt::RightEdge;
+            resizingEdges |= Qt::LeftEdge; //Левая
+        if (event->pos().x() >= width() - resizeMargin)
+            resizingEdges |= Qt::RightEdge; //Правая
 
         if (event->pos().y() <= resizeMargin)
-            resizingEdges |= Qt::TopEdge;
-        else if (event->pos().y() >= height() - resizeMargin)
-            resizingEdges |= Qt::BottomEdge;
+            resizingEdges |= Qt::TopEdge; //Верхняя
+        if (event->pos().y() >= height() - resizeMargin)
+            resizingEdges |= Qt::BottomEdge; //Нижняя
 
-        if (resizingEdges != Qt::Edges()) {
+        if (resizingEdges != Qt::Edges()) { // Если определены границы изменения размера
             resizing = true;
-            lastMousePosition = event->globalPosition().toPoint();
+            drawingFrame = true;
+            lastMousePosition = event->globalPosition().toPoint(); // Сохранение позиции мыши
+            frameRect = geometry(); // Сохранение геометрии окна
+
+            // Показ рамки
+            QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
+            frameOverlay->setGeometry(screenGeometry); // Установка геометрии
+            frameOverlay->setFrameRect(frameRect); // Установка рамки
+            frameOverlay->show();
+            frameOverlay->raise(); // Над другими виджетами
         } else {
-            // Start moving the window
             moving = true;
-            lastMousePosition = event->globalPosition().toPoint();
+            drawingFrame = true;
+            lastMousePosition = event->globalPosition().toPoint(); // Сохранение позиции мыши
+            frameRect = geometry(); // Сохранение геометрии окна
+
+            // Показ рамки
+            QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
+            frameOverlay->setGeometry(screenGeometry);
+            frameOverlay->setFrameRect(frameRect);
+            frameOverlay->show();
+            frameOverlay->raise();
+
+            setCursor(Qt::SizeAllCursor); // Смена курсора на курсор перемещения
         }
-        event->accept();
+        event->accept(); // Принятие события
     } else {
-        QMainWindow::mousePressEvent(event);
+        QMainWindow::mousePressEvent(event); // Вызов базового обработчика
     }
 }
 
 
 
 void MainWindow::mouseMoveEvent(QMouseEvent *event) {
-    if (resizing) {
+    if (drawingFrame) {
         QPoint delta = event->globalPosition().toPoint() - lastMousePosition;
-        QRect geom = geometry();
 
-        if (resizingEdges & Qt::LeftEdge)
-            geom.setLeft(geom.left() + delta.x());
-        if (resizingEdges & Qt::RightEdge)
-            geom.setRight(geom.right() + delta.x());
-        if (resizingEdges & Qt::TopEdge)
-            geom.setTop(geom.top() + delta.y());
-        if (resizingEdges & Qt::BottomEdge)
-            geom.setBottom(geom.bottom() + delta.y());
+        if (resizing) {
+            QRect newFrameRect = frameRect;
 
-        setGeometry(geom);
-        lastMousePosition = event->globalPosition().toPoint();
-        event->accept();
-    } else if (moving) {
-        QPoint delta = event->globalPosition().toPoint() - lastMousePosition;
-        move(pos() + delta);
-        lastMousePosition = event->globalPosition().toPoint();
-        event->accept();
+            // Корректируем размеры рамки в зависимости от того, какие края изменяются
+            if (resizingEdges & Qt::LeftEdge) {
+                newFrameRect.setLeft(newFrameRect.left() + delta.x());
+            }
+            if (resizingEdges & Qt::RightEdge) {
+                newFrameRect.setRight(newFrameRect.right() + delta.x());
+            }
+            if (resizingEdges & Qt::TopEdge) {
+                newFrameRect.setTop(newFrameRect.top() + delta.y());
+            }
+            if (resizingEdges & Qt::BottomEdge) {
+                newFrameRect.setBottom(newFrameRect.bottom() + delta.y());
+            }
+
+            frameRect = newFrameRect;
+            lastMousePosition = event->globalPosition().toPoint();
+            frameOverlay->setFrameRect(frameRect);
+            event->accept();
+
+        } else if (moving) {
+            // Перемещаем рамку
+            frameRect.moveTopLeft(frameRect.topLeft() + delta);
+            lastMousePosition = event->globalPosition().toPoint();
+            setCursor(Qt::SizeAllCursor); // Проверка, что курсор остается для перемещения
+            frameOverlay->setFrameRect(frameRect);
+            event->accept();
+        }
     } else {
+        // Обновляем курсор в зависимости от положения мыши относительно краев окна
         Qt::Edges edges = Qt::Edges();
 
         if (event->pos().x() <= resizeMargin)
             edges |= Qt::LeftEdge;
-        else if (event->pos().x() >= width() - resizeMargin)
+        if (event->pos().x() >= width() - resizeMargin)
             edges |= Qt::RightEdge;
 
         if (event->pos().y() <= resizeMargin)
             edges |= Qt::TopEdge;
-        else if (event->pos().y() >= height() - resizeMargin)
+        if (event->pos().y() >= height() - resizeMargin)
             edges |= Qt::BottomEdge;
 
         if (edges != Qt::Edges()) {
+            // Устанавливаем соответствующий курсор для изменения размера
             if ((edges & (Qt::LeftEdge | Qt::RightEdge)) && (edges & (Qt::TopEdge | Qt::BottomEdge))) {
                 if ((edges & Qt::LeftEdge) && (edges & Qt::TopEdge))
                     setCursor(Qt::SizeFDiagCursor);
@@ -341,41 +388,56 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event) {
 
 
 void MainWindow::mouseReleaseEvent(QMouseEvent *event) {
-    if (event->button() == Qt::LeftButton) {
+    if (event->button() == Qt::LeftButton && drawingFrame) {
         resizing = false;
         moving = false;
+        drawingFrame = false;
         setCursor(Qt::ArrowCursor);
+
+        setGeometry(frameRect);
+        frameOverlay->hide();
+
         event->accept();
     } else {
         QMainWindow::mouseReleaseEvent(event);
     }
 }
 
-
-
 void MainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
-    if (event->button() == Qt::LeftButton) {
-        moving = true;
-        setCursor(Qt::SizeAllCursor);
-        lastMousePosition = event->globalPosition().toPoint();
-        event->accept();
-    } else {
-        QMainWindow::mouseDoubleClickEvent(event);
-    }
 }
 
-
-
 void MainWindow::paintEvent(QPaintEvent *event) {
+    // Отрисовка окна с закругленными углами
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
     QPainterPath path;
 
-    if (!isMaximized()) {
-        path.addRoundedRect(0, 0, width(), height(), 10, 10); // Rounded corners
+    if (!isMaximized() && !isFullScreen()) {
+        path.addRoundedRect(0, 0, width(), height(), 10, 10);
+
+        ui->topBar->setStyleSheet("QWidget#topBar { background-color: #494850; color: #D8D8F6; border-top-left-radius: 10px; border-top-right-radius: 10px; "
+                                  "border-bottom-left-radius: 0px; border-bottom-right-radius: 0px; }");
+
+       ui->  leftMenu->setStyleSheet(QString::fromUtf8(R"(
+        background: #494850;
+        color: #D8D8F6;
+        border: none; /* Убираем все границы */
+        border-bottom-left-radius: 10px;   /* Закругление нижнего левого угла */
+        border-bottom-right-radius: 0px;
+    )"));
     } else {
-        path.addRect(0, 0, width(), height()); // Regular rectangle
+        path.addRect(0, 0, width(), height());
+        ui->topBar->setStyleSheet("QWidget#topBar { background-color: #494850; color: #D8D8F6; border-radius: 0px; }");
+
+        ui->leftMenu->setStyleSheet(QString::fromUtf8(R"(
+            background: "#494850";
+            color: "#D8D8F6";
+            QHeaderView::section {
+                background: "#494850";
+                color: "#D8D8F6";
+            }
+        )"));
     }
 
     painter.setClipPath(path);

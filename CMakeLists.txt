@@ -15,6 +15,7 @@ add_executable(ourpaint
         painter/objects.cpp
         painter/requirements.cpp
         GUI/mainwindow.cpp
+        GUI/FrameOverlay.cpp
         painter/Painter.h
         painter/QTPainter.h
         painter/QTPainter.cpp

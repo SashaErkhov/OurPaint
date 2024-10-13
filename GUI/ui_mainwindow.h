@@ -20,6 +20,7 @@
 #include <QPainterPath>
 #include <QBitmap>
 #include <QPainter>
+#include <QIcon>
 
 QT_BEGIN_NAMESPACE
 
@@ -113,8 +114,8 @@ public:
 
         // Создание правого вертикального макета
         QVBoxLayout *rightLayout = new QVBoxLayout();
-        rightLayout->setContentsMargins(0, 10, 10, 0);
-        rightLayout->setSpacing(10); // Добавляем отступ между console и workWindow
+        rightLayout->setContentsMargins(0, 15, 15, 0);
+        rightLayout->setSpacing(5); // Добавляем отступ между console и workWindow
 
         // Добавляем workWindow в rightLayout
         rightLayout->addWidget(workWindow);
@@ -126,7 +127,7 @@ public:
         rightLayout->setStretch(0, 1); // workWindow растягивается по высоте
 
         // Создание горизонтального spacer между leftMenu и workWindow
-        QSpacerItem *horizontalSpacer = new QSpacerItem(10, 0, QSizePolicy::Fixed, QSizePolicy::Minimum);
+        QSpacerItem *horizontalSpacer = new QSpacerItem(15, 0, QSizePolicy::Fixed, QSizePolicy::Minimum);
 
         // Добавление виджетов и spacer в основной макет
         gridLayout->addWidget(leftMenu, 0, 0, 1, 1); // Левое меню в первой колонке
@@ -135,14 +136,12 @@ public:
 
         // Установка коэффициентов растяжения
         gridLayout->setColumnStretch(0, 0); // leftMenu не растягивается по ширине
-        gridLayout->setColumnStretch(1, 0); // spacer фиксированного размера
+        gridLayout->setColumnStretch(1, 0);
         gridLayout->setColumnStretch(2, 1); // rightLayout растягивается по ширине
-        gridLayout->setRowStretch(0, 1);    // Строка с leftMenu и workWindow растягивается по высоте
+        gridLayout->setRowStretch(0, 1);
 
-        // Добавление основного макета в центральный виджет
         gridLayout_2->addLayout(gridLayout, 1, 0, 1, 1);
 
-        // Установка центрального виджета
         MainWindow->setCentralWidget(centralwindow);
 
         retranslateUi(MainWindow);
@@ -183,7 +182,9 @@ public:
         // Создание верхней панели
         topBar = new QWidget(MainWindow);
         topBar->setObjectName("topBar");
-        topBar->setStyleSheet("QWidget#topBar { background-color: #494850; color: #D8D8F6; border: 0px solid #000000; border-radius: 3px; }");
+        topBar->setStyleSheet("QWidget#topBar { background-color: #494850; color: #D8D8F6; border-top-left-radius: 3px; border-top-right-radius: 3px; "
+                              "  border-bottom-left-radius: 0px;\n"
+                              " border-bottom-right-radius: 0px; }");
         topBar->setFixedHeight(30);
 
         // Макет для верхней панели
@@ -199,8 +200,11 @@ public:
 
         // Добавление кнопок меню в верхнюю панель
         topBarLayout->addWidget(projectButton);
+        topBarLayout->addSpacing(10);
         topBarLayout->addWidget(collaborationButton);
+        topBarLayout->addSpacing(10); // Пробел
         topBarLayout->addWidget(helpButton);
+
 
         // Кнопки управления окном
         setupWindowControlButtons(MainWindow);
@@ -247,7 +251,7 @@ public:
     }
 
     void setupMenuButtons()
-    {
+    {//QPushButton:hover { background-color: rgba(255, 255, 255, 0.3);
         // Создание кнопки "Project"
         projectButton = new QPushButton("Project", topBar);
         projectButton->setObjectName("projectButton");
@@ -255,8 +259,13 @@ public:
                 "QPushButton#projectButton { "
                 "background-color: #494850; "
                 "color: #D8D8F6; "
+                "border: none; "
+                "border-radius: 5px; "
+                "padding: 5px 10px; "
                 "}"
-                "QPushButton#projectButton:hover {background-color: rgba(255, 255, 255, 0.3); }"
+                "QPushButton#projectButton:hover { "
+                "background-color: rgba(255, 255, 255, 0.3); "
+                "}"
         );
         projectButton->setMenu(menuProject);
 
@@ -267,8 +276,13 @@ public:
                 "QPushButton#collaborationButton { "
                 "background-color: #494850; "
                 "color: #D8D8F6; "
+                "border: none; "
+                "border-radius: 5px; "
+                "padding: 5px 10px; "
                 "}"
-                "QPushButton#collaborationButton:hover { background-color: rgba(255, 255, 255, 0.3); }"
+                "QPushButton#collaborationButton:hover { "
+                "background-color: rgba(255, 255, 255, 0.3); "
+                "}"
         );
         collaborationButton->setMenu(menuCollaboration);
 
@@ -279,8 +293,13 @@ public:
                 "QPushButton#helpButton { "
                 "background-color: #494850; "
                 "color: #D8D8F6; "
+                "border: none; "
+                "border-radius: 5px; "
+                "padding: 5px 10px; "
                 "}"
-                "QPushButton#helpButton:hover { background-color: rgba(255, 255, 255, 0.3); }"
+                "QPushButton#helpButton:hover { "
+                "background-color: rgba(255, 255, 255, 0.3); "
+                "}"
         );
         helpButton->setMenu(menuHelp);
     }
@@ -288,30 +307,36 @@ public:
     void setupWindowControlButtons(QMainWindow *MainWindow)
     {
         // Кнопка "Закрыть"
-        closeButton = new QPushButton("X", topBar);
+        closeButton = new QPushButton("", topBar);
         closeButton->setFixedSize(30, 30);
-        closeButton->setStyleSheet("QPushButton { background-color: transparent; color: white; }"
+        closeButton->setIcon(QIcon("C:/Users/Tim/CLionProjects/OurPaint/Static/icons/close1.ico")); // Установка иконки
+        closeButton->setStyleSheet("QPushButton { background: none; border: none; color: white; border-radius: 5px; }"
                                    "QPushButton:hover { background-color: rgba(255, 255, 255, 0.3); }"); // Подсветка при наведении
         QObject::connect(closeButton, &QPushButton::clicked, MainWindow, &QMainWindow::close);
 
         // Кнопка "Свернуть"
-        minimizeButton = new QPushButton("-", topBar);
+        minimizeButton = new QPushButton("", topBar);
         minimizeButton->setFixedSize(30, 30);
-        minimizeButton->setStyleSheet("QPushButton { background-color: transparent; color: white; }"
-                                      "QPushButton:hover { background-color: rgba(255, 255, 255, 0.3); }"); // Подсветка при наведении
+        minimizeButton->setIcon(QIcon("C:/Users/Tim/CLionProjects/OurPaint/Static/icons/minus1.ico"));
+        minimizeButton->setStyleSheet("QPushButton { background: none; border: none; color: white; border-radius: 5px; }"
+                                      "QPushButton:hover { background-color: rgba(255, 255, 255, 0.3); }");// Подсветка при наведении
         QObject::connect(minimizeButton, &QPushButton::clicked, MainWindow, &QMainWindow::showMinimized);
 
         // Кнопка "Развернуть"
-        maximizeButton = new QPushButton("[]", topBar);
+        maximizeButton = new QPushButton("", topBar);
         maximizeButton->setFixedSize(30, 30);
-        maximizeButton->setStyleSheet("QPushButton { background-color: transparent; color: white; }"
+        maximizeButton->setIcon(QIcon("C:/Users/Tim/CLionProjects/OurPaint/Static/icons/big1.ico"));
+        maximizeButton->setStyleSheet("QPushButton { background: none; border: none; color: white; border-radius: 5px; }"
                                       "QPushButton:hover { background-color: rgba(255, 255, 255, 0.3); }"); // Подсветка при наведении
         QObject::connect(maximizeButton, &QPushButton::clicked, [=]() {
-            if (MainWindow->isMaximized())
-                MainWindow->showNormal();
-            else
-                MainWindow->showMaximized();
+            if (MainWindow->isMaximized() || MainWindow->isFullScreen()) {
+                MainWindow->showNormal(); // Возвращаем к обычному размеру
+            } else {
+                MainWindow->showMaximized(); // Разворачиваем окно
+                MainWindow->update(); // Обновить стиль
+            }
         });
+
     }
 
     void setupLeftMenu()
@@ -334,16 +359,27 @@ public:
 
         __qtreewidgetitem->setFont(0, font1);
         leftMenu->setHeaderItem(__qtreewidgetitem);
+        leftMenu->setHeaderHidden(true);
 
         itemFigures->setFont(0, font2);
         itemRequirements->setFont(0, font2);
 
-        leftMenu->setStyleSheet(QString::fromUtf8(R"(background: "#494850"; color: "#D8D8F6"; QHeaderView::section { background: "#494850"; color: "#D8D8F6"; } )"));
+        QBrush blackBrush(QColor("#494850"));
+        __qtreewidgetitem->setBackground(0, blackBrush);
+
+        leftMenu->setStyleSheet(QString::fromUtf8(R"(
+        background: #494850;
+        color: #D8D8F6;
+        border: none; /* Убираем все границы */
+        border-bottom-left-radius: 10px;   /* Закругление нижнего левого угла */
+        border-bottom-right-radius: 0px;
+    )"));
+
         leftMenu->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
     }
 
-    void setupConsole()
-    {
+
+    void setupConsole() {
         // Создание и настройка консоли
         console = new QLineEdit(centralwindow);
         console->setObjectName("console");
@@ -353,7 +389,15 @@ public:
         console->setCursor(QCursor(Qt::CursorShape::IBeamCursor));
         console->setAutoFillBackground(false);
         console->setMinimumHeight(30);
-        console->setStyleSheet(QString::fromUtf8(R"(background: "#3e3d3d"; color: "#D8D8F6"; border: 1px solid black; border-radius: 3px;)"));
+        console->setStyleSheet(QString::fromUtf8(R"(
+    background: "#3e3d3d";
+    color: "#D8D8F6";
+    border: 1px solid black;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+)"));
     }
 
     void setupWorkWindow()
@@ -388,9 +432,9 @@ public:
         // Установка текста элементов левого меню
         const bool __sortingEnabled = leftMenu->isSortingEnabled();
         leftMenu->setSortingEnabled(false);
-        QTreeWidgetItem *itemFigures = leftMenu->topLevelItem(0);
+        QTreeWidgetItem *itemFigures = leftMenu->topLevelItem(1);
         itemFigures->setText(0, QCoreApplication::translate("MainWindow", "Figures", nullptr));
-        QTreeWidgetItem *itemRequirements = leftMenu->topLevelItem(1);
+        QTreeWidgetItem *itemRequirements = leftMenu->topLevelItem(2);
         itemRequirements->setText(0, QCoreApplication::translate("MainWindow", "Requirements", nullptr));
         leftMenu->setSortingEnabled(__sortingEnabled);
 
