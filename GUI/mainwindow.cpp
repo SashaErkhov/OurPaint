@@ -140,7 +140,7 @@ void MainWindow::saveProjectToFile() {
 
 // Добавление элементов в левое меню
 void MainWindow::Print_LeftMenu(unsigned long long id, const std::string &text, const std::vector<double> &object) {
-    QTreeWidgetItem *itemFigures = ui->leftMenu->topLevelItem(0);
+    QTreeWidgetItem *itemFigures = ui->leftMenu->topLevelItem(1);
 
     if (text == "Clear") {
         itemFigures->takeChildren();
@@ -170,6 +170,10 @@ void MainWindow::Print_LeftMenu(unsigned long long id, const std::string &text, 
 
     QTreeWidgetItem *itemFigure = new QTreeWidgetItem(itemFigures);
     itemFigure->setText(0, figureName);
+
+    QIcon figureIcon("../Static/icons/Icon.ico");
+    itemFigure->setIcon(0, figureIcon);
+
     itemFigures->addChild(itemFigure);
 
     std::vector<QString> paramNames;
@@ -183,8 +187,11 @@ void MainWindow::Print_LeftMenu(unsigned long long id, const std::string &text, 
         paramNames = {"ID", "X1", "Y1", "X2", "Y2"};
     }
 
+
     for (size_t i = 0; i < paramNames.size() && i < object.size() + 1; ++i) {
         QTreeWidgetItem *paramItem = new QTreeWidgetItem(itemFigure);
+        QIcon paramIcon("../Static/icons/Database.ico");
+        paramItem->setIcon(0, paramIcon);
         if (paramNames[i] == "ID") {
             paramItem->setText(0, QString("%1: %2").arg(paramNames[i]).arg(id));
         } else {
@@ -201,7 +208,7 @@ void MainWindow::Print_LeftMenu(unsigned long long id, const std::string &text, 
 
 // Добавление требований в левое меню
 void MainWindow::Requar_LeftMenu(unsigned long long id, const std::string &text) {
-    QTreeWidgetItem *itemReq = ui->leftMenu->topLevelItem(0);
+    QTreeWidgetItem *itemReq = ui->leftMenu->topLevelItem(2);
 
     if (text == "Clear") {
         itemReq->takeChildren();
