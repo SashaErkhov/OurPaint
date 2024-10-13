@@ -309,7 +309,7 @@ public:
         // Кнопка "Закрыть"
         closeButton = new QPushButton("", topBar);
         closeButton->setFixedSize(30, 30);
-        closeButton->setIcon(QIcon("C:/Users/Tim/CLionProjects/OurPaint/Static/icons/close1.ico")); // Установка иконки
+        closeButton->setIcon(QIcon("../Static/icons/close1.ico")); // Установка иконки
         closeButton->setStyleSheet("QPushButton { background: none; border: none; color: white; border-radius: 5px; }"
                                    "QPushButton:hover { background-color: rgba(255, 255, 255, 0.3); }"); // Подсветка при наведении
         QObject::connect(closeButton, &QPushButton::clicked, MainWindow, &QMainWindow::close);
@@ -317,7 +317,7 @@ public:
         // Кнопка "Свернуть"
         minimizeButton = new QPushButton("", topBar);
         minimizeButton->setFixedSize(30, 30);
-        minimizeButton->setIcon(QIcon("C:/Users/Tim/CLionProjects/OurPaint/Static/icons/minus1.ico"));
+        minimizeButton->setIcon(QIcon("../Static/icons/minus1.ico"));
         minimizeButton->setStyleSheet("QPushButton { background: none; border: none; color: white; border-radius: 5px; }"
                                       "QPushButton:hover { background-color: rgba(255, 255, 255, 0.3); }");// Подсветка при наведении
         QObject::connect(minimizeButton, &QPushButton::clicked, MainWindow, &QMainWindow::showMinimized);
@@ -325,7 +325,7 @@ public:
         // Кнопка "Развернуть"
         maximizeButton = new QPushButton("", topBar);
         maximizeButton->setFixedSize(30, 30);
-        maximizeButton->setIcon(QIcon("C:/Users/Tim/CLionProjects/OurPaint/Static/icons/big1.ico"));
+        maximizeButton->setIcon(QIcon("../Static/icons/big1.ico"));
         maximizeButton->setStyleSheet("QPushButton { background: none; border: none; color: white; border-radius: 5px; }"
                                       "QPushButton:hover { background-color: rgba(255, 255, 255, 0.3); }"); // Подсветка при наведении
         QObject::connect(maximizeButton, &QPushButton::clicked, [=]() {
@@ -354,6 +354,7 @@ public:
         font1.setStyleStrategy(QFont::PreferDefault);
 
         QTreeWidgetItem *__qtreewidgetitem = new QTreeWidgetItem();
+        QTreeWidgetItem *NotSee = new QTreeWidgetItem(leftMenu);
         QTreeWidgetItem *itemFigures = new QTreeWidgetItem(leftMenu);
         QTreeWidgetItem *itemRequirements = new QTreeWidgetItem(leftMenu);
 
