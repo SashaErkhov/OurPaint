@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
        splash.show();*/
 
     MainWindow w;
-
+    w.show();
     auto painter = std::make_unique<QTPainter>(w.getUi(), w.getWorkWindow());
     painter->setParent(w.getWorkWindow());
     painter->show();
@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
           splash.finish(&w);
 
       });*/
-    w.show();
+
 
 
     QObject::connect(&w, &MainWindow::EnterPressed, [&w, &screen, &painter](const QString &command) {

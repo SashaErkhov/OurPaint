@@ -73,10 +73,8 @@ public:
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName("MainWindow");
 
-        // Размеры окна
-        int width = 1280;
-        int height = 720;
-        MainWindow->resize(width, height);
+
+        MainWindow->resize(960, 540);
         MainWindow->setMinimumSize(QSize(672, 378));
 
         // Настройка действий
