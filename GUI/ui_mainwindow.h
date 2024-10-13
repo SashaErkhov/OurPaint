@@ -73,6 +73,11 @@ public:
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName("MainWindow");
 
+        MainWindow->setStyleSheet(
+                "QWidget { "
+                "color: #D8D8F6; "
+                "}"
+        );
 
         MainWindow->resize(960, 540);
         MainWindow->setMinimumSize(QSize(672, 378));
@@ -153,12 +158,16 @@ public:
         QFont font;
         font.setPointSize(9);
 
+        QIcon fileIn("../Static/icons/filein.ico");
+        QIcon fileOn("../Static/icons/fileon.ico");
+
         actionSave_project_to = new QAction(MainWindow);
         actionSave_project_to->setObjectName("actionSave_project_to");
+        actionSave_project_to->setIcon(fileIn);
         actionSave_project_to->setFont(font);
-
         actionImport_project = new QAction(MainWindow);
         actionImport_project->setObjectName("actionImport_project");
+        actionImport_project->setIcon(fileOn);
         actionExport_bmp = new QAction(MainWindow);
         actionExport_bmp->setObjectName("actionExport_bmp");
         actionOpen_bmp = new QAction(MainWindow);
@@ -222,7 +231,7 @@ public:
         // Меню "Project"
         menuProject = new QMenu(MainWindow);
         menuProject->setObjectName("menuProject");
-        menuProject->setStyleSheet("QMenu#menuProject { background-color: #494850; color: #D8D8F6; border: 1px solid #443d3c; border-radius: 5px; }");
+        menuProject->setStyleSheet("QMenu#menuProject { background-color: #494850; color: #D8D8F6; border: 1px solid #443d3c; border-radius: 5px; icon: none;}");
         menuProject->setFont(font);
         menuProject->addAction(actionSave_project_to);
         menuProject->addAction(actionImport_project);
@@ -243,7 +252,7 @@ public:
         // Меню "Help"
         menuHelp = new QMenu(MainWindow);
         menuHelp->setObjectName("menuHelp");
-        menuHelp->setStyleSheet("QMenu#menuHelp { background-color: #494850; color: #D8D8F6; border: 1px solid #443d3c; border-radius: 5px; }");
+        menuHelp->setStyleSheet("QMenu#menuHelp { background-color: #494850; color: #D8D8F6; border: 1px solid #443d3c; border-radius: 5px;}");
         menuHelp->setFont(font);
         menuHelp->addAction(action_help);
     }
@@ -260,6 +269,7 @@ public:
                 "border: none; "
                 "border-radius: 5px; "
                 "padding: 5px 10px; "
+                "icon: none;"
                 "}"
                 "QPushButton#projectButton:hover { "
                 "background-color: rgba(255, 255, 255, 0.3); "
