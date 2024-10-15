@@ -9,6 +9,8 @@
 #include <QTranslator>
 #include <QTimer>
 #include <QPixmap>
+#include "ClientServer/Server.h"
+#include "ClientServer/Client.h"
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
@@ -25,15 +27,41 @@ int main(int argc, char *argv[]) {
     painter->setParent(w.getWorkWindow());
     painter->show();
     Paint screen(painter.get());
-
+    Server server;
+    Client client;
+    bool isConnected = false;
+    bool isServer = false;
     /*  QTimer::singleShot(1000, [&]() {
           splash.finish(&w);
 
       });*/
+    auto updateState = [&screen, &w, &painter]() {
+        screen.paint();
+        painter->draw();
+        w.Print_LeftMenu(0, "Clear", {});
+        std::vector<std::pair<ID, ElementData>> elements = screen.getAllElementsInfo();
 
+        for (auto element: elements) {
+            if (element.second.et == ET_POINT) {
+                double x = element.second.params.getElement(0);
+                double y = element.second.params.getElement(1);
+                w.Print_LeftMenu(element.first.id, "Point", {x, y});
+            } else if (element.second.et == ET_SECTION) {
+                double x1 = element.second.params.getElement(0);
+                double y1 = element.second.params.getElement(1);
+                double x2 = element.second.params.getElement(2);
+                double y2 = element.second.params.getElement(3);
+                w.Print_LeftMenu(element.first.id, "Section", {x1, y1, x2, y2});
+            } else if (element.second.et == ET_CIRCLE) {
+                double x = element.second.params.getElement(0);
+                double y = element.second.params.getElement(1);
+                double r = element.second.params.getElement(2);
+                w.Print_LeftMenu(element.first.id, "Circle", {x, y, r});
+            }
+        }
+    };
 
-
-    QObject::connect(&w, &MainWindow::EnterPressed, [&w, &screen, &painter](const QString &command) {
+    auto handler = [&w, &screen, &painter, &updateState](const QString &command) {
         QStringList commandParts = command.split(' ');
 
         if (commandParts[0] == "point" && commandParts.size() == 3) {
@@ -84,26 +112,25 @@ int main(int argc, char *argv[]) {
                 w.setSave(false);
             }
 
-        }  else if (commandParts[0] == "exit") {
+        } else if (commandParts[0] == "exit") {
             w.close();
         } else if (commandParts[0] == "clear") {
             w.setSave(true);
             painter->clear();
             w.Print_LeftMenu(0, "Clear", {});
             screen.clear();
-        }else if (commandParts[0] == "addreq" && commandParts.size() >3) {
+        } else if (commandParts[0] == "addreq" && commandParts.size() > 3) {
             int req = commandParts[1].toInt();
-            ID obj1=commandParts[2].toInt();
-            ID obj2=commandParts[3].toInt();
+            ID obj1 = commandParts[2].toInt();
+            ID obj2 = commandParts[3].toInt();
             RequirementData reqData;
             Requirement type;
-            double parameters=0;
+            double parameters = 0;
 
-            if(commandParts.size() ==5 ){
-                double parameters=commandParts[4].toDouble();
+            if (commandParts.size() == 5) {
+                double parameters = commandParts[4].toDouble();
             }
-
-            switch  (req)  {
+            switch (req) {
                 case 1:
                     type = ET_POINTSECTIONDIST;
                     reqData.req = type;
@@ -189,61 +216,91 @@ int main(int argc, char *argv[]) {
                     w.setSave(false);
                     break;
                 default:
-                  //  std::cout << "Unknown requirement. Please read types of instructions by help command" << std::endl;
+                    //  std::cout << "Unknown requirement. Please read types of instructions by help command" << std::endl;
                     break;
             }
         }
-
-        w.Print_LeftMenu(0, "Clear", {});
-        std::vector<std::pair<ID, ElementData>> elements = screen.getAllElementsInfo();
-
-        for (auto element: elements) {
-            if (element.second.et == ET_POINT) {
-                double x = element.second.params.getElement(0);
-                double y = element.second.params.getElement(1);
-                w.Print_LeftMenu(element.first.id, "Point", {x, y});
-            }else if (element.second.et == ET_SECTION) {
-                double x1 = element.second.params.getElement(0);
-                double y1 = element.second.params.getElement(1);
-                double x2 = element.second.params.getElement(2);
-                double y2 = element.second.params.getElement(3);
-                w.Print_LeftMenu(element.first.id, "Section", {x1, y1, x2, y2});
-            }else  if (element.second.et == ET_CIRCLE) {
-                double x = element.second.params.getElement(0);
-                double y = element.second.params.getElement(1);
-                double r = element.second.params.getElement(2);
-                w.Print_LeftMenu(element.first.id, "Circle", {x, y, r});
-            }
-        }
-        screen.paint();
-        painter->draw();
-
-       // std::vector<std::pair<ID, ElementData>> req = screen.getAllReqInfo();
+        updateState();
+        // std::vector<std::pair<ID, ElementData>> req = screen.getAllReqInfo();
         //for (auto element: elements) {
         //   w.Requar_LeftMenu(unsigned long long id, const std::string &text);
         // }
 
         //Такой же для требований!
 
+    };
+    QObject::connect(&w, &MainWindow::EnterPressed, [&](const QString &command) {
+        QStringList commandParts = command.split(' ');
+        if (commandParts[0] == "connect" && commandParts.size() == 2) {
+            QStringList addressParts = commandParts[1].split(':');
+            if (addressParts.size() == 2) {
+                QString ip = addressParts[0];
+                bool portOk;
+                quint16 port = addressParts[1].toUShort(&portOk);
+                if (portOk) {
+                    client.connectToServer(ip, port);
+                    isConnected = true;
+                    QObject::connect(&client, &Client::newStateReceived, [&](const QString &cmd) {
+                        screen.loadFromString(cmd.toStdString());
+                    });
+                    qDebug() << "Connected to server " + ip + ":" + QString::number(port);
+                }
+            } else if (addressParts.size() == 1) {
+                QString ip = addressParts[0];
+                client.connectToServer(ip, 2005);
+                isConnected = true;
+                QObject::connect(&client, &Client::newStateReceived, [&](const QString &cmd) {
+                    screen.loadFromString(cmd.toStdString());
+                });
+                qDebug() << "Connected to server " + ip;
+            }
+        } else if (commandParts[0] == "startserver" and commandParts.size() < 2) {
+            if (commandParts.size() == 1) {
+                server.startServer(2005);
+                isServer = true;
+                isConnected = true;
+                qDebug() << "Started server on port 2005";
+            } else {
+                server.startServer(commandParts[1].toUShort());
+                isServer = true;
+                isConnected = true;
+                qDebug() << "Started server on port " + commandParts[1];
+            }
+            w.setSave(false);
+        }
+        else {
+            if (isConnected) {
+                if (isServer) {
+                    handler(command);
+                    server.sendToClients(QString::fromStdString(screen.to_string()));
+                } else {
+                    client.sendCommandToServer(command);
+                }
+            }
+            else {
+                handler(command);
+            }
+        }
     });
-
-
-    QObject::connect(&w, &MainWindow::REDO, [&screen]() {
-        try{
+    QObject::connect(&w, &MainWindow::REDO, [&screen, &painter, &w, &updateState]() {
+        try {
             screen.redo();
-        }catch (std::exception& e){
-            qDebug() << e.what()<<"!";
+            updateState();
+            w.setSave(true);
+        } catch (std::exception &e) {
+            qDebug() << e.what() << "!";
         }
 
     });
 
-    QObject::connect(&w, &MainWindow::UNDO, [&screen]() {
+    QObject::connect(&w, &MainWindow::UNDO, [&screen, &painter, &w, &updateState]() {
         try {
             screen.undo();
-        }catch (std::exception& e){
-            qDebug() << e.what()<<"!";
+            updateState();
+            w.setSave(true);
+        } catch (std::exception &e) {
+            qDebug() << e.what() << "!";
         }
-
     });
 
     QObject::connect(&w, &MainWindow::projectSaved, [&screen, &w](const QString &fileName) {
@@ -277,15 +334,26 @@ int main(int argc, char *argv[]) {
                 w.Print_LeftMenu(element.first.id, "Section", {x1, y1, x2, y2});
             }
         }
-
-        // std::vector<std::pair<ID, ElementData>> req = screen.getAllReqInfo();
-        //for (auto element: elements) {
-        //   w.Requar_LeftMenu(unsigned long long id, const std::string &text);
-        // }
-
-        //Такой же для требований!
-
     });
+
+
+    QObject::connect(&server, &Server::newCommandReceived, [&](const QString &cmd) {
+        handler(cmd);
+        server.sendToClients(QString::fromStdString(screen.to_string()));
+    });
+
+    QObject::connect(&client, &Client::newStateReceived, [&](const QString & state) {
+        screen.loadFromString(state.toStdString());
+        updateState();
+    });
+
+
+
+
+
+
+
+
 
 
 
