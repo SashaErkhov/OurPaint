@@ -14,7 +14,7 @@
 
 class FileOurP {
     std::vector<objectInFile> m_objects;
-    std::vector<objectInFile> parseFile(std::ifstream& file);
+    std::vector<objectInFile> parseFile(std::istream& file);
 
 public:
     FileOurP();
@@ -36,6 +36,10 @@ public:
     void loadFromOurP(const std::string &fileName);
 
     const std::vector<objectInFile>& getObjects() const;
+
+    std::string to_string() const;
+
+    void loadString(const std::string &basicString);
 };
 
 

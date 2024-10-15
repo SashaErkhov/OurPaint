@@ -4,7 +4,7 @@
 
 #include "FileOurP.h"
 
-std::vector<objectInFile> FileOurP::parseFile(std::ifstream& file) {
+std::vector<objectInFile> FileOurP::parseFile(std::istream& file) {
     std::vector<objectInFile> objects;
     std::string line;
     std::queue<std::pair<ID, primitive*>> q;
@@ -96,7 +96,20 @@ FileOurP &FileOurP::operator=(FileOurP &&other) noexcept {
 void FileOurP::addObject(std::pair<ID, primitive*> &obj) {
     m_objects.emplace_back(obj);
 }
-
+std::string FileOurP::to_string() const {
+    std::stringstream ss;
+    std::vector<objectInFile> sort_objects = m_objects;
+    std::sort(sort_objects.begin(), sort_objects.end(), [](const objectInFile &a, const objectInFile &b) {
+        return a.to_pair().first < b.to_pair().first;
+    });
+    ss << "Elements: {\n";
+    for (const auto &obj: sort_objects) {
+        ss << obj.to_string() << "\n";
+    }
+    ss << "}\n";
+    //TODO::add for req
+    return ss.str();
+}
 
 void FileOurP::saveToOurP(const std::string &fileName) const {
     std::ofstream file(fileName);
@@ -125,4 +138,10 @@ void FileOurP::loadFromOurP(const std::string &fileName) {
 }
 const std::vector<objectInFile> &FileOurP::getObjects() const {
         return m_objects;
+}
+
+void FileOurP::loadString(const std::string & s) {
+    std::stringstream ss;
+    ss << s;
+    m_objects = parseFile(ss);
 }
