@@ -660,3 +660,49 @@ std::vector<std::pair<ID, ElementData>> Paint::getAllElementsInfo() {
     }
     return data;
 }
+
+void Paint::setPainter(Painter *p) {
+    c_bmpPainter = p;
+}
+
+void Paint::loadFromString(const std::string & str) {
+    FileOurP loader;
+    loader.loadString(str);
+    clear();
+    for (const auto &i: loader.getObjects()) {
+        if (i.to_pair().second->type() == ET_POINT) {
+            point *p = static_cast<point *>(i.to_pair().second);
+            m_pointIDs[i.to_pair().first] = m_pointStorage.addElement(*p);
+            s_allFigures = s_allFigures || p->rect();
+        } else if (i.to_pair().second->type() == ET_CIRCLE) {
+            circle *c = static_cast<circle *>(i.to_pair().second);
+            m_circleIDs[i.to_pair().first] = m_circleStorage.addElement(*c);
+            s_allFigures = s_allFigures || c->rect();
+        } else if (i.to_pair().second->type() == ET_SECTION) {
+            section *s = static_cast<section *>(i.to_pair().second);
+            m_sectionIDs[i.to_pair().first] = m_sectionStorage.addElement(*s);
+            s_allFigures = s_allFigures || s->rect();
+        }
+    }
+}
+
+std::string Paint::to_string() const {
+    FileOurP saver;
+    for (auto i = m_pointIDs.begin(); i != m_pointIDs.end(); ++i) {
+        point *p = &(*i->second);
+        std::pair<ID, primitive *> m{i->first, p};
+        saver.addObject(m);
+    }
+    for (auto i = m_sectionIDs.begin(); i != m_sectionIDs.end(); ++i) {
+        section *s = &(*i->second);
+        std::pair<ID, primitive *> m{i->first, s};
+        saver.addObject(m);
+    }
+    for (auto i = m_circleIDs.begin(); i != m_circleIDs.end(); ++i) {
+        circle *c = &(*i->second);
+        std::pair<ID, primitive *> m{i->first, c};
+        saver.addObject(m);
+    }
+    return saver.to_string();
+}
+

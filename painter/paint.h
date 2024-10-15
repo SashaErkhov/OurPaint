@@ -75,16 +75,19 @@ public:
 
     // Сохранение данных в файл
     void saveToFile(const char *filename);
+    std::string to_string() const;
     
     // Экспорт в BMP файл
     void exportToBMP(const char *file);
     
     // Загрузка данных из файла
     void loadFromFile(const char *file);
-    
+    //Загрузка данных из string
+    void loadFromString(const std::string & str);
     // Задает фон(изменяет filename файл)
     // void changeBMP(const BMPfile& file);
     // void changeBMP(const char* filename);
+    void setPainter(Painter* p);
 
     void deleteElement(ID elem);
     void deleteRequirement(ID req);
