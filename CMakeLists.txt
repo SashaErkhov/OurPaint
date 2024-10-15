@@ -3,7 +3,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 project(ourpaint)
 # for using this app, you need to download QT6. If you have question, ask @ardrasss
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Network)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
@@ -21,7 +21,7 @@ add_executable(ourpaint
         painter/QTPainter.cpp
         painter/saveload/objectInFile.cpp
         painter/saveload/FileOurP.cpp
-)
+        ClientServer/Server.cpp ClientServer/Client.cpp)
 
 include_directories(additions)
 include_directories(UndoRedo)
@@ -36,6 +36,7 @@ target_link_libraries(ourpaint
         Qt6::Core
         Qt6::Gui
         Qt6::Widgets
+        Qt6::Network
 )
 
 
