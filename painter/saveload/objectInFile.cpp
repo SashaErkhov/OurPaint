@@ -14,7 +14,7 @@ std::string objectInFile::to_string() const {
         return "{\nID " + std::to_string(id.id) + "\nsection" + "\n}";
     } else if (s_obj->type() == ET_CIRCLE) {
         circle *s = dynamic_cast<circle *>(s_obj);
-        return "\nID " + std::to_string(id.id) + "\ncircle " + std::to_string(s->R) + "\n}";
+        return "{\nID " + std::to_string(id.id) + "\ncircle " + std::to_string(s->R) + "\n}";
     }
     return "error";
 }
