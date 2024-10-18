@@ -232,6 +232,9 @@ int main(int argc, char *argv[]) {
     QObject::connect(&w, &MainWindow::EnterPressed, [&](const QString &command) {
         QStringList commandParts = command.split(' ');
         if (commandParts[0] == "connect" && commandParts.size() == 2) {
+            if (!isConnected) {
+                return;
+            }
             QStringList addressParts = commandParts[1].split(':');
             if (addressParts.size() == 2) {
                 QString ip = addressParts[0];
@@ -251,19 +254,31 @@ int main(int argc, char *argv[]) {
                 isConnected = true;
                 QObject::connect(&client, &Client::newStateReceived, [&](const QString &cmd) {
                     screen.loadFromString(cmd.toStdString());
+                    updateState();
                 });
                 qDebug() << "Connected to server " + ip;
             }
-        } else if (commandParts[0] == "startserver" and commandParts.size() < 2) {
+        } else if (commandParts[0] == "startserver" and commandParts.size() < 3) {
+            if (isConnected) {
+                return;
+            }
             if (commandParts.size() == 1) {
                 server.startServer(2005);
                 isServer = true;
                 isConnected = true;
+                QObject::connect(&server, &Server::newCommandReceived, [&](const QString &cmd) {
+                    handler(cmd);
+                    server.sendToClients(QString::fromStdString(screen.to_string()));
+                });
                 qDebug() << "Started server on port 2005";
             } else {
                 server.startServer(commandParts[1].toUShort());
                 isServer = true;
                 isConnected = true;
+                QObject::connect(&server, &Server::newCommandReceived, [&](const QString &cmd) {
+                    handler(cmd);
+                    server.sendToClients(QString::fromStdString(screen.to_string()));
+                });
                 qDebug() << "Started server on port " + commandParts[1];
             }
             w.setSave(false);
