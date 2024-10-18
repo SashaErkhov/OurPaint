@@ -10,13 +10,16 @@ CONFIG += c++17
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp
-
+    mainwindow.cpp \
+    help.cpp
 HEADERS += \
-    mainwindow.h
+    mainwindow.h \
+    help.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    Help.ui
+
 
 TRANSLATIONS += \
     OP_ru_RU.ts
