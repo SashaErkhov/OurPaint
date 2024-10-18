@@ -8,7 +8,8 @@ MainWindow::MainWindow(QWidget *parent)
           moving(false),
           resizing(false),
           drawingFrame(false),
-          frameOverlay(new FrameOverlay()) {
+          frameOverlay(new FrameOverlay()),
+          helpWindow(nullptr){
 
     ui->setupUi(this);
     setAllMouseTracking(this); // Отслеживания мыши
@@ -18,7 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->actionSave_project_to, &QAction::triggered, this, &MainWindow::saveProjectToFile);
     connect(ui->actionImport_project, &QAction::triggered, this, &MainWindow::LoadProjectFile);
-
+    connect(ui->action_help, &QAction::triggered, this, &MainWindow::showHelp);
     // Обработка ввода в консоли
     connect(ui->console, &QLineEdit::returnPressed, this, [this]() {
         QString input = ui->console->text();
@@ -31,7 +32,15 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-
+void MainWindow::showHelp()
+{
+    if (!helpWindow) {
+        helpWindow = new Help(this);
+    }
+    helpWindow->show();
+    helpWindow->raise();
+    helpWindow->activateWindow();
+}
 // Отслеживание мыши
 void MainWindow::setAllMouseTracking(QWidget *widget) {
     widget->setMouseTracking(true);
@@ -263,6 +272,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
 MainWindow::~MainWindow() {
     delete frameOverlay; // Наложения рамки
     delete ui;
+    delete helpWindow;
 }
 
 /****************************************************************************************

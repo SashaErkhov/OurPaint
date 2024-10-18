@@ -21,6 +21,7 @@
 #include <QTimer>
 #include <QGuiApplication>
 #include <QScreen>
+#include "Help.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -32,6 +33,7 @@ class MainWindow : public QMainWindow {
 Q_OBJECT
 
 private:
+    Help *helpWindow;
     Ui::MainWindow *ui;
     std::vector<QString> commands; // Список команд для консоли
     int Index; // Индекс для навигации по командам
@@ -59,6 +61,8 @@ public:
     QWidget *getWorkWindow() const { return ui->workWindow; }
     Ui::MainWindow *getUi() const { return ui; }
     void setSave(bool T) { save = T; }
+
+    void showHelp();
 
     // Ловим сигнал изменения окна
     void resizeEvent(QResizeEvent *event) override {
