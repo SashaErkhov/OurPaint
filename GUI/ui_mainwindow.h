@@ -66,7 +66,7 @@ public:
     {
         // Установка флагов окна
         MainWindow->setWindowFlags(Qt::FramelessWindowHint | Qt::Window);
-        MainWindow->setAttribute(Qt::WA_TranslucentBackground);
+        MainWindow->setAttribute(Qt::WA_TranslucentBackground); // Прозрачность
 
         // Установка объекта окна
         if (MainWindow->objectName().isEmpty())
@@ -360,7 +360,9 @@ public:
         font1.setStyleStrategy(QFont::PreferDefault);
 
         QTreeWidgetItem *__qtreewidgetitem = new QTreeWidgetItem();
-        QTreeWidgetItem *NotSee = new QTreeWidgetItem(leftMenu);
+        QTreeWidgetItem *NotSee = new QTreeWidgetItem(leftMenu);// Обьект для отступа
+        NotSee->setFlags(NotSee->flags() & ~Qt::ItemIsSelectable & ~Qt::ItemIsEnabled);//Делаем неактивным
+
         QTreeWidgetItem *itemFigures = new QTreeWidgetItem(leftMenu);
         QTreeWidgetItem *itemRequirements = new QTreeWidgetItem(leftMenu);
 
@@ -415,6 +417,8 @@ public:
         workWindow->setFrameShape(QFrame::Shape::NoFrame);
         workWindow->setFrameShadow(QFrame::Shadow::Plain);
         workWindow->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        workWindow->resize(674,460);
+
     }
 
     void retranslateUi(QMainWindow *MainWindow)
