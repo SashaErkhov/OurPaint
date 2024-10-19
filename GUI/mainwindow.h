@@ -23,6 +23,7 @@
 #include <QScreen>
 #include "Help.h"
 
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
     class MainWindow;
@@ -33,6 +34,7 @@ class MainWindow : public QMainWindow {
 Q_OBJECT
 
 private:
+
     Help *helpWindow;
     Ui::MainWindow *ui;
     std::vector<QString> commands; // Список команд для консоли
@@ -47,10 +49,15 @@ private:
     QRect frameRect; // Геометрия рамки
     FrameOverlay *frameOverlay; // Объект наложения рамки
 
+
+
 public:
+
     MainWindow(QWidget *parent = nullptr);
-    void setAllMouseTracking(QWidget *widget); // Отслеживание мыши
+
     ~MainWindow();
+
+    void setAllMouseTracking(QWidget *widget); // Отслеживание мыши
 
     // Добавление элементов в левое меню
     void Print_LeftMenu(unsigned long long id, const std::string &text, const std::vector<double> &object);
@@ -59,39 +66,75 @@ public:
     void Requar_LeftMenu(unsigned long long int id, const std::string &text);
 
     QWidget *getWorkWindow() const { return ui->workWindow; }
+
     Ui::MainWindow *getUi() const { return ui; }
+
     void setSave(bool T) { save = T; }
 
     void showHelp();
 
-    // Ловим сигнал изменения окна
-    void resizeEvent(QResizeEvent *event) override {
-        QMainWindow::resizeEvent(event);
-        emit resized(); // Сигнал
-    }
 
 protected:
     // Обработчики событий клавиатуры и мыши
     void keyPressEvent(QKeyEvent *event) override;
+
+// Закрытие
     void closeEvent(QCloseEvent *event) override;
+
+    // Нажатие мыши
     void mousePressEvent(QMouseEvent *event) override;
+
+    // Перемещение мыши
     void mouseMoveEvent(QMouseEvent *event) override;
+
+    // Отпускание мыши
     void mouseReleaseEvent(QMouseEvent *event) override;
+
+    // Двойное нажатие клавиши
     void mouseDoubleClickEvent(QMouseEvent *event) override;
 
+    // Изменение размеров
+    void resizeEvent(QResizeEvent *event) override;
+
     void paintEvent(QPaintEvent *event) override; // Обработка отрисовки окна
+
+    // Кручение колёсиком или тачпадом
+    void wheelEvent(QWheelEvent *event) override;
+
+    // Если курсор в WorkWindow
+    bool event(QEvent *event) override;
 
 signals:
     void EnterPressed(const QString &command); // Сигнал при нажатии Enter
     void resized(); // Сигнал при изменении размера окна
     void projectSaved(const QString &fileName); // Сигнал о сохранении проекта
     void LoadFile(const QString &fileName); // Сигнал для загрузки файла
+    void KeyPlus(); // Сигнал увелечения при тачпаде,колёсике и ctrl +
+    void KeyMinus(); // Сигнал уменьшения при тачпаде,колёсике и ctrl -
+    void KeyZero(); // Обнуление
     void REDO(); // Сигнал для повторения действия
     void UNDO(); // Сигнал для отмены действия
+    void PressRightMouse(); // Нажатие правой клавиши в области workWindow
+    void CloseWindow();
+    void SigOpenServer();
+    void SigJoinServer();
+    void SigJoinLocalServer();
+
+
+
 
 public slots:
+    void updateDrawing() {
+        emit CloseWindow();
+        update();
+    }
     void saveProjectToFile();
     void LoadProjectFile();
+    void openServer();
+    void joinServer();
+    void joinLocalServer();
+
+
 };
 
 #endif // MAINWINDOW_H

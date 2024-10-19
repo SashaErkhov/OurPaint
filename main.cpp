@@ -11,6 +11,7 @@
 #include <QPixmap>
 #include "ClientServer/Server.h"
 #include "ClientServer/Client.h"
+#include "../GUI/CastomeWindowError.h"
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
@@ -63,6 +64,7 @@ int main(int argc, char *argv[]) {
 
     auto handler = [&w, &screen, &painter, &updateState](const QString &command) {
         QStringList commandParts = command.split(' ');
+        bool commandRight=false;
 
         if (commandParts[0] == "point" && commandParts.size() == 3) {
             bool xOk, yOk;
@@ -76,6 +78,7 @@ int main(int argc, char *argv[]) {
                 point.params.addElement(y);
                 ID id = screen.addElement(point);
                 w.setSave(false);
+                commandRight=true;
             }
 
         } else if (commandParts[0] == "circle" && commandParts.size() == 4) {
@@ -93,6 +96,7 @@ int main(int argc, char *argv[]) {
                 circle.params.addElement(r);
                 ID id = screen.addElement(circle);
                 w.setSave(false);
+                commandRight=true;
             }
 
         } else if (commandParts[0] == "section" && commandParts.size() == 5) {
@@ -110,16 +114,26 @@ int main(int argc, char *argv[]) {
                 section.params.addElement(r);
                 ID id = screen.addElement(section);
                 w.setSave(false);
+                commandRight=true;
             }
 
         } else if (commandParts[0] == "exit") {
+            commandRight=true;
             w.close();
+        } else if (commandParts[0] == "CellOn") {
+            commandRight=true;
+            painter->setCell(true);
+        } else if (commandParts[0] == "CellOff") {
+            commandRight=true;
+            painter->setCell(false);
         } else if (commandParts[0] == "clear") {
+            commandRight=true;
             w.setSave(true);
             painter->clear();
             w.Print_LeftMenu(0, "Clear", {});
             screen.clear();
         } else if (commandParts[0] == "addreq" && commandParts.size() > 3) {
+            commandRight=true;
             int req = commandParts[1].toInt();
             ID obj1 = commandParts[2].toInt();
             ID obj2 = commandParts[3].toInt();
@@ -128,8 +142,9 @@ int main(int argc, char *argv[]) {
             double parameters = 0;
 
             if (commandParts.size() == 5) {
-                double parameters = commandParts[4].toDouble();
+                parameters = commandParts[4].toDouble();
             }
+
             switch (req) {
                 case 1:
                     type = ET_POINTSECTIONDIST;
@@ -220,7 +235,9 @@ int main(int argc, char *argv[]) {
                     break;
             }
         }
-        updateState();
+        if(commandRight){
+            updateState();
+       }
         // std::vector<std::pair<ID, ElementData>> req = screen.getAllReqInfo();
         //for (auto element: elements) {
         //   w.Requar_LeftMenu(unsigned long long id, const std::string &text);
@@ -229,12 +246,21 @@ int main(int argc, char *argv[]) {
         //Такой же для требований!
 
     };
+
+      QObject::connect(&w, &MainWindow::CloseWindow, [&screen,&painter]() {
+        screen.paint();
+        painter->draw();
+    });
+
+
+    QObject::connect(&w, &MainWindow::resized, [&screen,&painter]() {
+         screen.paint();
+        painter->draw();
+    });
+
     QObject::connect(&w, &MainWindow::EnterPressed, [&](const QString &command) {
         QStringList commandParts = command.split(' ');
         if (commandParts[0] == "connect" && commandParts.size() == 2) {
-            if (!isConnected) {
-                return;
-            }
             QStringList addressParts = commandParts[1].split(':');
             if (addressParts.size() == 2) {
                 QString ip = addressParts[0];
@@ -254,31 +280,19 @@ int main(int argc, char *argv[]) {
                 isConnected = true;
                 QObject::connect(&client, &Client::newStateReceived, [&](const QString &cmd) {
                     screen.loadFromString(cmd.toStdString());
-                    updateState();
                 });
                 qDebug() << "Connected to server " + ip;
             }
-        } else if (commandParts[0] == "startserver" and commandParts.size() < 3) {
-            if (isConnected) {
-                return;
-            }
+        } else if (commandParts[0] == "startserver" and commandParts.size() < 2) {
             if (commandParts.size() == 1) {
                 server.startServer(2005);
                 isServer = true;
                 isConnected = true;
-                QObject::connect(&server, &Server::newCommandReceived, [&](const QString &cmd) {
-                    handler(cmd);
-                    server.sendToClients(QString::fromStdString(screen.to_string()));
-                });
                 qDebug() << "Started server on port 2005";
             } else {
                 server.startServer(commandParts[1].toUShort());
                 isServer = true;
                 isConnected = true;
-                QObject::connect(&server, &Server::newCommandReceived, [&](const QString &cmd) {
-                    handler(cmd);
-                    server.sendToClients(QString::fromStdString(screen.to_string()));
-                });
                 qDebug() << "Started server on port " + commandParts[1];
             }
             w.setSave(false);
@@ -297,6 +311,23 @@ int main(int argc, char *argv[]) {
             }
         }
     });
+
+    QObject::connect(&w, &MainWindow::KeyPlus, [&screen,&painter]() {
+        painter->setZoomPlus();
+        screen.paint();
+        painter->draw();
+    });
+    QObject::connect(&w, &MainWindow::KeyMinus, [&screen,&painter]() {
+        painter->setZoomMinus();
+        screen.paint();
+        painter->draw();
+    });
+    QObject::connect(&w, &MainWindow::KeyZero, [&screen,&painter]() {
+        painter->setZoomZero();
+        screen.paint();
+        painter->draw();
+    });
+
     QObject::connect(&w, &MainWindow::REDO, [&screen, &painter, &w, &updateState]() {
         try {
             screen.redo();
@@ -316,6 +347,12 @@ int main(int argc, char *argv[]) {
         } catch (std::exception &e) {
             qDebug() << e.what() << "!";
         }
+    });
+
+ QObject::connect(&w, &MainWindow::CloseWindow, [&screen, &painter]() {
+        qDebug()  << "!";
+        screen.paint();
+        painter->draw();
     });
 
     QObject::connect(&w, &MainWindow::projectSaved, [&screen, &w](const QString &fileName) {

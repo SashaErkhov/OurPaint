@@ -16,13 +16,18 @@ add_executable(ourpaint
         painter/requirements.cpp
         GUI/mainwindow.cpp
         GUI/FrameOverlay.cpp
+        GUI/Scaling.cpp
+        GUI/CastomeWindowError.h
         GUI/help.cpp
         painter/Painter.h
         painter/QTPainter.h
         painter/QTPainter.cpp
         painter/saveload/objectInFile.cpp
         painter/saveload/FileOurP.cpp
-        ClientServer/Server.cpp ClientServer/Client.cpp)
+        ClientServer/Server.cpp ClientServer/Client.cpp
+        GUI/CastomeWindowWarning.h
+        GUI/CastomeWindowSuccessful.h
+)
 
 include_directories(additions)
 include_directories(UndoRedo)

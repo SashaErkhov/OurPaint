@@ -1,36 +1,85 @@
+#include <QGestureEvent>
 #include "mainwindow.h"
+
+
 
 MainWindow::MainWindow(QWidget *parent)
         : QMainWindow(parent),
           ui(new Ui::MainWindow),
-          Index(-1),
           save(true),
           moving(false),
           resizing(false),
           drawingFrame(false),
           frameOverlay(new FrameOverlay()),
+          Index(0),
           helpWindow(nullptr){
 
     ui->setupUi(this);
-    setAllMouseTracking(this); // Отслеживания мыши
-
-    // Инициализация команд по умолчанию
-    commands = {"exit", "point 0 0", "circle 0 0 10", "section 0 0 10 10", "clear", "addreq "};
+    setAllMouseTracking(this); // Отслеживание мыши
+    setAttribute(Qt::WA_OpaquePaintEvent);
 
     connect(ui->actionSave_project_to, &QAction::triggered, this, &MainWindow::saveProjectToFile);
     connect(ui->actionImport_project, &QAction::triggered, this, &MainWindow::LoadProjectFile);
+
+    connect(ui->actionOpen_server, &QAction::triggered, this, &MainWindow::openServer);
+    connect(ui->actionJoin_server, &QAction::triggered, this, &MainWindow::joinServer);
+    connect(ui->actionJoin_local_server, &QAction::triggered, this, &MainWindow::joinLocalServer);
+
     connect(ui->helpButton, &QPushButton::clicked, this, &MainWindow::showHelp);
     // Обработка ввода в консоли
     connect(ui->console, &QLineEdit::returnPressed, this, [this]() {
         QString input = ui->console->text();
-        emit EnterPressed(input);
-        ui->console->clear();
+        if (!input.isEmpty()) {
+            commands.push_back(input);
+            emit EnterPressed(input);
+            ui->console->clear();
+        }
     });
     this->setFocusPolicy(Qt::StrongFocus);
     frameOverlay->hide(); // Скрытие наложения рамки
 }
 
 
+// Изменение размеров
+void MainWindow::resizeEvent(QResizeEvent *event) {
+    QMainWindow::resizeEvent(event);
+    emit resized();
+}
+
+// Кручение колёсиком
+void MainWindow::wheelEvent(QWheelEvent *event) {
+    if (ui->workWindow && ui->workWindow->underMouse()) {
+        if (event->angleDelta().y() > 0) {
+            emit KeyPlus();
+        } else {
+            emit KeyMinus();
+        }
+        event->accept();
+    } else {
+        QMainWindow::wheelEvent(event);
+    }
+}
+
+// Жесты в тачпаде в области workWindow
+bool MainWindow::event(QEvent *event) {
+
+    if (event->type() == QEvent::Gesture) {
+        QGestureEvent *gestureEvent = static_cast<QGestureEvent *>(event);
+        if (QGesture *pinch = gestureEvent->gesture(Qt::PinchGesture)) {
+            QPinchGesture *pinchGesture = static_cast<QPinchGesture *>(pinch);
+            if (pinchGesture->changeFlags() & QPinchGesture::ScaleFactorChanged) {
+                if (pinchGesture->scaleFactor() > 1.0) {
+                    emit KeyPlus();
+                } else {
+                    emit KeyMinus();
+                }
+            }
+            return true;
+        }
+    }
+
+    return QMainWindow::event(event);
+}
 
 void MainWindow::showHelp()
 {
@@ -44,7 +93,7 @@ void MainWindow::showHelp()
 // Отслеживание мыши
 void MainWindow::setAllMouseTracking(QWidget *widget) {
     widget->setMouseTracking(true);
-    for (QObject *child : widget->children()) {
+    for (QObject *child: widget->children()) {
         if (QWidget *childWidget = qobject_cast<QWidget *>(child)) {
             setAllMouseTracking(childWidget);
         }
@@ -58,22 +107,27 @@ void MainWindow::setAllMouseTracking(QWidget *widget) {
 void MainWindow::closeEvent(QCloseEvent *event) {
     if (!save) {
         SaveDialog dialog(this);
+        dialog.setModal(true);
         int result = dialog.exec(); // Показать окно
 
         if (result == QMessageBox::Yes) {
             saveProjectToFile();
             if (save) {
                 event->accept();
+                close();
             } else {
                 event->ignore();
             }
         } else if (result == QMessageBox::No) {
             event->accept();
+            close();
         } else {
             event->ignore();
         }
+        emit CloseWindow();
     } else {
         event->accept();
+        close();
     }
 }
 
@@ -204,7 +258,8 @@ void MainWindow::Print_LeftMenu(unsigned long long id, const std::string &text, 
         if (paramNames[i] == "ID") {
             paramItem->setText(0, QString("%1: %2").arg(paramNames[i]).arg(id));
         } else {
-            paramItem->setText(0, QString("%1: %2").arg(paramNames[i]).arg(QString::number(object[i - 1], 'f', 6))); // Установка параметра
+            paramItem->setText(0, QString("%1: %2").arg(paramNames[i]).arg(
+                    QString::number(object[i - 1], 'f', 6))); // Установка параметра
         }
         itemFigure->addChild(paramItem);
     }
@@ -297,38 +352,54 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
             }else{
                 this->showMinimized();
             }
-        }
-    }else if (ui->console->isActiveWindow()) { // Если консоль активна
-        if (event->key() == Qt::Key_Up) { // Кнопка вверх
-            if (Index < static_cast<int>(commands.size()) - 1) {
-                ++Index;
-                ui->console->setText(commands[commands.size() - 1 - Index]);
-            }
-        } else if (event->key() == Qt::Key_Down) { // Кнопка вниз
-            if (Index > 0) {
-                --Index;
-                ui->console->setText(commands[commands.size() - 1 - Index]);
-            } else {
-                Index = -1;
-                ui->console->clear();
-            }
-        } else if (event->key() == Qt::Key_W && event->modifiers() & Qt::ControlModifier) { // Ctrl+W
+        }else if (event->key() == Qt::Key_W && event->modifiers() & Qt::ControlModifier) { // Ctrl+W
             emit REDO(); // Сигнал
         } else if (event->key() == Qt::Key_Z && event->modifiers() & Qt::ControlModifier) { // Ctrl+Z
             emit UNDO(); // Сигнал
-        }
-
-        if (event->key() == Qt::Key_F11) { // F11 - Полный экран
-            if (isFullScreen()) {
-                showNormal();
-            } else {
-                showFullScreen();
-            }
-            event->accept();
+        } else if (event->key() == Qt::Key_Plus && event->modifiers() & Qt::ControlModifier) {
+            emit KeyPlus();
+        } else if (event->key() == Qt::Key_Minus && event->modifiers() & Qt::ControlModifier) {
+            emit KeyMinus();
+        } else if (event->key() == Qt::Key_0 && event->modifiers() & Qt::ControlModifier) {
+            emit KeyZero();
         }
     }
 
+    if (ui->console->isActiveWindow()) { // Если консоль активна
+        if (event->key() == Qt::Key_Up) { // Кнопка вверх
+            if (Index == 0) {
+                Index = static_cast<int>(commands.size()) - 1;
+            } else {
+                Index = (Index + 1) % commands.size();
+            }
+            ui->console->setText(commands[Index]);
+        } else if (event->key() == Qt::Key_Down) { // Кнопка вниз
+            Index = (Index - 1 + commands.size()) % commands.size();
+            ui->console->setText(commands[Index]);
+        }
+    }
+
+    if (event->key() == Qt::Key_F11) { // F11 - Полный экран
+        if (isFullScreen()) {
+            showNormal();
+        } else {
+            showFullScreen();
+        }
+        event->accept();
+    }
+
+
     QWidget::keyPressEvent(event); // Вызов базового обработчика
+}
+
+void MainWindow::openServer(){
+
+}
+void MainWindow::joinServer(){
+
+}
+void MainWindow::joinLocalServer(){
+
 }
 
 MainWindow::~MainWindow() {
@@ -345,6 +416,12 @@ MainWindow::~MainWindow() {
 
 // Обработка нажатий мыши
 void MainWindow::mousePressEvent(QMouseEvent *event) {
+    // Если правая кнопка нажата в области workWindow
+    if (ui->workWindow && ui->workWindow->underMouse() && event->button() == Qt::RightButton) {
+        qDebug() << "!!";
+        emit PressRightMouse();
+    }
+
     if (event->button() == Qt::LeftButton) { // Если нажата левая кнопка мыши
         resizingEdges = Qt::Edges(); // Сброс границ изменения размера
 
@@ -373,7 +450,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event) {
             frameOverlay->raise(); // Над другими виджетами
         } else {
             moving = true;
-            drawingFrame = true;
+            drawingFrame = true; // Создаём рамку
             lastMousePosition = event->globalPosition().toPoint(); // Сохранение позиции мыши
             frameRect = geometry(); // Сохранение геометрии окна
 
@@ -395,10 +472,10 @@ void MainWindow::mousePressEvent(QMouseEvent *event) {
 
 
 void MainWindow::mouseMoveEvent(QMouseEvent *event) {
-    if (drawingFrame) {
+    if (drawingFrame) { // Создание рамки
         QPoint delta = event->globalPosition().toPoint() - lastMousePosition;
 
-        if (resizing) {
+        if (resizing) {  // Создание рамки
             QRect newFrameRect = frameRect;
 
             // Корректируем размеры рамки в зависимости от того, какие края изменяются
