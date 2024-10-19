@@ -19,7 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->actionSave_project_to, &QAction::triggered, this, &MainWindow::saveProjectToFile);
     connect(ui->actionImport_project, &QAction::triggered, this, &MainWindow::LoadProjectFile);
-    connect(ui->action_help, &QAction::triggered, this, &MainWindow::showHelp);
+    connect(ui->helpButton, &QPushButton::clicked, this, &MainWindow::showHelp);
     // Обработка ввода в консоли
     connect(ui->console, &QLineEdit::returnPressed, this, [this]() {
         QString input = ui->console->text();

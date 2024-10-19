@@ -51,7 +51,6 @@ public:
     // Меню
     QMenu *menuProject;
     QMenu *menuCollaboration;
-    QMenu *menuHelp;
 
     // Кнопки меню
     QPushButton *projectButton;
@@ -254,13 +253,6 @@ public:
         menuCollaboration->addAction(actionJoin_local_server);
         menuCollaboration->addSeparator();
         menuCollaboration->addAction(actionExit_from_session);
-
-        // Меню "Help"
-        menuHelp = new QMenu(MainWindow);
-        menuHelp->setObjectName("menuHelp");
-        menuHelp->setStyleSheet("QMenu#menuHelp { background-color: #494850; color: #D8D8F6; border: 1px solid #443d3c; border-radius: 5px;}");
-        menuHelp->setFont(font);
-        menuHelp->addAction(action_help);
     }
 
     void setupMenuButtons()
@@ -315,7 +307,7 @@ public:
                 "background-color: rgba(255, 255, 255, 0.3); "
                 "}"
         );
-        helpButton->setMenu(menuHelp);
+        helpButton->addAction(action_help);
     }
 
     void setupWindowControlButtons(QMainWindow *MainWindow)
@@ -437,11 +429,7 @@ public:
         actionJoin_server->setText(QCoreApplication::translate("MainWindow", "Join server", nullptr));
         actionJoin_local_server->setText(QCoreApplication::translate("MainWindow", "Join local server", nullptr));
         actionExit_from_session->setText(QCoreApplication::translate("MainWindow", "Exit from session", nullptr));
-        action_help->setText(QCoreApplication::translate("MainWindow",
-                                                         "Консольные команды:\n"
-                                                         "point X Y\n"
-                                                         "circle X Y R\n"
-                                                         "section X1 Y1 X2 Y2",
+        action_help->setText(QCoreApplication::translate("Help",
                                                          nullptr));
 
         // Установка текста элементов левого меню
