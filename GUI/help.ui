@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+    <class>MainWindow</class>
+    <widget class="QMainWindow" name="MainWindow">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>1024</width>
+                <height>576</height>
+            </rect>
+        </property>
+        <property name="minimumSize">
+            <size>
+                <width>640</width>
+                <height>360</height>
+            </size>
+        </property>
+        <property name="maximumSize">
+            <size>
+                <width>1920</width>
+                <height>1080</height>
+            </size>
+        </property>
+        <property name="windowTitle">
+            <string>MainWindow</string>
+        </property>
+        <property name="styleSheet">
+            <string notr="true">background: &quot;#978897&quot;</string>
+        </property>
+        <widget class="QWidget" name="centralwindow">
+            <layout class="QGridLayout" name="gridLayout_2">
+                <item row="1" column="1">
+                    <widget class="QFrame" name="workWindow">
+                        <property name="minimumSize">
+                            <size>
+                                <width>320</width>
+                                <height>180</height>
+                            </size>
+                        </property>
+                        <property name="maximumSize">
+                            <size>
+                                <width>1920</width>
+                                <height>1080</height>
+                            </size>
+                        </property>
+                        <property name="styleSheet">
+                            <string notr="true">background: &quot;#ffffff&quot;</string>
+                        </property>
+                        <property name="frameShape">
+                            <enum>QFrame::Shape::StyledPanel</enum>
+                        </property>
+                        <property name="frameShadow">
+                            <enum>QFrame::Shadow::Raised</enum>
+                        </property>
+                    </widget>
+                </item>
+                <item row="2" column="1">
+                    <widget class="QLineEdit" name="console">
+                        <property name="enabled">
+                            <bool>true</bool>
+                        </property>
+                        <property name="sizePolicy">
+                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                            </sizepolicy>
+                        </property>
+                        <property name="minimumSize">
+                            <size>
+                                <width>0</width>
+                                <height>40</height>
+                            </size>
+                        </property>
+                        <property name="font">
+                            <font>
+                                <pointsize>12</pointsize>
+                            </font>
+                        </property>
+                        <property name="cursor">
+                            <cursorShape>IBeamCursor</cursorShape>
+                        </property>
+                        <property name="layoutDirection">
+                            <enum>Qt::LayoutDirection::LeftToRight</enum>
+                        </property>
+                        <property name="autoFillBackground">
+                            <bool>false</bool>
+                        </property>
+                        <property name="styleSheet">
+                            <string notr="true">background:&quot;#3e3d3d&quot;</string>
+                        </property>
+                        <property name="text">
+                            <string/>
+                        </property>
+                    </widget>
+                </item>
+                <item row="1" column="0" rowspan="2">
+                    <widget class="QTreeWidget" name="leftMenu">
+                        <property name="sizePolicy">
+                            <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                            </sizepolicy>
+                        </property>
+                        <property name="minimumSize">
+                            <size>
+                                <width>50</width>
+                                <height>320</height>
+                            </size>
+                        </property>
+                        <property name="styleSheet">
+                            <string notr="true">background: &quot;#494850&quot;</string>
+                        </property>
+                        <column>
+                            <property name="text">
+                                <string/>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <stylestrategy>PreferDefault</stylestrategy>
+                                    <kerning>true</kerning>
+                                </font>
+                            </property>
+                        </column>
+                        <item>
+                            <property name="text">
+                                <string>Figures</string>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <pointsize>12</pointsize>
+                                </font>
+                            </property>
+                        </item>
+                        <item>
+                            <property name="text">
+                                <string>Requirements</string>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <pointsize>12</pointsize>
+                                </font>
+                            </property>
+                        </item>
+                    </widget>
+                </item>
+            </layout>
+        </widget>
+        <widget class="QMenuBar" name="upMenu">
+            <property name="geometry">
+                <rect>
+                    <x>0</x>
+                    <y>0</y>
+                    <width>1024</width>
+                    <height>33</height>
+                </rect>
+            </property>
+            <property name="font">
+                <font>
+                    <pointsize>9</pointsize>
+                </font>
+            </property>
+            <widget class="QMenu" name="menuCollaboration">
+                <property name="font">
+                    <font>
+                        <pointsize>9</pointsize>
+                    </font>
+                </property>
+                <property name="title">
+                    <string>Project</string>
+                </property>
+                <addaction name="actionSave_project_to"/>
+                <addaction name="actionImport_project"/>
+                <addaction name="actionExport_bmp"/>
+                <addaction name="actionOpen_bmp"/>
+            </widget>
+            <widget class="QMenu" name="menuProject">
+                <property name="title">
+                    <string>Collaboration</string>
+                </property>
+                <addaction name="actionOpen_server"/>
+                <addaction name="actionJoin_server"/>
+                <addaction name="actionJoin_local_server"/>
+                <addaction name="separator"/>
+                <addaction name="actionExit_from_session"/>
+            </widget>
+            <widget class="QMenu" name="menuHelp">
+                <property name="title">
+                    <string>Help</string>
+                </property>
+                <addaction name="action_help"/>
+            </widget>
+            <addaction name="menuCollaboration"/>
+            <addaction name="menuProject"/>
+            <addaction name="menuHelp"/>
+        </widget>
+        <action name="actionSave_project_to">
+            <property name="text">
+                <string>Save project to...</string>
+            </property>
+            <property name="font">
+                <font/>
+            </property>
+        </action>
+        <action name="actionImport_project">
+            <property name="text">
+                <string>Import project</string>
+            </property>
+        </action>
+        <action name="actionExport_bmp">
+            <property name="text">
+                <string>Export bmp</string>
+            </property>
+        </action>
+        <action name="actionOpen_bmp">
+            <property name="text">
+                <string>Open bmp</string>
+            </property>
+        </action>
+        <action name="actionOpen_server">
+            <property name="text">
+                <string>Open server</string>
+            </property>
+        </action>
+        <action name="actionJoin_server">
+            <property name="text">
+                <string>Join server</string>
+            </property>
+        </action>
+        <action name="actionJoin_local_server">
+            <property name="text">
+                <string>Join local server</string>
+            </property>
+        </action>
+        <action name="actionExit_from_session">
+            <property name="text">
+                <string>Exit from session</string>
+            </property>
+        </action>
+        <action name="action_help">
+            <property name="text">
+                <string>Вам не нужен help</string>
+            </property>
+        </action>
+    </widget>
+    <resources/>
+    <connections/>
+</ui>
