@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
         emit EnterPressed(input);
         ui->console->clear();
     });
-
+    this->setFocusPolicy(Qt::StrongFocus);
     frameOverlay->hide(); // Скрытие наложения рамки
 }
 
@@ -236,7 +236,69 @@ void MainWindow::Requar_LeftMenu(unsigned long long id, const std::string &text)
 
 // Обработка нажатий клавиш
 void MainWindow::keyPressEvent(QKeyEvent *event) {
-    if (ui->console->isActiveWindow()) { // Если консоль активна
+    if (event->modifiers() & Qt::ControlModifier)
+    {
+        QRect screenGeometry = QApplication::primaryScreen()->availableGeometry();
+        if (event->key() == Qt::Key_Left){
+            bool isRightDownHalf = this->geometry() == QRect(screenGeometry.left() + screenGeometry.width() / 2, screenGeometry.height()/2,screenGeometry.width()/2, screenGeometry.height()/2);
+            bool isRightTop = this->geometry() == QRect(screenGeometry.left() + screenGeometry.width() / 2, screenGeometry.top(),screenGeometry.width()/2, screenGeometry.height()/2);
+            if (isRightTop){
+                this->setGeometry(screenGeometry.left(), screenGeometry.top(),
+                              screenGeometry.width() / 2, screenGeometry.height()/2);
+            }else if(isRightDownHalf){
+                this->setGeometry(screenGeometry.left(), screenGeometry.height()/2,
+                              screenGeometry.width() / 2, screenGeometry.height()/2);
+            }else{
+                this->setGeometry(screenGeometry.left(), screenGeometry.top(),
+                              screenGeometry.width() / 2, screenGeometry.height());
+            }
+        }
+        else if (event->key() == Qt::Key_Right) {
+            bool isLeftDownHalf = this->geometry() == QRect(screenGeometry.left(), screenGeometry.height()/2,screenGeometry.width()/2, screenGeometry.height()/2);
+            bool isLeftUpHalf = this->geometry() == QRect(screenGeometry.left(), screenGeometry.height()/2,screenGeometry.width()/2, screenGeometry.height()/2);
+            if (isLeftUpHalf){
+                this->setGeometry(screenGeometry.left() + screenGeometry.width() / 2, screenGeometry.top(),
+                              screenGeometry.width() / 2, screenGeometry.height()/2);
+            }else if(isLeftDownHalf){
+                this->setGeometry(screenGeometry.left() + screenGeometry.width() / 2, screenGeometry.height()/2, screenGeometry.width() / 2, screenGeometry.height()/2);
+            }else{
+                this->setGeometry(screenGeometry.left() + screenGeometry.width() / 2, screenGeometry.top(),
+                              screenGeometry.width() / 2, screenGeometry.height());
+            }
+        }
+        else if (event->key() == Qt::Key_Up)
+        {
+            bool isLeftDownHalf = this->geometry() == QRect(screenGeometry.left(), screenGeometry.height()/2,screenGeometry.width()/2, screenGeometry.height()/2);
+            bool isRightDownHalf = this->geometry() == QRect(screenGeometry.left() + screenGeometry.width() / 2, screenGeometry.height()/2,screenGeometry.width()/2, screenGeometry.height()/2);
+            bool isLeft = this->geometry() == QRect(screenGeometry.left(), screenGeometry.top(),screenGeometry.width()/2, screenGeometry.height());
+            bool isRight = this->geometry() == QRect(screenGeometry.left() + screenGeometry.width() / 2, screenGeometry.top(),screenGeometry.width()/2, screenGeometry.height());
+            if (isLeft || isLeftDownHalf){
+                this->setGeometry(screenGeometry.left(), screenGeometry.top(),screenGeometry.width()/2, screenGeometry.height()/2);
+            }else if (isRight || isRightDownHalf){
+                this->setGeometry(screenGeometry.left() + screenGeometry.width() / 2, screenGeometry.top(),screenGeometry.width()/2, screenGeometry.height()/2);
+            }else{
+                this->showMaximized();
+            }
+        }
+        else if (event->key() == Qt::Key_Down)
+        {
+            bool isOnRight = this->geometry() == QRect(screenGeometry.left() + screenGeometry.width() / 2, screenGeometry.top(),
+                                                 screenGeometry.width() / 2, screenGeometry.height());
+            bool isOnLeft = this->geometry() == QRect(screenGeometry.left(), screenGeometry.top(),screenGeometry.width() / 2, screenGeometry.height());
+            bool isRightTop = this->geometry() == QRect(screenGeometry.left() + screenGeometry.width() / 2, screenGeometry.top(),screenGeometry.width()/2, screenGeometry.height()/2);
+            bool isLeftTop = this->geometry() == QRect(screenGeometry.left(), screenGeometry.top(),screenGeometry.width()/2, screenGeometry.height()/2);
+            if (this->isMaximized()) {
+                this->showNormal();
+            }else if (isOnRight || isRightTop) {
+                this->setGeometry(screenGeometry.left() + screenGeometry.width() / 2, screenGeometry.height()/2,
+                      screenGeometry.width() / 2, screenGeometry.height()/2);
+            }else if (isOnLeft || isLeftTop){
+                this->setGeometry(screenGeometry.left(), screenGeometry.height()/2,screenGeometry.width()/2, screenGeometry.height()/2);
+            }else{
+                this->showMinimized();
+            }
+        }
+    }else if (ui->console->isActiveWindow()) { // Если консоль активна
         if (event->key() == Qt::Key_Up) { // Кнопка вверх
             if (Index < static_cast<int>(commands.size()) - 1) {
                 ++Index;
