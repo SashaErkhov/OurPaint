@@ -33,7 +33,7 @@ public:
 
     void draw();
 
-    void getUsers(){Scaling.getUsers();}
+    void getUsers(bool var) { Scaling.getUsers(var); }
 
     void setZoomPlus();
 
@@ -70,11 +70,15 @@ protected:
 
     void mouseReleaseEvent(QMouseEvent *event) override;
 
+
 signals:
+
     void RightPress();
 
 
+
 private slots:
+
     void onWorkWindowResized();
 
 

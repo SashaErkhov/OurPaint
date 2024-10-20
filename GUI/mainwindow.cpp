@@ -57,10 +57,12 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 
-// Изменение размеров
 void MainWindow::resizeEvent(QResizeEvent *event) {
+    qDebug()<<event->oldSize()<< " " <<event->size();
+    if (event->oldSize() != event->size()) {
+        emit resized();
+    }
     QMainWindow::resizeEvent(event);
-    emit resized();
 }
 
 void MainWindow::moveEvent(QMoveEvent *event) {
@@ -445,6 +447,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
     }
 
     if (ui->console->isActiveWindow()) { // Если консоль активна
+        emit KeyPress();
         if (event->key() == Qt::Key_Up) { // Кнопка вверх
             if (Index == 0) {
                 Index = static_cast<int>(commands.size()) - 1;
@@ -508,9 +511,6 @@ MainWindow::~MainWindow() {
 
 // Обработка нажатий мыши
 void MainWindow::mousePressEvent(QMouseEvent *event) {
-    // Если правая кнопка нажата в области workWindow
-
-
 
     if (event->button() == Qt::LeftButton) { // Если нажата левая кнопка мыши
         resizingEdges = Qt::Edges(); // Сброс границ изменения размера
@@ -629,7 +629,8 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event) {
         }
         QMainWindow::mouseMoveEvent(event);
     }
-    emit resized();
+
+  //  emit resized();
 }
 
 
@@ -647,7 +648,7 @@ void MainWindow::mouseReleaseEvent(QMouseEvent *event) {
     } else {
         QMainWindow::mouseReleaseEvent(event);
     }
-    emit resized();
+   // emit resized();
 }
 
 void MainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
@@ -721,5 +722,6 @@ void MainWindow::paintEvent(QPaintEvent *event) {
     painter.setPen(pen);
 
     painter.drawPath(path);
-    emit resized();
+
+  //  emit resized();
 }

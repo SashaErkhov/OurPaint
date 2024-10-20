@@ -31,7 +31,7 @@ public:
 
     void setZoomMinus();
 
-    void getUsers(){usersResize=true;}
+    void getUsers(bool var){usersResize=var;}
 
     void setZoomZero();
 

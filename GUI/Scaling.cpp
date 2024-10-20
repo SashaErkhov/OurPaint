@@ -55,8 +55,7 @@ void Scaling::scaling(int widgetWidth, int widgetHeight, std::vector<double> siz
             zoom = newZoom / margin;
         }
     }
-
-    usersResize = false;
+else { usersResize = false; }
 
 
 }

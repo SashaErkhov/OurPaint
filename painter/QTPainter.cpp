@@ -9,6 +9,7 @@ QTPainter::QTPainter(Ui::MainWindow *ui, QWidget *parent)
 
     // Отслеживаем размер окна родителя
     connect(ui->workWindow->window(), SIGNAL(resized()), this, SLOT(onWorkWindowResized()));
+    setAttribute(Qt::WA_AcceptTouchEvents);
 }
 
 void QTPainter::clear() {
@@ -105,9 +106,10 @@ std::vector<double> QTPainter::FindMaxMin() {
 
     return size;
 }
-
+int count=0;
 
 void QTPainter::paintEvent(QPaintEvent *event) {
+    qDebug()<<++count;
     QFrame::paintEvent(event);
     QPainter painter(this);
 
@@ -187,8 +189,8 @@ void QTPainter::paintEvent(QPaintEvent *event) {
 
     // Отрисовка фигур
     for (const auto &pt: points) {
-        int X = static_cast<int>(Scaling.scaleCoordinateY(pt.x) + _width );
-        int Y = static_cast<int>(Scaling.scaleCoordinateX(-pt.y ) + _height );
+        int X = static_cast<int>(Scaling.scaleCoordinateX(pt.x) + _width );
+        int Y = static_cast<int>(Scaling.scaleCoordinateY(-pt.y ) + _height );
         painter.drawPoint(X, Y);
     }
 
@@ -224,8 +226,8 @@ unsigned long long QTPainter::getHeight() {
 void QTPainter::mousePressEvent(QMouseEvent *event) {
     if (event->button() == Qt::RightButton) {
         Scaling.startMousePress(event->pos());
-        emit RightPress();
     }
+    emit RightPress();
 }
 
 void QTPainter::mouseMoveEvent(QMouseEvent *event) {

@@ -42,6 +42,7 @@ int main(int argc, char *argv[]) {
     auto updateState = [&screen, &w, &painter]() {
         screen.paint();
         painter->draw();
+        painter->getUsers(false);
         w.Print_LeftMenu(0, "Clear", {});
         std::vector<std::pair<ID, ElementData>> elements = screen.getAllElementsInfo();
 
@@ -279,7 +280,7 @@ int main(int argc, char *argv[]) {
     });
 
     QObject::connect(painter.get(), &QTPainter::RightPress, [&screen, &painter]() {
-        painter->getUsers();
+        painter->getUsers(true);
         screen.paint();
         painter->draw();
     });
@@ -399,8 +400,8 @@ int main(int argc, char *argv[]) {
     QObject::connect(&w, &MainWindow::resized, [&screen,&painter]() {
       //  qDebug()<<"1";
       //  painter->getUsers();
-      //   screen.paint();
-      //  painter->draw();
+         screen.paint();
+        painter->draw();
     });
     QObject::connect(&w, &MainWindow::KeyPlus, [&screen,&painter]() {
         painter->setZoomPlus();
@@ -418,7 +419,8 @@ int main(int argc, char *argv[]) {
         painter->draw();
     });
     QObject::connect(&w, &MainWindow::KeyPress, [&screen,&painter]() {
-        painter->getUsers();
+        painter->getUsers(true);
+        //qDebug()<<"12";
         screen.paint();
         painter->draw();
     });
@@ -517,6 +519,7 @@ int main(int argc, char *argv[]) {
     });
     QObject::connect(&w, &MainWindow::positionChanged, [&screen,&painter]() {
       //  painter->getUsers();
+      //  qDebug()<<"12";
         screen.paint();
         painter->draw();
     });
