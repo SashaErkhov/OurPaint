@@ -17,7 +17,6 @@ double Scaling::scaleCoordinateY(double Y) {
     return Y * scale * zoom + deltaY;
 }
 
-
 void Scaling::scaling(int widgetWidth, int widgetHeight, std::vector<double> size) {
     double scaleX = widgetWidth / width_;
     double scaleY = widgetHeight / height_;
@@ -55,7 +54,6 @@ void Scaling::scaling(int widgetWidth, int widgetHeight, std::vector<double> siz
             zoom = newZoom / margin;
         }
     }
-else { usersResize = false; }
 
 
 }
@@ -105,7 +103,7 @@ void Scaling::startMousePress(const QPoint &pos) {
 }
 
 void Scaling::mouseMove(const QPoint &pos) {
-    usersResize = true;
+   // usersResize = true;
     if (rightMousePressed) {
         int deltaX_ = pos.x() - lastMousePos.x();
         int deltaY_ = pos.y() - lastMousePos.y();

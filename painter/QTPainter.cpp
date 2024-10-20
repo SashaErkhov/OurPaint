@@ -106,10 +106,8 @@ std::vector<double> QTPainter::FindMaxMin() {
 
     return size;
 }
-int count=0;
 
 void QTPainter::paintEvent(QPaintEvent *event) {
-    qDebug()<<++count;
     QFrame::paintEvent(event);
     QPainter painter(this);
 
@@ -117,7 +115,6 @@ void QTPainter::paintEvent(QPaintEvent *event) {
     painter.setPen(Qt::lightGray);
 
     // Масштабируем
-    
     Scaling.scaling(width(), height(), FindMaxMin());
 
     double scale = Scaling.getScale();
@@ -211,6 +208,7 @@ void QTPainter::paintEvent(QPaintEvent *event) {
     points.clear();
     circles.clear();
     sections.clear();
+
 }
 
 void QTPainter::changeSize(const rectangle &allObjects) {}

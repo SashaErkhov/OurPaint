@@ -40,9 +40,9 @@ int main(int argc, char *argv[]) {
 
       });*/
     auto updateState = [&screen, &w, &painter]() {
+        painter->getUsers(false);
         screen.paint();
         painter->draw();
-        painter->getUsers(false);
         w.Print_LeftMenu(0, "Clear", {});
         std::vector<std::pair<ID, ElementData>> elements = screen.getAllElementsInfo();
 
@@ -280,7 +280,6 @@ int main(int argc, char *argv[]) {
     });
 
     QObject::connect(painter.get(), &QTPainter::RightPress, [&screen, &painter]() {
-        painter->getUsers(true);
         screen.paint();
         painter->draw();
     });
@@ -398,29 +397,29 @@ int main(int argc, char *argv[]) {
 
 
     QObject::connect(&w, &MainWindow::resized, [&screen,&painter]() {
-      //  qDebug()<<"1";
-      //  painter->getUsers();
          screen.paint();
         painter->draw();
     });
     QObject::connect(&w, &MainWindow::KeyPlus, [&screen,&painter]() {
+        painter->getUsers(true);
         painter->setZoomPlus();
         screen.paint();
         painter->draw();
     });
     QObject::connect(&w, &MainWindow::KeyMinus, [&screen,&painter]() {
+        painter->getUsers(true);
         painter->setZoomMinus();
         screen.paint();
         painter->draw();
+        painter->draw();
     });
     QObject::connect(&w, &MainWindow::KeyZero, [&screen,&painter]() {
+        painter->getUsers(true);
         painter->setZoomZero();
         screen.paint();
         painter->draw();
     });
     QObject::connect(&w, &MainWindow::KeyPress, [&screen,&painter]() {
-        painter->getUsers(true);
-        //qDebug()<<"12";
         screen.paint();
         painter->draw();
     });
@@ -429,7 +428,6 @@ int main(int argc, char *argv[]) {
 
     QObject::connect(&w, &MainWindow::REDO, [&screen, &painter, &w, &updateState]() {
         try {
-           // painter->getUsers();
             screen.redo();
             updateState();
             w.setSave(true);
@@ -460,7 +458,6 @@ int main(int argc, char *argv[]) {
 
     QObject::connect(&w, &MainWindow::UNDO, [&screen, &painter, &w, &updateState]() {
         try {
-          //  painter->getUsers();
             screen.undo();
             updateState();
             w.setSave(true);
@@ -489,12 +486,10 @@ int main(int argc, char *argv[]) {
     });
 
  QObject::connect(&w, &MainWindow::CloseWindow, [&screen, &painter]() {
-    // painter->getUsers();
         screen.paint();
         painter->draw();
     });
  QObject::connect(&w, &MainWindow::NoCloseWindow, [&screen, &painter]() {
-   //  painter->getUsers();
         screen.paint();
         painter->draw();
     });
@@ -502,31 +497,25 @@ int main(int argc, char *argv[]) {
     QObject::connect(&w, &MainWindow::projectSaved, [&screen, &w,&painter](const QString &fileName) {
         std::string File = fileName.toStdString();
         screen.saveToFile(File.c_str());
-       // painter->getUsers();
         screen.paint();
         painter->draw();
     });
     QObject::connect(&w, &MainWindow::NoSaved, [&screen,&painter]() {
-       // painter->getUsers();
         screen.paint();
         painter->draw();
     });
 
     QObject::connect(&w, &MainWindow::NoLoadFile, [&screen,&painter]() {
-     //   painter->getUsers();
         screen.paint();
         painter->draw();
     });
     QObject::connect(&w, &MainWindow::positionChanged, [&screen,&painter]() {
-      //  painter->getUsers();
-      //  qDebug()<<"12";
         screen.paint();
         painter->draw();
     });
 
     QObject::connect(&w, &MainWindow::LoadFile, [&screen, &painter, &w](const QString &fileName) {
         painter->clear();
-      //  painter->getUsers();
         w.Print_LeftMenu(0, "Clear", {});
         std::string File = fileName.toStdString();
         screen.loadFromFile(File.c_str());
