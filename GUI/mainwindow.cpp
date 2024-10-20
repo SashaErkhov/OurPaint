@@ -2,7 +2,6 @@
 #include "mainwindow.h"
 #include "WindowServer.h"
 
-
 MainWindow::MainWindow(QWidget *parent)
         : QMainWindow(parent),
           ui(new Ui::MainWindow),
@@ -58,7 +57,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 void MainWindow::resizeEvent(QResizeEvent *event) {
-    qDebug()<<event->oldSize()<< " " <<event->size();
+
     if (event->oldSize() != event->size()) {
         emit resized();
     }
@@ -723,5 +722,5 @@ void MainWindow::paintEvent(QPaintEvent *event) {
 
     painter.drawPath(path);
 
-  //  emit resized();
+    emit resized();
 }

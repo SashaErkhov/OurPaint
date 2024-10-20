@@ -26,7 +26,6 @@ private:
     int currentCellSize;   // Текущий размер клетки
     bool CellView;         // Флаг отрисовки сетки
 
-
 public:
     // Функция включения сетки
     void setCell(bool On_Off);
