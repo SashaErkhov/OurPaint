@@ -70,8 +70,14 @@ protected:
 
     void mouseReleaseEvent(QMouseEvent *event) override;
 
+signals:
+    void RightPress();
+
+
 private slots:
     void onWorkWindowResized();
+
+
 };
 
 #endif // QTPAINTER_H

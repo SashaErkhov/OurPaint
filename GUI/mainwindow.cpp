@@ -71,6 +71,7 @@ void MainWindow::moveEvent(QMoveEvent *event) {
 
 // Кручение колёсиком
 void MainWindow::wheelEvent(QWheelEvent *event) {
+
     if (ui->workWindow && ui->workWindow->underMouse()) {
         if (event->angleDelta().y() > 0) {
             emit KeyPlus();
@@ -508,9 +509,8 @@ MainWindow::~MainWindow() {
 // Обработка нажатий мыши
 void MainWindow::mousePressEvent(QMouseEvent *event) {
     // Если правая кнопка нажата в области workWindow
-    if (ui->workWindow && ui->workWindow->underMouse() && event->button() == Qt::RightButton) {
-        emit PressRightMouse();
-    }
+
+
 
     if (event->button() == Qt::LeftButton) { // Если нажата левая кнопка мыши
         resizingEdges = Qt::Edges(); // Сброс границ изменения размера
@@ -558,7 +558,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event) {
         QMainWindow::mousePressEvent(event); // Вызов базового обработчика
     }
 
-    emit resized();
+    emit KeyPress();
 }
 
 

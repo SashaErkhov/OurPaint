@@ -33,6 +33,7 @@ int main(int argc, char *argv[]) {
     Client client;
     bool isConnected = false;
     bool isServer = false;
+
     /*  QTimer::singleShot(1000, [&]() {
           splash.finish(&w);
 
@@ -276,6 +277,12 @@ int main(int argc, char *argv[]) {
         painter->draw();
     });
 
+    QObject::connect(painter.get(), &QTPainter::RightPress, [&screen, &painter]() {
+        painter->getUsers();
+        screen.paint();
+        painter->draw();
+    });
+
     // Чатик
     QObject::connect(&w, &MainWindow::EnterMessage, [](const QString &text) {
         QMessageBox::information(nullptr, "Окно", "Ты ввёл " + text);
@@ -410,10 +417,12 @@ int main(int argc, char *argv[]) {
         painter->draw();
     });
     QObject::connect(&w, &MainWindow::KeyPress, [&screen,&painter]() {
-       // painter->getUsers();
+        painter->getUsers();
         screen.paint();
         painter->draw();
     });
+
+
 
     QObject::connect(&w, &MainWindow::REDO, [&screen, &painter, &w, &updateState]() {
         try {
