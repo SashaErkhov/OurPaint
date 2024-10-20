@@ -34,6 +34,7 @@ int main(int argc, char *argv[]) {
     Client client;
     bool isConnected = false;
     bool isServer = false;
+
     /*  QTimer::singleShot(1000, [&]() {
           splash.finish(&w);
 
@@ -277,6 +278,16 @@ int main(int argc, char *argv[]) {
         painter->draw();
     });
 
+    QObject::connect(painter.get(), &QTPainter::RightPress, [&screen, &painter]() {
+        painter->getUsers();
+        screen.paint();
+        painter->draw();
+    });
+
+    // Чатик
+    QObject::connect(&w, &MainWindow::EnterMessage, [](const QString &text) {
+        QMessageBox::information(nullptr, "Окно", "Ты ввёл " + text);
+    });
 
     //Кнопки сервера
     QObject::connect(&w, &MainWindow::SigExitSession, []() {
@@ -287,15 +298,16 @@ int main(int argc, char *argv[]) {
     });
     QObject::connect(&w, &MainWindow::SigJoinServer, [](const QString &text) {
         QMessageBox::information(nullptr, "Окно", "Ты ввёл " + text);
-    }); QObject::connect(&w, &MainWindow::SigJoinLocalServer, [](const QString &text) {
+    });
+    QObject::connect(&w, &MainWindow::SigJoinLocalServer, [](const QString &text) {
         QMessageBox::information(nullptr, "Окно", "Ты ввёл " + text);
     });
 
+    // Сервера
     QObject::connect(&server, &Server::newCommandReceived, [&](const QString &cmd) {
         handler(cmd);
         server.sendToClients(QString::fromStdString(screen.to_string()));
     });
-
     QObject::connect(&client, &Client::newStateReceived, [&](const QString & state) {
         screen.loadFromString(state.toStdString());
         updateState();
@@ -355,7 +367,7 @@ int main(int argc, char *argv[]) {
         }
     });
 
-
+// Изменение обьектов левого меню
     QObject::connect(&w, &MainWindow::ChangeLeftMenu, [&w,&screen,&painter]() {
         w.setSave(false);
         w.Print_LeftMenu(0, "Clear", {});
@@ -383,23 +395,13 @@ int main(int argc, char *argv[]) {
         painter->draw();
     });
 
-    QObject::connect(&w, &MainWindow::CloseWindow, [&screen,&painter]() {
-        screen.paint();
-        painter->draw();
-    });
-
 
     QObject::connect(&w, &MainWindow::resized, [&screen,&painter]() {
-         screen.paint();
-        painter->draw();
+      //  qDebug()<<"1";
+      //  painter->getUsers();
+      //   screen.paint();
+      //  painter->draw();
     });
-
-    QObject::connect(&w, &MainWindow::KeyPlus, [&screen,&painter]() {
-        painter->setZoomPlus();
-        screen.paint();
-        painter->draw();
-    });
-
     QObject::connect(&w, &MainWindow::KeyPlus, [&screen,&painter]() {
         painter->setZoomPlus();
         screen.paint();
@@ -416,12 +418,16 @@ int main(int argc, char *argv[]) {
         painter->draw();
     });
     QObject::connect(&w, &MainWindow::KeyPress, [&screen,&painter]() {
+        painter->getUsers();
         screen.paint();
         painter->draw();
     });
 
+
+
     QObject::connect(&w, &MainWindow::REDO, [&screen, &painter, &w, &updateState]() {
         try {
+           // painter->getUsers();
             screen.redo();
             updateState();
             w.setSave(true);
@@ -452,6 +458,7 @@ int main(int argc, char *argv[]) {
 
     QObject::connect(&w, &MainWindow::UNDO, [&screen, &painter, &w, &updateState]() {
         try {
+          //  painter->getUsers();
             screen.undo();
             updateState();
             w.setSave(true);
@@ -480,10 +487,12 @@ int main(int argc, char *argv[]) {
     });
 
  QObject::connect(&w, &MainWindow::CloseWindow, [&screen, &painter]() {
+    // painter->getUsers();
         screen.paint();
         painter->draw();
     });
  QObject::connect(&w, &MainWindow::NoCloseWindow, [&screen, &painter]() {
+   //  painter->getUsers();
         screen.paint();
         painter->draw();
     });
@@ -491,25 +500,30 @@ int main(int argc, char *argv[]) {
     QObject::connect(&w, &MainWindow::projectSaved, [&screen, &w,&painter](const QString &fileName) {
         std::string File = fileName.toStdString();
         screen.saveToFile(File.c_str());
+       // painter->getUsers();
         screen.paint();
         painter->draw();
     });
-    QObject::connect(&w, &MainWindow::NoSaved, [&screen, &w,&painter]() {
+    QObject::connect(&w, &MainWindow::NoSaved, [&screen,&painter]() {
+       // painter->getUsers();
         screen.paint();
         painter->draw();
     });
 
     QObject::connect(&w, &MainWindow::NoLoadFile, [&screen,&painter]() {
+     //   painter->getUsers();
         screen.paint();
         painter->draw();
     });
     QObject::connect(&w, &MainWindow::positionChanged, [&screen,&painter]() {
+      //  painter->getUsers();
         screen.paint();
         painter->draw();
     });
 
     QObject::connect(&w, &MainWindow::LoadFile, [&screen, &painter, &w](const QString &fileName) {
         painter->clear();
+      //  painter->getUsers();
         w.Print_LeftMenu(0, "Clear", {});
         std::string File = fileName.toStdString();
         screen.loadFromFile(File.c_str());

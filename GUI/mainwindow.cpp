@@ -29,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionJoin_local_server, &QAction::triggered, this, &MainWindow::exitSession);
 
     connect(ui->helpButton, &QPushButton::clicked, this, &MainWindow::showHelp);
+
     // Обработка ввода в консоли
     connect(ui->console, &QLineEdit::returnPressed, this, [this]() {
         QString input = ui->console->text();
@@ -36,6 +37,15 @@ MainWindow::MainWindow(QWidget *parent)
             commands.push_back(input);
             emit EnterPressed(input);
             ui->console->clear();
+        }
+    });
+
+    // Обработка ввода в консоль чата
+    connect(ui->messageConsole, &QLineEdit::returnPressed, this, [this]() {
+        QString input = ui->messageConsole->text();
+        if (!input.isEmpty()) {
+            emit EnterMessage(input);
+            ui->messageConsole->clear();
         }
     });
 
@@ -61,6 +71,7 @@ void MainWindow::moveEvent(QMoveEvent *event) {
 
 // Кручение колёсиком
 void MainWindow::wheelEvent(QWheelEvent *event) {
+
     if (ui->workWindow && ui->workWindow->underMouse()) {
         if (event->angleDelta().y() > 0) {
             emit KeyPlus();
@@ -420,15 +431,15 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
             } else {
                 this->showMinimized();
             }
-        } else if (event->key() == Qt::Key_W && event->modifiers() & Qt::ControlModifier) { // Ctrl+W
+        } else if (event->key() == Qt::Key_W ) { // Ctrl+W
             emit REDO(); // Сигнал
-        } else if (event->key() == Qt::Key_Z && event->modifiers() & Qt::ControlModifier) { // Ctrl+Z
+        } else if (event->key() == Qt::Key_Z ) { // Ctrl+Z
             emit UNDO(); // Сигнал
-        } else if (event->key() == Qt::Key_Plus && event->modifiers() & Qt::ControlModifier) {
+        } else if (event->key() == Qt::Key_Plus ) {
             emit KeyPlus();
-        } else if (event->key() == Qt::Key_Minus && event->modifiers() & Qt::ControlModifier) {
+        } else if (event->key() == Qt::Key_Minus ) {
             emit KeyMinus();
-        } else if (event->key() == Qt::Key_0 && event->modifiers() & Qt::ControlModifier) {
+        } else if (event->key() == Qt::Key_0 ) {
             emit KeyZero();
         }
     }
@@ -498,9 +509,8 @@ MainWindow::~MainWindow() {
 // Обработка нажатий мыши
 void MainWindow::mousePressEvent(QMouseEvent *event) {
     // Если правая кнопка нажата в области workWindow
-    if (ui->workWindow && ui->workWindow->underMouse() && event->button() == Qt::RightButton) {
-        emit PressRightMouse();
-    }
+
+
 
     if (event->button() == Qt::LeftButton) { // Если нажата левая кнопка мыши
         resizingEdges = Qt::Edges(); // Сброс границ изменения размера
@@ -548,7 +558,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event) {
         QMainWindow::mousePressEvent(event); // Вызов базового обработчика
     }
 
-    emit resized();
+    emit KeyPress();
 }
 
 
@@ -670,6 +680,15 @@ void MainWindow::paintEvent(QPaintEvent *event) {
         border-bottom-left-radius: 10px;   /* Закругление нижнего левого угла */
         border-bottom-right-radius: 0px;
     )"));
+        ui->messageConsole->setStyleSheet(QString::fromUtf8(R"(
+        background: "#3e3d3d";
+        color: "#D8D8F6";
+        border: 1px solid black;
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 0px;
+    )"));
+        ui->collapsedPanel->setStyleSheet("background-color: #494850; border-bottom-left-radius: 10px;\n"
+                                          "border-bottom-right-radius: 0px;");
     } else {
         path.addRect(0, 0, width(), height());
         ui->topBar->setStyleSheet("QWidget#topBar { "
@@ -687,6 +706,12 @@ void MainWindow::paintEvent(QPaintEvent *event) {
             color: #D8D8F6;
         }
     )"));
+       ui-> messageConsole->setStyleSheet(QString::fromUtf8(R"(
+        background: "#3e3d3d";
+        color: "#D8D8F6";
+        border: 1px solid black;
+    )"));
+       ui->collapsedPanel->setStyleSheet("background-color: #494850; ");
     }
 
 

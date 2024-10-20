@@ -5,43 +5,45 @@ Scaling::Scaling(double width, double height)
           deltaX(0), deltaY(0), rightMousePressed(false) {}
 
 
-double Scaling::scaleCoordinate(double X){
-return X * scale * zoom;
+double Scaling::scaleCoordinate(double X) {
+    return X * scale * zoom;
 }
-double Scaling::scaleCoordinateX(double X){
-    return X * scale * zoom+deltaX;
+
+double Scaling::scaleCoordinateX(double X) {
+    return X * scale * zoom + deltaX;
 }
-double Scaling::scaleCoordinateY(double Y){
-    return Y * scale * zoom+deltaY;
+
+double Scaling::scaleCoordinateY(double Y) {
+    return Y * scale * zoom + deltaY;
 }
 
 
-void Scaling::scaling(int widgetWidth, int widgetHeight,std::vector<double> size) {
+void Scaling::scaling(int widgetWidth, int widgetHeight, std::vector<double> size) {
     double scaleX = widgetWidth / width_;
     double scaleY = widgetHeight / height_;
     scale = std::min(scaleX, scaleY);
 
     if (!usersResize && !size.empty()) {
-        deltaX=0;
-        deltaY=0;
+        deltaX = 0;
+        deltaY = 0;
         // Вычисление границ окна в координатах
-        int widthX = static_cast<int>(widgetWidth / (2 * scale * zoom)) ;
-        int heightY = static_cast<int>(widgetHeight / (2 * scale * zoom)) ;
+        int widthX = static_cast<int>(widgetWidth / (2 * scale * zoom));
+        int heightY = static_cast<int>(widgetHeight / (2 * scale * zoom));
 
         double maxX = size[0];
-        double minX =size[1];
+        double minX = size[1];
         double maxY = size[2];
         double minY = size[3];
 
-        double scaleMaxX = (maxX / (scale * zoom)) ;
-        double scaleMaxY = (maxY / (scale * zoom)) ;
-        double scaleMinX = (minX / (scale * zoom)) ;
-        double scaleMinY = (minY / (scale * zoom)) ;
+        double scaleMaxX = (maxX / (scale * zoom));
+        double scaleMaxY = (maxY / (scale * zoom));
+        double scaleMinX = (minX / (scale * zoom));
+        double scaleMinY = (minY / (scale * zoom));
 
-        double ZoomMaxX=abs(widthX/scaleMaxX);
-        double ZoomMinX=abs(widthX/scaleMinX);
-        double ZoomMaxY=abs(heightY/scaleMaxY);
-        double ZoomMinY=abs(heightY/scaleMinY);
+        double ZoomMaxX = abs(widthX / scaleMaxX);
+        double ZoomMinX = abs(widthX / scaleMinX);
+        double ZoomMaxY = abs(heightY / scaleMaxY);
+        double ZoomMinY = abs(heightY / scaleMinY);
 
         double newZoomX = std::min(ZoomMaxX, ZoomMinX);
         double newZoomY = std::min(ZoomMaxY, ZoomMinY);
@@ -52,9 +54,10 @@ void Scaling::scaling(int widgetWidth, int widgetHeight,std::vector<double> size
             const double margin = 1.1;
             zoom = newZoom / margin;
         }
-    } else {
-        usersResize = false;
     }
+
+    usersResize = false;
+
 
 }
 
@@ -97,12 +100,12 @@ void Scaling::setDelta(int dx, int dy) {
     deltaY += dy;
 }
 
-void Scaling::startMousePress(const QPoint& pos) {
+void Scaling::startMousePress(const QPoint &pos) {
     rightMousePressed = true;
     lastMousePos = pos;
 }
 
-void Scaling::mouseMove(const QPoint& pos) {
+void Scaling::mouseMove(const QPoint &pos) {
     usersResize = true;
     if (rightMousePressed) {
         int deltaX_ = pos.x() - lastMousePos.x();

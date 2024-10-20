@@ -115,6 +115,7 @@ void QTPainter::paintEvent(QPaintEvent *event) {
     painter.setPen(Qt::lightGray);
 
     // Масштабируем
+    
     Scaling.scaling(width(), height(), FindMaxMin());
 
     double scale = Scaling.getScale();
@@ -223,12 +224,14 @@ unsigned long long QTPainter::getHeight() {
 void QTPainter::mousePressEvent(QMouseEvent *event) {
     if (event->button() == Qt::RightButton) {
         Scaling.startMousePress(event->pos());
+        emit RightPress();
     }
 }
 
 void QTPainter::mouseMoveEvent(QMouseEvent *event) {
     Scaling.mouseMove(event->pos());
     if (Scaling.isRightMousePressed()) {
+        emit RightPress();
         update();
     }
 }
