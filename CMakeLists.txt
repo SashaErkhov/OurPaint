@@ -19,14 +19,16 @@ add_executable(ourpaint
         GUI/Scaling.cpp
         GUI/CastomeWindowError.h
         GUI/help.cpp
+        GUI/CastomeWindowWarning.h
+        GUI/CastomeWindowSuccessful.h
+        GUI/WindowServer.h
         painter/Painter.h
         painter/QTPainter.h
         painter/QTPainter.cpp
         painter/saveload/objectInFile.cpp
         painter/saveload/FileOurP.cpp
         ClientServer/Server.cpp ClientServer/Client.cpp
-        GUI/CastomeWindowWarning.h
-        GUI/CastomeWindowSuccessful.h
+
 )
 
 include_directories(additions)

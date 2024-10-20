@@ -1,6 +1,6 @@
 #include <QGestureEvent>
 #include "mainwindow.h"
-
+#include "WindowServer.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -12,7 +12,8 @@ MainWindow::MainWindow(QWidget *parent)
           drawingFrame(false),
           frameOverlay(new FrameOverlay()),
           Index(0),
-          helpWindow(nullptr){
+          helpWindow(nullptr),
+          addElem(true) {
 
     ui->setupUi(this);
     setAllMouseTracking(this); // Отслеживание мыши
@@ -21,9 +22,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionSave_project_to, &QAction::triggered, this, &MainWindow::saveProjectToFile);
     connect(ui->actionImport_project, &QAction::triggered, this, &MainWindow::LoadProjectFile);
 
+    // Кнопки сервера
     connect(ui->actionOpen_server, &QAction::triggered, this, &MainWindow::openServer);
     connect(ui->actionJoin_server, &QAction::triggered, this, &MainWindow::joinServer);
     connect(ui->actionJoin_local_server, &QAction::triggered, this, &MainWindow::joinLocalServer);
+    connect(ui->actionJoin_local_server, &QAction::triggered, this, &MainWindow::exitSession);
 
     connect(ui->helpButton, &QPushButton::clicked, this, &MainWindow::showHelp);
     // Обработка ввода в консоли
@@ -35,6 +38,10 @@ MainWindow::MainWindow(QWidget *parent)
             ui->console->clear();
         }
     });
+
+    // Изменение параметров обьектов
+    connect(ui->leftMenu, &QTreeWidget::itemChanged, this, &MainWindow::LeftMenuChanged);
+
     this->setFocusPolicy(Qt::StrongFocus);
     frameOverlay->hide(); // Скрытие наложения рамки
 }
@@ -45,6 +52,12 @@ void MainWindow::resizeEvent(QResizeEvent *event) {
     QMainWindow::resizeEvent(event);
     emit resized();
 }
+
+void MainWindow::moveEvent(QMoveEvent *event) {
+    QMainWindow::moveEvent(event);
+    emit positionChanged();
+}
+
 
 // Кручение колёсиком
 void MainWindow::wheelEvent(QWheelEvent *event) {
@@ -81,8 +94,7 @@ bool MainWindow::event(QEvent *event) {
     return QMainWindow::event(event);
 }
 
-void MainWindow::showHelp()
-{
+void MainWindow::showHelp() {
     if (!helpWindow) {
         helpWindow = new Help(this);
     }
@@ -90,6 +102,7 @@ void MainWindow::showHelp()
     helpWindow->raise();
     helpWindow->activateWindow();
 }
+
 // Отслеживание мыши
 void MainWindow::setAllMouseTracking(QWidget *widget) {
     widget->setMouseTracking(true);
@@ -99,8 +112,6 @@ void MainWindow::setAllMouseTracking(QWidget *widget) {
         }
     }
 }
-
-
 
 
 // Обработка события закрытия окна
@@ -119,6 +130,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
                 event->ignore();
             }
         } else if (result == QMessageBox::No) {
+            emit NoCloseWindow();
             event->accept();
             close();
         } else {
@@ -132,8 +144,6 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 }
 
 
-
-
 // Загрузка файла проекта
 void MainWindow::LoadProjectFile() {
     if (!save) {
@@ -143,6 +153,7 @@ void MainWindow::LoadProjectFile() {
         if (result == QMessageBox::Yes) {
             saveProjectToFile();
         } else if (result == QMessageBox::Cancel) {
+            emit NoLoadFile();
             return;
         }
     }
@@ -156,8 +167,6 @@ void MainWindow::LoadProjectFile() {
         emit LoadFile(fileName); // Сигнал
     }
 }
-
-
 
 
 // Сохранение текущего проекта в файл
@@ -194,11 +203,10 @@ void MainWindow::saveProjectToFile() {
         save = true;
         emit projectSaved(selectedFileName); //Сигнал
     } else {
+        emit NoSaved();
         save = false;
     }
 }
-
-
 
 
 // Добавление элементов в левое меню
@@ -212,6 +220,7 @@ void MainWindow::Print_LeftMenu(unsigned long long id, const std::string &text, 
 
     QString figureName = QString::fromStdString(text); // Преобразование имени фигуры
     int count = 1;
+    addElem = true;
 
     while (true) { // Проверка уникальности имени фигуры
         bool exists = false;
@@ -234,6 +243,8 @@ void MainWindow::Print_LeftMenu(unsigned long long id, const std::string &text, 
     QTreeWidgetItem *itemFigure = new QTreeWidgetItem(itemFigures);
     itemFigure->setText(0, figureName);
 
+    itemFigure->setFlags(itemFigure->flags() | Qt::ItemIsEditable); // Для изменения имён
+
     QIcon figureIcon("../Static/icons/Icon.ico");
     itemFigure->setIcon(0, figureIcon);
 
@@ -253,6 +264,11 @@ void MainWindow::Print_LeftMenu(unsigned long long id, const std::string &text, 
 
     for (size_t i = 0; i < paramNames.size() && i < object.size() + 1; ++i) {
         QTreeWidgetItem *paramItem = new QTreeWidgetItem(itemFigure);
+
+        if (paramNames[i] != "ID") {
+            paramItem->setFlags(paramItem->flags() | Qt::ItemIsEditable); // Для изменения параметров
+        }
+
         QIcon paramIcon("../Static/icons/Database.ico");
         paramItem->setIcon(0, paramIcon);
         if (paramNames[i] == "ID") {
@@ -263,11 +279,40 @@ void MainWindow::Print_LeftMenu(unsigned long long id, const std::string &text, 
         }
         itemFigure->addChild(paramItem);
     }
-
-  //  itemFigure->setExpanded(true); Разворачивание
+    addElem = false;
+    //  itemFigure->setExpanded(true); Разворачивание
 }
 
+void MainWindow::LeftMenuChanged(QTreeWidgetItem *item) {
+    if (!item || addElem) { return; }
+    QTreeWidgetItem *Figure = item->parent();
+    if (!Figure) { return; }
 
+    std::vector<double> parameters;
+    unsigned long long id = 0;
+
+    for (int i = 0; i < Figure->childCount(); ++i) {
+        QTreeWidgetItem *Parametrs = Figure->child(i);
+        QString peremen = Parametrs->text(0);
+
+        QStringList XYR = peremen.split(": ");
+        if (XYR.size() != 2) continue;
+
+        QString Name = XYR[0];
+        QString value = XYR[1];
+
+        if (Name == "ID") {
+            id = value.toULongLong();
+        } else {
+            bool ok;
+            double count = value.toDouble(&ok);
+            if (ok) {
+                parameters.push_back(count);
+            }
+        }
+    }
+    emit parameterChanged(id, parameters);
+}
 
 
 // Добавление требований в левое меню
@@ -284,75 +329,98 @@ void MainWindow::Requar_LeftMenu(unsigned long long id, const std::string &text)
     newItem->setText(0, itemType);
 
     itemReq->addChild(newItem);
-   // ui->leftMenu->expandAll(); // Разворачивание
+    // ui->leftMenu->expandAll(); // Разворачивание
 }
-
 
 
 // Обработка нажатий клавиш
 void MainWindow::keyPressEvent(QKeyEvent *event) {
-    if (event->modifiers() & Qt::ControlModifier)
-    {
+
+    emit KeyPress();
+
+    if (event->modifiers() & Qt::ControlModifier) {
         QRect screenGeometry = QApplication::primaryScreen()->availableGeometry();
-        if (event->key() == Qt::Key_Left){
-            bool isRightDownHalf = this->geometry() == QRect(screenGeometry.left() + screenGeometry.width() / 2, screenGeometry.height()/2,screenGeometry.width()/2, screenGeometry.height()/2);
-            bool isRightTop = this->geometry() == QRect(screenGeometry.left() + screenGeometry.width() / 2, screenGeometry.top(),screenGeometry.width()/2, screenGeometry.height()/2);
-            if (isRightTop){
+        if (event->key() == Qt::Key_Left) {
+            bool isRightDownHalf = this->geometry() == QRect(screenGeometry.left() + screenGeometry.width() / 2,
+                                                             screenGeometry.height() / 2, screenGeometry.width() / 2,
+                                                             screenGeometry.height() / 2);
+            bool isRightTop = this->geometry() ==
+                              QRect(screenGeometry.left() + screenGeometry.width() / 2, screenGeometry.top(),
+                                    screenGeometry.width() / 2, screenGeometry.height() / 2);
+            if (isRightTop) {
                 this->setGeometry(screenGeometry.left(), screenGeometry.top(),
-                              screenGeometry.width() / 2, screenGeometry.height()/2);
-            }else if(isRightDownHalf){
-                this->setGeometry(screenGeometry.left(), screenGeometry.height()/2,
-                              screenGeometry.width() / 2, screenGeometry.height()/2);
-            }else{
+                                  screenGeometry.width() / 2, screenGeometry.height() / 2);
+            } else if (isRightDownHalf) {
+                this->setGeometry(screenGeometry.left(), screenGeometry.height() / 2,
+                                  screenGeometry.width() / 2, screenGeometry.height() / 2);
+            } else {
                 this->setGeometry(screenGeometry.left(), screenGeometry.top(),
-                              screenGeometry.width() / 2, screenGeometry.height());
+                                  screenGeometry.width() / 2, screenGeometry.height());
             }
-        }
-        else if (event->key() == Qt::Key_Right) {
-            bool isLeftDownHalf = this->geometry() == QRect(screenGeometry.left(), screenGeometry.height()/2,screenGeometry.width()/2, screenGeometry.height()/2);
-            bool isLeftUpHalf = this->geometry() == QRect(screenGeometry.left(), screenGeometry.height()/2,screenGeometry.width()/2, screenGeometry.height()/2);
-            if (isLeftUpHalf){
+        } else if (event->key() == Qt::Key_Right) {
+            bool isLeftDownHalf = this->geometry() ==
+                                  QRect(screenGeometry.left(), screenGeometry.height() / 2, screenGeometry.width() / 2,
+                                        screenGeometry.height() / 2);
+            bool isLeftUpHalf = this->geometry() ==
+                                QRect(screenGeometry.left(), screenGeometry.height() / 2, screenGeometry.width() / 2,
+                                      screenGeometry.height() / 2);
+            if (isLeftUpHalf) {
                 this->setGeometry(screenGeometry.left() + screenGeometry.width() / 2, screenGeometry.top(),
-                              screenGeometry.width() / 2, screenGeometry.height()/2);
-            }else if(isLeftDownHalf){
-                this->setGeometry(screenGeometry.left() + screenGeometry.width() / 2, screenGeometry.height()/2, screenGeometry.width() / 2, screenGeometry.height()/2);
-            }else{
+                                  screenGeometry.width() / 2, screenGeometry.height() / 2);
+            } else if (isLeftDownHalf) {
+                this->setGeometry(screenGeometry.left() + screenGeometry.width() / 2, screenGeometry.height() / 2,
+                                  screenGeometry.width() / 2, screenGeometry.height() / 2);
+            } else {
                 this->setGeometry(screenGeometry.left() + screenGeometry.width() / 2, screenGeometry.top(),
-                              screenGeometry.width() / 2, screenGeometry.height());
+                                  screenGeometry.width() / 2, screenGeometry.height());
             }
-        }
-        else if (event->key() == Qt::Key_Up)
-        {
-            bool isLeftDownHalf = this->geometry() == QRect(screenGeometry.left(), screenGeometry.height()/2,screenGeometry.width()/2, screenGeometry.height()/2);
-            bool isRightDownHalf = this->geometry() == QRect(screenGeometry.left() + screenGeometry.width() / 2, screenGeometry.height()/2,screenGeometry.width()/2, screenGeometry.height()/2);
-            bool isLeft = this->geometry() == QRect(screenGeometry.left(), screenGeometry.top(),screenGeometry.width()/2, screenGeometry.height());
-            bool isRight = this->geometry() == QRect(screenGeometry.left() + screenGeometry.width() / 2, screenGeometry.top(),screenGeometry.width()/2, screenGeometry.height());
-            if (isLeft || isLeftDownHalf){
-                this->setGeometry(screenGeometry.left(), screenGeometry.top(),screenGeometry.width()/2, screenGeometry.height()/2);
-            }else if (isRight || isRightDownHalf){
-                this->setGeometry(screenGeometry.left() + screenGeometry.width() / 2, screenGeometry.top(),screenGeometry.width()/2, screenGeometry.height()/2);
-            }else{
+        } else if (event->key() == Qt::Key_Up) {
+            bool isLeftDownHalf = this->geometry() ==
+                                  QRect(screenGeometry.left(), screenGeometry.height() / 2, screenGeometry.width() / 2,
+                                        screenGeometry.height() / 2);
+            bool isRightDownHalf = this->geometry() == QRect(screenGeometry.left() + screenGeometry.width() / 2,
+                                                             screenGeometry.height() / 2, screenGeometry.width() / 2,
+                                                             screenGeometry.height() / 2);
+            bool isLeft = this->geometry() ==
+                          QRect(screenGeometry.left(), screenGeometry.top(), screenGeometry.width() / 2,
+                                screenGeometry.height());
+            bool isRight = this->geometry() ==
+                           QRect(screenGeometry.left() + screenGeometry.width() / 2, screenGeometry.top(),
+                                 screenGeometry.width() / 2, screenGeometry.height());
+            if (isLeft || isLeftDownHalf) {
+                this->setGeometry(screenGeometry.left(), screenGeometry.top(), screenGeometry.width() / 2,
+                                  screenGeometry.height() / 2);
+            } else if (isRight || isRightDownHalf) {
+                this->setGeometry(screenGeometry.left() + screenGeometry.width() / 2, screenGeometry.top(),
+                                  screenGeometry.width() / 2, screenGeometry.height() / 2);
+            } else {
                 this->showMaximized();
             }
-        }
-        else if (event->key() == Qt::Key_Down)
-        {
-            bool isOnRight = this->geometry() == QRect(screenGeometry.left() + screenGeometry.width() / 2, screenGeometry.top(),
-                                                 screenGeometry.width() / 2, screenGeometry.height());
-            bool isOnLeft = this->geometry() == QRect(screenGeometry.left(), screenGeometry.top(),screenGeometry.width() / 2, screenGeometry.height());
-            bool isRightTop = this->geometry() == QRect(screenGeometry.left() + screenGeometry.width() / 2, screenGeometry.top(),screenGeometry.width()/2, screenGeometry.height()/2);
-            bool isLeftTop = this->geometry() == QRect(screenGeometry.left(), screenGeometry.top(),screenGeometry.width()/2, screenGeometry.height()/2);
+        } else if (event->key() == Qt::Key_Down) {
+            bool isOnRight =
+                    this->geometry() == QRect(screenGeometry.left() + screenGeometry.width() / 2, screenGeometry.top(),
+                                              screenGeometry.width() / 2, screenGeometry.height());
+            bool isOnLeft = this->geometry() ==
+                            QRect(screenGeometry.left(), screenGeometry.top(), screenGeometry.width() / 2,
+                                  screenGeometry.height());
+            bool isRightTop = this->geometry() ==
+                              QRect(screenGeometry.left() + screenGeometry.width() / 2, screenGeometry.top(),
+                                    screenGeometry.width() / 2, screenGeometry.height() / 2);
+            bool isLeftTop = this->geometry() ==
+                             QRect(screenGeometry.left(), screenGeometry.top(), screenGeometry.width() / 2,
+                                   screenGeometry.height() / 2);
             if (this->isMaximized()) {
                 this->showNormal();
-            }else if (isOnRight || isRightTop) {
-                this->setGeometry(screenGeometry.left() + screenGeometry.width() / 2, screenGeometry.height()/2,
-                      screenGeometry.width() / 2, screenGeometry.height()/2);
-            }else if (isOnLeft || isLeftTop){
-                this->setGeometry(screenGeometry.left(), screenGeometry.height()/2,screenGeometry.width()/2, screenGeometry.height()/2);
-            }else{
+            } else if (isOnRight || isRightTop) {
+                this->setGeometry(screenGeometry.left() + screenGeometry.width() / 2, screenGeometry.height() / 2,
+                                  screenGeometry.width() / 2, screenGeometry.height() / 2);
+            } else if (isOnLeft || isLeftTop) {
+                this->setGeometry(screenGeometry.left(), screenGeometry.height() / 2, screenGeometry.width() / 2,
+                                  screenGeometry.height() / 2);
+            } else {
                 this->showMinimized();
             }
-        }else if (event->key() == Qt::Key_W && event->modifiers() & Qt::ControlModifier) { // Ctrl+W
+        } else if (event->key() == Qt::Key_W && event->modifiers() & Qt::ControlModifier) { // Ctrl+W
             emit REDO(); // Сигнал
         } else if (event->key() == Qt::Key_Z && event->modifiers() & Qt::ControlModifier) { // Ctrl+Z
             emit UNDO(); // Сигнал
@@ -388,18 +456,31 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
         event->accept();
     }
 
-
     QWidget::keyPressEvent(event); // Вызов базового обработчика
 }
 
-void MainWindow::openServer(){
-
+void MainWindow::openServer() {
+    WindowServer *windowServer = new WindowServer;
+    QObject::connect(windowServer, &WindowServer::textEnter, [this](const QString &text) {
+        emit SigOpenServer(text);
+    });
+    windowServer->show();
 }
-void MainWindow::joinServer(){
 
+void MainWindow::joinServer() {
+    WindowServer *windowServer = new WindowServer;
+    QObject::connect(windowServer, &WindowServer::textEnter, [this](const QString &text) {
+        emit SigJoinServer(text);
+    });
+    windowServer->show();
 }
-void MainWindow::joinLocalServer(){
 
+void MainWindow::joinLocalServer() {
+    WindowServer *windowServer = new WindowServer;
+    QObject::connect(windowServer, &WindowServer::textEnter, [this](const QString &text) {
+        emit SigJoinLocalServer(text);
+    });
+    windowServer->show();
 }
 
 MainWindow::~MainWindow() {
@@ -418,7 +499,6 @@ MainWindow::~MainWindow() {
 void MainWindow::mousePressEvent(QMouseEvent *event) {
     // Если правая кнопка нажата в области workWindow
     if (ui->workWindow && ui->workWindow->underMouse() && event->button() == Qt::RightButton) {
-        qDebug() << "!!";
         emit PressRightMouse();
     }
 
@@ -467,8 +547,9 @@ void MainWindow::mousePressEvent(QMouseEvent *event) {
     } else {
         QMainWindow::mousePressEvent(event); // Вызов базового обработчика
     }
-}
 
+    emit resized();
+}
 
 
 void MainWindow::mouseMoveEvent(QMouseEvent *event) {
@@ -538,9 +619,8 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event) {
         }
         QMainWindow::mouseMoveEvent(event);
     }
+    emit resized();
 }
-
-
 
 
 void MainWindow::mouseReleaseEvent(QMouseEvent *event) {
@@ -557,6 +637,7 @@ void MainWindow::mouseReleaseEvent(QMouseEvent *event) {
     } else {
         QMainWindow::mouseReleaseEvent(event);
     }
+    emit resized();
 }
 
 void MainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
@@ -615,4 +696,5 @@ void MainWindow::paintEvent(QPaintEvent *event) {
     painter.setPen(pen);
 
     painter.drawPath(path);
+    emit resized();
 }

@@ -12,6 +12,7 @@
 #include "ClientServer/Server.h"
 #include "ClientServer/Client.h"
 #include "../GUI/CastomeWindowError.h"
+#include "../GUI/WindowServer.h"
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
@@ -247,15 +248,56 @@ int main(int argc, char *argv[]) {
 
     };
 
-      QObject::connect(&w, &MainWindow::CloseWindow, [&screen,&painter]() {
+    QObject::connect(&w, &MainWindow::parameterChanged, [&w,&screen,&painter](unsigned long long id, const std::vector<double> &parameters) {
+        w.setSave(false);
+
+      /*  w.Print_LeftMenu(0, "Clear", {});
+        std::vector<std::pair<ID, ElementData>> elements = screen.getAllElementsInfo();
+        for (auto element: elements) {
+            if (element.second.et == ET_POINT) {
+                double x = element.second.params.getElement(0);
+                double y = element.second.params.getElement(1);
+                w.Print_LeftMenu(element.first.id, "Point", {x, y});
+            } else if (element.second.et == ET_CIRCLE) {
+                double x = element.second.params.getElement(0);
+                double y = element.second.params.getElement(1);
+                double r = element.second.params.getElement(2);
+                w.Print_LeftMenu(element.first.id, "Circle", {x, y, r});
+            } else if (element.second.et == ET_SECTION) {
+                double x1 = element.second.params.getElement(0);
+                double y1 = element.second.params.getElement(1);
+                double x2 = element.second.params.getElement(2);
+                double y2 = element.second.params.getElement(3);
+                w.Print_LeftMenu(element.first.id, "Section", {x1, y1, x2, y2});
+            }
+        }*/
+
         screen.paint();
         painter->draw();
     });
 
 
-    QObject::connect(&w, &MainWindow::resized, [&screen,&painter]() {
-         screen.paint();
-        painter->draw();
+    //Кнопки сервера
+    QObject::connect(&w, &MainWindow::SigExitSession, []() {
+
+    });
+    QObject::connect(&w, &MainWindow::SigOpenServer, [](const QString &text) {
+        QMessageBox::information(nullptr, "Окно", "Ты ввёл " + text);
+    });
+    QObject::connect(&w, &MainWindow::SigJoinServer, [](const QString &text) {
+        QMessageBox::information(nullptr, "Окно", "Ты ввёл " + text);
+    }); QObject::connect(&w, &MainWindow::SigJoinLocalServer, [](const QString &text) {
+        QMessageBox::information(nullptr, "Окно", "Ты ввёл " + text);
+    });
+
+    QObject::connect(&server, &Server::newCommandReceived, [&](const QString &cmd) {
+        handler(cmd);
+        server.sendToClients(QString::fromStdString(screen.to_string()));
+    });
+
+    QObject::connect(&client, &Client::newStateReceived, [&](const QString & state) {
+        screen.loadFromString(state.toStdString());
+        updateState();
     });
 
     QObject::connect(&w, &MainWindow::EnterPressed, [&](const QString &command) {
@@ -312,6 +354,51 @@ int main(int argc, char *argv[]) {
         }
     });
 
+
+    QObject::connect(&w, &MainWindow::ChangeLeftMenu, [&w,&screen,&painter]() {
+        w.setSave(false);
+        w.Print_LeftMenu(0, "Clear", {});
+        std::vector<std::pair<ID, ElementData>> elements = screen.getAllElementsInfo();
+        for (auto element: elements) {
+            if (element.second.et == ET_POINT) {
+                double x = element.second.params.getElement(0);
+                double y = element.second.params.getElement(1);
+                w.Print_LeftMenu(element.first.id, "Point", {x, y});
+            } else if (element.second.et == ET_CIRCLE) {
+                double x = element.second.params.getElement(0);
+                double y = element.second.params.getElement(1);
+                double r = element.second.params.getElement(2);
+                w.Print_LeftMenu(element.first.id, "Circle", {x, y, r});
+            } else if (element.second.et == ET_SECTION) {
+                double x1 = element.second.params.getElement(0);
+                double y1 = element.second.params.getElement(1);
+                double x2 = element.second.params.getElement(2);
+                double y2 = element.second.params.getElement(3);
+                w.Print_LeftMenu(element.first.id, "Section", {x1, y1, x2, y2});
+            }
+        }
+
+        screen.paint();
+        painter->draw();
+    });
+
+    QObject::connect(&w, &MainWindow::CloseWindow, [&screen,&painter]() {
+        screen.paint();
+        painter->draw();
+    });
+
+
+    QObject::connect(&w, &MainWindow::resized, [&screen,&painter]() {
+         screen.paint();
+        painter->draw();
+    });
+
+    QObject::connect(&w, &MainWindow::KeyPlus, [&screen,&painter]() {
+        painter->setZoomPlus();
+        screen.paint();
+        painter->draw();
+    });
+
     QObject::connect(&w, &MainWindow::KeyPlus, [&screen,&painter]() {
         painter->setZoomPlus();
         screen.paint();
@@ -327,14 +414,37 @@ int main(int argc, char *argv[]) {
         screen.paint();
         painter->draw();
     });
+    QObject::connect(&w, &MainWindow::KeyPress, [&screen,&painter]() {
+        screen.paint();
+        painter->draw();
+    });
 
     QObject::connect(&w, &MainWindow::REDO, [&screen, &painter, &w, &updateState]() {
         try {
             screen.redo();
             updateState();
             w.setSave(true);
+            w.Print_LeftMenu(0, "Clear", {});
+            std::vector<std::pair<ID, ElementData>> elements = screen.getAllElementsInfo();
+            for (auto element: elements) {
+                if (element.second.et == ET_POINT) {
+                    double x = element.second.params.getElement(0);
+                    double y = element.second.params.getElement(1);
+                    w.Print_LeftMenu(element.first.id, "Point", {x, y});
+                } else if (element.second.et == ET_CIRCLE) {
+                    double x = element.second.params.getElement(0);
+                    double y = element.second.params.getElement(1);
+                    double r = element.second.params.getElement(2);
+                    w.Print_LeftMenu(element.first.id, "Circle", {x, y, r});
+                } else if (element.second.et == ET_SECTION) {
+                    double x1 = element.second.params.getElement(0);
+                    double y1 = element.second.params.getElement(1);
+                    double x2 = element.second.params.getElement(2);
+                    double y2 = element.second.params.getElement(3);
+                    w.Print_LeftMenu(element.first.id, "Section", {x1, y1, x2, y2});
+                }
+            }
         } catch (std::exception &e) {
-            qDebug() << e.what() << "!";
         }
 
     });
@@ -344,20 +454,57 @@ int main(int argc, char *argv[]) {
             screen.undo();
             updateState();
             w.setSave(true);
+            w.Print_LeftMenu(0, "Clear", {});
+            std::vector<std::pair<ID, ElementData>> elements = screen.getAllElementsInfo();
+            for (auto element: elements) {
+                if (element.second.et == ET_POINT) {
+                    double x = element.second.params.getElement(0);
+                    double y = element.second.params.getElement(1);
+                    w.Print_LeftMenu(element.first.id, "Point", {x, y});
+                } else if (element.second.et == ET_CIRCLE) {
+                    double x = element.second.params.getElement(0);
+                    double y = element.second.params.getElement(1);
+                    double r = element.second.params.getElement(2);
+                    w.Print_LeftMenu(element.first.id, "Circle", {x, y, r});
+                } else if (element.second.et == ET_SECTION) {
+                    double x1 = element.second.params.getElement(0);
+                    double y1 = element.second.params.getElement(1);
+                    double x2 = element.second.params.getElement(2);
+                    double y2 = element.second.params.getElement(3);
+                    w.Print_LeftMenu(element.first.id, "Section", {x1, y1, x2, y2});
+                }
+            }
         } catch (std::exception &e) {
-            qDebug() << e.what() << "!";
         }
     });
 
  QObject::connect(&w, &MainWindow::CloseWindow, [&screen, &painter]() {
-        qDebug()  << "!";
+        screen.paint();
+        painter->draw();
+    });
+ QObject::connect(&w, &MainWindow::NoCloseWindow, [&screen, &painter]() {
         screen.paint();
         painter->draw();
     });
 
-    QObject::connect(&w, &MainWindow::projectSaved, [&screen, &w](const QString &fileName) {
+    QObject::connect(&w, &MainWindow::projectSaved, [&screen, &w,&painter](const QString &fileName) {
         std::string File = fileName.toStdString();
         screen.saveToFile(File.c_str());
+        screen.paint();
+        painter->draw();
+    });
+    QObject::connect(&w, &MainWindow::NoSaved, [&screen, &w,&painter]() {
+        screen.paint();
+        painter->draw();
+    });
+
+    QObject::connect(&w, &MainWindow::NoLoadFile, [&screen,&painter]() {
+        screen.paint();
+        painter->draw();
+    });
+    QObject::connect(&w, &MainWindow::positionChanged, [&screen,&painter]() {
+        screen.paint();
+        painter->draw();
     });
 
     QObject::connect(&w, &MainWindow::LoadFile, [&screen, &painter, &w](const QString &fileName) {
@@ -366,8 +513,8 @@ int main(int argc, char *argv[]) {
         std::string File = fileName.toStdString();
         screen.loadFromFile(File.c_str());
         screen.paint();
-        std::vector<std::pair<ID, ElementData>> elements = screen.getAllElementsInfo();
         painter->draw();
+        std::vector<std::pair<ID, ElementData>> elements = screen.getAllElementsInfo();
         for (auto element: elements) {
             if (element.second.et == ET_POINT) {
                 double x = element.second.params.getElement(0);
@@ -389,15 +536,7 @@ int main(int argc, char *argv[]) {
     });
 
 
-    QObject::connect(&server, &Server::newCommandReceived, [&](const QString &cmd) {
-        handler(cmd);
-        server.sendToClients(QString::fromStdString(screen.to_string()));
-    });
 
-    QObject::connect(&client, &Client::newStateReceived, [&](const QString & state) {
-        screen.loadFromString(state.toStdString());
-        updateState();
-    });
 
 
 

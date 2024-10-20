@@ -48,6 +48,7 @@ private:
     QPoint lastMousePosition; // Последняя позиция мыши
     QRect frameRect; // Геометрия рамки
     FrameOverlay *frameOverlay; // Объект наложения рамки
+    bool addElem;
 
 
 
@@ -72,6 +73,8 @@ public:
     void setSave(bool T) { save = T; }
 
     void showHelp();
+
+
 
 
 protected:
@@ -103,36 +106,58 @@ protected:
 
     // Если курсор в WorkWindow
     bool event(QEvent *event) override;
+    void moveEvent(QMoveEvent *event) override;
 
 signals:
+
     void EnterPressed(const QString &command); // Сигнал при нажатии Enter
     void resized(); // Сигнал при изменении размера окна
     void projectSaved(const QString &fileName); // Сигнал о сохранении проекта
+    void NoSaved();
     void LoadFile(const QString &fileName); // Сигнал для загрузки файла
+    void NoLoadFile();
     void KeyPlus(); // Сигнал увелечения при тачпаде,колёсике и ctrl +
     void KeyMinus(); // Сигнал уменьшения при тачпаде,колёсике и ctrl -
     void KeyZero(); // Обнуление
     void REDO(); // Сигнал для повторения действия
     void UNDO(); // Сигнал для отмены действия
     void PressRightMouse(); // Нажатие правой клавиши в области workWindow
+    void KeyPress();
     void CloseWindow();
-    void SigOpenServer();
-    void SigJoinServer();
-    void SigJoinLocalServer();
+    void NoCloseWindow();
+    void positionChanged();
+    void  ChangeLeftMenu();
 
+    void SigOpenServer(const QString &text);
+    void SigJoinServer(const QString &text);
+    void SigJoinLocalServer(const QString &text);
+    void SigExitSession();
+    void parameterChanged(unsigned long long id, const std::vector<double> &parameters);
 
 
 
 public slots:
+
     void updateDrawing() {
         emit CloseWindow();
         update();
     }
+
     void saveProjectToFile();
+
     void LoadProjectFile();
+
     void openServer();
+
     void joinServer();
+
     void joinLocalServer();
+
+    void exitSession() {
+        emit SigExitSession();
+    }
+
+    void LeftMenuChanged(QTreeWidgetItem *item);
 
 
 };
