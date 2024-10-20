@@ -31,6 +31,8 @@ public:
 
     void setZoomMinus();
 
+    void getUsers(){usersResize=true;}
+
     void setZoomZero();
 
     double getScale() const;

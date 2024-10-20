@@ -115,6 +115,7 @@ void QTPainter::paintEvent(QPaintEvent *event) {
     painter.setPen(Qt::lightGray);
 
     // Масштабируем
+    
     Scaling.scaling(width(), height(), FindMaxMin());
 
     double scale = Scaling.getScale();

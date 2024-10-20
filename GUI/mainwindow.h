@@ -134,6 +134,8 @@ signals:
     void SigExitSession();
     void parameterChanged(unsigned long long id, const std::vector<double> &parameters);
 
+    void EnterMessage(const QString &text);
+
 
 
 public slots:

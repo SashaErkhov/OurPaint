@@ -33,6 +33,8 @@ public:
 
     void draw();
 
+    void getUsers(){Scaling.getUsers();}
+
     void setZoomPlus();
 
     void setZoomMinus();
