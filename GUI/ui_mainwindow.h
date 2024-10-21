@@ -532,17 +532,23 @@ public:
         collapsedPanelLayout->setAlignment(Qt::AlignTop); // Выравниваем виджеты по верхней части
 
         // Создание кнопки для разворачивания меню элементов
-        leftMenuElements = new QPushButton("⮚", collapsedPanel);
+        leftMenuElements = new QPushButton("", collapsedPanel);
         leftMenuElements->setFixedSize(40, 40);
+        QIcon IcoElem("../Static/icons/icoLeftMenu.ico");
+        leftMenuElements->setIcon(IcoElem);
         leftMenuElements->setStyleSheet(
                 "QPushButton { background: none; border: none; color: #D8D8F6; border-radius: 0; }"
                 "QPushButton:hover { background-color: rgba(255, 255, 255, 0.1); border-radius: 0; }"
         );
         collapsedPanelLayout->addWidget(leftMenuElements);
 
+
+
 // Создание кнопки для открытия чата
-        leftMenuMessage = new QPushButton("1", collapsedPanel);
+        leftMenuMessage = new QPushButton("", collapsedPanel);
         leftMenuMessage->setFixedSize(40, 40);
+        QIcon IcoMes("../Static/icons/icoMes.ico");
+        leftMenuMessage->setIcon(IcoMes);
         leftMenuMessage->setStyleSheet(
                 "QPushButton { background: none; border: none; color: #D8D8F6; border-radius: 0; }"
                 "QPushButton:hover { background-color: rgba(255, 255, 255, 0.1); border-radius: 0; }"
