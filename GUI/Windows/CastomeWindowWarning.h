@@ -1,3 +1,10 @@
+/*
+ *
+ *  Окошко предупреждение (уведомление)
+ *
+ * */
+
+
 #ifndef OURPAINT_CATOMEWINDOWWARNING_H
 #define OURPAINT_CATOMEWINDOWWARNING_H
 

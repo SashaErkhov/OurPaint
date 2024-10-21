@@ -2,7 +2,7 @@
 
 QTPainter::QTPainter(Ui::MainWindow *ui, QWidget *parent)
         : QFrame(parent), ui(ui), Scaling(ui->workWindow->width(), ui->workWindow->height()),
-          minCellSize(10), maxCellSize(50), CellSize(20), CellView(true), currentCellSize(1) {
+          minCellSize(10), maxCellSize(20), CellSize(50), CellView(true), currentCellSize(1) {
 
     resize(parent->size());
     setStyleSheet("background: \"#ffffff\"");
@@ -129,7 +129,6 @@ void QTPainter::paintEvent(QPaintEvent *event) {
     if (CellView) {
         double ZoomCell = zoom;
         currentCellSize = static_cast<int>(CellSize * scale * ZoomCell);
-
         // Изменяем размер клетки
         if (currentCellSize > maxCellSize) {
             while (currentCellSize > maxCellSize) {
@@ -172,7 +171,6 @@ void QTPainter::paintEvent(QPaintEvent *event) {
     // Отрисовка координат
     int widthX = static_cast<int>(_width / (scale * zoom)) - deltaX;
     int heightY = static_cast<int>(_height / (scale * zoom)) + deltaY;
-
     if ((width() + deltaX - 30 > width()) || (_height + deltaY - 5  > height()) ||
         (_width + deltaX - 30 > width()) || ( deltaY+10 > height())) {
         painter.drawText(10, 10, QString::number(widthX));

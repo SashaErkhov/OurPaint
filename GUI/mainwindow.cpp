@@ -1,6 +1,5 @@
-#include <QGestureEvent>
 #include "mainwindow.h"
-#include "WindowServer.h"
+
 
 MainWindow::MainWindow(QWidget *parent)
         : QMainWindow(parent),
@@ -18,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
     setAllMouseTracking(this); // Отслеживание мыши
     setAttribute(Qt::WA_OpaquePaintEvent);
 
+    // Кнопки сохранение/импорт
     connect(ui->actionSave_project_to, &QAction::triggered, this, &MainWindow::saveProjectToFile);
     connect(ui->actionImport_project, &QAction::triggered, this, &MainWindow::LoadProjectFile);
 
@@ -27,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionJoin_local_server, &QAction::triggered, this, &MainWindow::joinLocalServer);
     connect(ui->actionJoin_local_server, &QAction::triggered, this, &MainWindow::exitSession);
 
+    // Кнопка помощь
     connect(ui->helpButton, &QPushButton::clicked, this, &MainWindow::showHelp);
 
     // Обработка ввода в консоли
@@ -48,32 +49,26 @@ MainWindow::MainWindow(QWidget *parent)
         }
     });
 
-    // Изменение параметров обьектов
+    // Изменение параметров обьектов в левом меню
     connect(ui->leftMenu, &QTreeWidget::itemChanged, this, &MainWindow::LeftMenuChanged);
 
+
     this->setFocusPolicy(Qt::StrongFocus);
+
     frameOverlay->hide(); // Скрытие наложения рамки
 }
 
 
+// Отрисовка 60 раз в секундк
 void MainWindow::resizeEvent(QResizeEvent *event) {
-
-    if (event->oldSize() != event->size()) {
-        emit resized();
-    }
+    emit resized();
     QMainWindow::resizeEvent(event);
 }
 
-void MainWindow::moveEvent(QMoveEvent *event) {
-    QMainWindow::moveEvent(event);
-    emit positionChanged();
-}
 
-
-// Кручение колёсиком
+// Кручение колёсиком или тачпадом
 void MainWindow::wheelEvent(QWheelEvent *event) {
-
-    if (ui->workWindow && ui->workWindow->underMouse()) {
+    if (ui->workWindow && ui->workWindow->underMouse()) { // В области workWindow
         if (event->angleDelta().y() > 0) {
             emit KeyPlus();
         } else {
@@ -84,6 +79,7 @@ void MainWindow::wheelEvent(QWheelEvent *event) {
         QMainWindow::wheelEvent(event);
     }
 }
+
 
 // Жесты в тачпаде в области workWindow
 bool MainWindow::event(QEvent *event) {
@@ -106,6 +102,8 @@ bool MainWindow::event(QEvent *event) {
     return QMainWindow::event(event);
 }
 
+
+// Обработка кнопки помощи
 void MainWindow::showHelp() {
     if (!helpWindow) {
         helpWindow = new Help(this);
@@ -114,6 +112,7 @@ void MainWindow::showHelp() {
     helpWindow->raise();
     helpWindow->activateWindow();
 }
+
 
 // Отслеживание мыши
 void MainWindow::setAllMouseTracking(QWidget *widget) {
@@ -142,13 +141,12 @@ void MainWindow::closeEvent(QCloseEvent *event) {
                 event->ignore();
             }
         } else if (result == QMessageBox::No) {
-            emit NoCloseWindow();
             event->accept();
             close();
         } else {
             event->ignore();
         }
-        emit CloseWindow();
+
     } else {
         event->accept();
         close();
@@ -165,7 +163,6 @@ void MainWindow::LoadProjectFile() {
         if (result == QMessageBox::Yes) {
             saveProjectToFile();
         } else if (result == QMessageBox::Cancel) {
-            emit NoLoadFile();
             return;
         }
     }
@@ -215,7 +212,6 @@ void MainWindow::saveProjectToFile() {
         save = true;
         emit projectSaved(selectedFileName); //Сигнал
     } else {
-        emit NoSaved();
         save = false;
     }
 }
@@ -291,10 +287,12 @@ void MainWindow::Print_LeftMenu(unsigned long long id, const std::string &text, 
         }
         itemFigure->addChild(paramItem);
     }
-    addElem = false;
+    addElem = false; // Флаг для изменения обьектов
     //  itemFigure->setExpanded(true); Разворачивание
 }
 
+
+// Изменение обьектов левого меню
 void MainWindow::LeftMenuChanged(QTreeWidgetItem *item) {
     if (!item || addElem) { return; }
     QTreeWidgetItem *Figure = item->parent();
@@ -323,7 +321,7 @@ void MainWindow::LeftMenuChanged(QTreeWidgetItem *item) {
             }
         }
     }
-    emit parameterChanged(id, parameters);
+    emit parameterChanged(id, parameters); // Сигнал
 }
 
 
@@ -348,8 +346,7 @@ void MainWindow::Requar_LeftMenu(unsigned long long id, const std::string &text)
 // Обработка нажатий клавиш
 void MainWindow::keyPressEvent(QKeyEvent *event) {
 
-    emit KeyPress();
-
+    // Обрадотка комбинаций ctrl + стрелочки -> перемещает окно в разные положения
     if (event->modifiers() & Qt::ControlModifier) {
         QRect screenGeometry = QApplication::primaryScreen()->availableGeometry();
         if (event->key() == Qt::Key_Left) {
@@ -432,21 +429,22 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
             } else {
                 this->showMinimized();
             }
-        } else if (event->key() == Qt::Key_W ) { // Ctrl+W
+            // Обработка других комбинаций
+        } else if (event->key() == Qt::Key_W) { // Ctrl+W
             emit REDO(); // Сигнал
-        } else if (event->key() == Qt::Key_Z ) { // Ctrl+Z
+        } else if (event->key() == Qt::Key_Z) { // Ctrl+Z
             emit UNDO(); // Сигнал
-        } else if (event->key() == Qt::Key_Plus ) {
+        } else if (event->key() == Qt::Key_Plus) {
             emit KeyPlus();
-        } else if (event->key() == Qt::Key_Minus ) {
+        } else if (event->key() == Qt::Key_Minus) {
             emit KeyMinus();
-        } else if (event->key() == Qt::Key_0 ) {
+        } else if (event->key() == Qt::Key_0) {
             emit KeyZero();
         }
     }
 
+    // Буфер команд
     if (ui->console->isActiveWindow()) { // Если консоль активна
-        emit KeyPress();
         if (event->key() == Qt::Key_Up) { // Кнопка вверх
             if (Index == 0) {
                 Index = static_cast<int>(commands.size()) - 1;
@@ -472,6 +470,8 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
     QWidget::keyPressEvent(event); // Вызов базового обработчика
 }
 
+
+// Обработка кнопки сервера
 void MainWindow::openServer() {
     WindowServer *windowServer = new WindowServer;
     QObject::connect(windowServer, &WindowServer::textEnter, [this](const QString &text) {
@@ -480,6 +480,8 @@ void MainWindow::openServer() {
     windowServer->show();
 }
 
+
+// Обработка кнопки сервера
 void MainWindow::joinServer() {
     WindowServer *windowServer = new WindowServer;
     QObject::connect(windowServer, &WindowServer::textEnter, [this](const QString &text) {
@@ -488,6 +490,8 @@ void MainWindow::joinServer() {
     windowServer->show();
 }
 
+
+// Обработка кнопки сервера
 void MainWindow::joinLocalServer() {
     WindowServer *windowServer = new WindowServer;
     QObject::connect(windowServer, &WindowServer::textEnter, [this](const QString &text) {
@@ -495,6 +499,7 @@ void MainWindow::joinLocalServer() {
     });
     windowServer->show();
 }
+
 
 MainWindow::~MainWindow() {
     delete frameOverlay; // Наложения рамки
@@ -556,12 +561,13 @@ void MainWindow::mousePressEvent(QMouseEvent *event) {
     } else {
         QMainWindow::mousePressEvent(event); // Вызов базового обработчика
     }
-
-    emit KeyPress();
 }
 
 
+// Перемщение курсора
 void MainWindow::mouseMoveEvent(QMouseEvent *event) {
+
+    // Отслеживаем на границе ли он
     if (drawingFrame) { // Создание рамки
         QPoint delta = event->globalPosition().toPoint() - lastMousePosition;
 
@@ -628,11 +634,10 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event) {
         }
         QMainWindow::mouseMoveEvent(event);
     }
-
-  //  emit resized();
 }
 
 
+// Обработка отпускания мыши
 void MainWindow::mouseReleaseEvent(QMouseEvent *event) {
     if (event->button() == Qt::LeftButton && drawingFrame) {
         resizing = false;
@@ -647,11 +652,13 @@ void MainWindow::mouseReleaseEvent(QMouseEvent *event) {
     } else {
         QMainWindow::mouseReleaseEvent(event);
     }
-   // emit resized();
 }
 
+
+// Двойное нажатие мыши
 void MainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
 }
+
 
 void MainWindow::paintEvent(QPaintEvent *event) {
     // Отрисовка окна с закругленными углами
@@ -706,12 +713,12 @@ void MainWindow::paintEvent(QPaintEvent *event) {
             color: #D8D8F6;
         }
     )"));
-       ui-> messageConsole->setStyleSheet(QString::fromUtf8(R"(
+        ui->messageConsole->setStyleSheet(QString::fromUtf8(R"(
         background: "#3e3d3d";
         color: "#D8D8F6";
         border: 1px solid black;
     )"));
-       ui->collapsedPanel->setStyleSheet("background-color: #494850; ");
+        ui->collapsedPanel->setStyleSheet("background-color: #494850; ");
     }
 
 

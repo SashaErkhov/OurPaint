@@ -2,7 +2,7 @@
 #define HELP_H
 
 #include <QMainWindow>
-#include "ui_help.h"
+#include "ui_Help.h"
 #include <QMouseEvent>
 
 class Help : public QMainWindow

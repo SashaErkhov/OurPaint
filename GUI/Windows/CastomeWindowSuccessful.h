@@ -1,5 +1,10 @@
-#ifndef OURPAINT_CATOMEWINDOWERROR_H
-#define OURPAINT_CATOMEWINDOWERROR_H
+/*
+ * Окошко успешно (уведомление)
+ * */
+
+
+#ifndef OURPAINT_CATOMEWINDOWSUCCESSFUL_H
+#define OURPAINT_CATOMEWINDOWSUCCESSFUL_H
 
 #include <QWidget>
 #include <QVBoxLayout>
@@ -10,11 +15,11 @@
 #include <QDebug>
 #include <QPropertyAnimation>
 
-class CastomeWindowError : public QWidget {
+class CastomeWindowSuccessful : public QWidget {
 Q_OBJECT
 
 public:
-    CastomeWindowError(const QString &message, QWidget *parent = nullptr) : QWidget(parent) {
+    CastomeWindowSuccessful(const QString &message, QWidget *parent = nullptr) : QWidget(parent) {
         setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
         setAttribute(Qt::WA_TranslucentBackground);
 
@@ -27,7 +32,7 @@ public:
         layout->addWidget(label);
 
         QPushButton *okButton = new QPushButton("OK", this);
-        connect(okButton, &QPushButton::clicked, this, &CastomeWindowError::close);
+        connect(okButton, &QPushButton::clicked, this, &CastomeWindowSuccessful::close);
         layout->addWidget(okButton);
 
         setLayout(layout);
@@ -63,4 +68,4 @@ protected:
     }
 };
 
-#endif // OURPAINT_CATOMEWINDOWERROR_H
+#endif //OURPAINT_CATOMEWINDOWSUCCESSFUL_H

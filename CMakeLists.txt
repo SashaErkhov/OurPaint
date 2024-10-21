@@ -16,12 +16,12 @@ add_executable(ourpaint
         painter/requirements.cpp
         GUI/mainwindow.cpp
         GUI/FrameOverlay.cpp
-        GUI/Scaling.cpp
-        GUI/CastomeWindowError.h
-        GUI/help.cpp
-        GUI/CastomeWindowWarning.h
-        GUI/CastomeWindowSuccessful.h
-        GUI/WindowServer.h
+        painter/Scaling.cpp
+        GUI/Windows/CastomeWindowError.h
+        GUI/Windows/help.cpp
+        GUI/Windows/CastomeWindowWarning.h
+        GUI/Windows/CastomeWindowSuccessful.h
+        GUI/Windows/WindowServer.h
         painter/Painter.h
         painter/QTPainter.h
         painter/QTPainter.cpp

@@ -1,18 +1,17 @@
+#include <memory>
+#include <QApplication>
+#include <QTranslator>
+#include <QPixmap>
+#include "ClientServer/Server.h"
+#include "ClientServer/Client.h"
+#include "GUI/Windows/CastomeWindowError.h"
+#include "GUI/Windows/WindowServer.h"
 #include "Arry.h"
 #include "BMPfile.h"
 #include "painter/objects.h"
 #include "painter/paint.h"
 #include "painter/QTPainter.h"
 #include "GUI/mainwindow.h"
-#include <memory>
-#include <QApplication>
-#include <QTranslator>
-#include <QTimer>
-#include <QPixmap>
-#include "ClientServer/Server.h"
-#include "ClientServer/Client.h"
-#include "../GUI/CastomeWindowError.h"
-#include "../GUI/WindowServer.h"
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
@@ -26,10 +25,12 @@ int main(int argc, char *argv[]) {
 
     MainWindow w;
     w.show();
+
     auto painter = std::make_unique<QTPainter>(w.getUi(), w.getWorkWindow());
     painter->setParent(w.getWorkWindow());
     painter->show();
     Paint screen(painter.get());
+
     Server server;
     Client client;
     bool isConnected = false;
@@ -279,10 +280,6 @@ int main(int argc, char *argv[]) {
         painter->draw();
     });
 
-    QObject::connect(painter.get(), &QTPainter::RightPress, [&screen, &painter]() {
-        screen.paint();
-        painter->draw();
-    });
 
     // Чатик
     QObject::connect(&w, &MainWindow::EnterMessage, [](const QString &text) {
@@ -400,6 +397,7 @@ int main(int argc, char *argv[]) {
          screen.paint();
         painter->draw();
     });
+
     QObject::connect(&w, &MainWindow::KeyPlus, [&screen,&painter]() {
         painter->getUsers(true);
         painter->setZoomPlus();
@@ -419,12 +417,6 @@ int main(int argc, char *argv[]) {
         screen.paint();
         painter->draw();
     });
-    QObject::connect(&w, &MainWindow::KeyPress, [&screen,&painter]() {
-        screen.paint();
-        painter->draw();
-    });
-
-
 
     QObject::connect(&w, &MainWindow::REDO, [&screen, &painter, &w, &updateState]() {
         try {
@@ -485,14 +477,6 @@ int main(int argc, char *argv[]) {
         }
     });
 
- QObject::connect(&w, &MainWindow::CloseWindow, [&screen, &painter]() {
-        screen.paint();
-        painter->draw();
-    });
- QObject::connect(&w, &MainWindow::NoCloseWindow, [&screen, &painter]() {
-        screen.paint();
-        painter->draw();
-    });
 
     QObject::connect(&w, &MainWindow::projectSaved, [&screen, &w,&painter](const QString &fileName) {
         std::string File = fileName.toStdString();
@@ -500,19 +484,7 @@ int main(int argc, char *argv[]) {
         screen.paint();
         painter->draw();
     });
-    QObject::connect(&w, &MainWindow::NoSaved, [&screen,&painter]() {
-        screen.paint();
-        painter->draw();
-    });
 
-    QObject::connect(&w, &MainWindow::NoLoadFile, [&screen,&painter]() {
-        screen.paint();
-        painter->draw();
-    });
-    QObject::connect(&w, &MainWindow::positionChanged, [&screen,&painter]() {
-        screen.paint();
-        painter->draw();
-    });
 
     QObject::connect(&w, &MainWindow::LoadFile, [&screen, &painter, &w](const QString &fileName) {
         painter->clear();

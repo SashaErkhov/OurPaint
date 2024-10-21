@@ -8,7 +8,7 @@
 #include <vector>
 #include "paint.h"
 #include "../GUI/mainwindow.h"
-#include "../GUI/Scaling.h"
+#include "Scaling.h"
 
 class QTPainter : public QFrame, public Painter {
 Q_OBJECT

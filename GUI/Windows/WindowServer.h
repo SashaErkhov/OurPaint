@@ -1,3 +1,7 @@
+/*
+ *     Окошко для кнопки сервера
+ * */
+
 #ifndef OURPAINT_WINDOWSERVER_H
 #define OURPAINT_WINDOWSERVER_H
 

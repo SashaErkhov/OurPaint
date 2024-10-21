@@ -1,4 +1,4 @@
-#include "../GUI/Scaling.h"
+#include "Scaling.h"
 
 Scaling::Scaling(double width, double height)
         : scale(1.0), width_(width), height_(height), zoom(1.0), usersResize(false),
