@@ -29,6 +29,16 @@ public:
     virtual Arry<PARAMID> getParams() = 0;
     virtual rectangle getRectangle() = 0;
     virtual double getDerivative(PARAMID p) {
+        bool found = false;
+        for (auto &elem: getParams()){
+            if (elem == p) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            return 0;
+        }
         double origValue = *p;
         *p += eps;
         double f1 = getError();
@@ -48,6 +58,16 @@ public:
     }
 
     virtual double getSecondDerivative(PARAMID p) {
+        bool found = false;
+        for (auto &elem: getParams()){
+            if (elem == p) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            return 0;
+        }
         double origValue = *p;
         *p += eps;
         double f1 = getError();
@@ -60,6 +80,18 @@ public:
     }
 
     virtual double getMixedDerivative(PARAMID p1, PARAMID p2) {
+        bool found1 = false;
+        bool found2 = false;
+        for (auto &elem: getParams()){
+            if (elem == p1) {
+                found1 = true;
+            } else if (elem == p2) {
+                found2 = true;
+            }
+        }
+        if (!(found1 && found2)) {
+            return 0;
+        }
         double origValue1 = *p1;
         double origValue2 = *p2;
         *p1 += eps;

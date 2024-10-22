@@ -29,7 +29,7 @@ add_executable(ourpaint
         painter/saveload/FileOurP.cpp
         ClientServer/Server.cpp ClientServer/Client.cpp
 
-)
+        painter/Optimization/GradientOptimizer.cpp)
 
 include_directories(additions)
 include_directories(UndoRedo)

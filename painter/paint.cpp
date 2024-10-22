@@ -1,127 +1,100 @@
 #include "paint.h"
 #include "../Matrix/Matrix.h"
 #include <map>
+#include "./Optimization/Task.h"
+#include "./Optimization/GradientOptimizer.h"
+#include "./Optimization/Function.h"
 
 ElementData::ElementData() {
     params = Arry<double>();
 }
 
 ID Paint::addRequirement(const RequirementData &rd) {
-
-    ActionsInfo info;
-
-    m_reqD.addElement(rd);
     Arry<IReq*> allRequirements;
-    std::map<PARAMID, double*> allParams;
-    Arry<double> allParamValues;
-
+    ActionsInfo info;
+    m_reqD.addElement(rd);
+    SumOfSquares sq;
 // Сбор всех требований и их параметров
-    for (const auto &rd: m_reqD) {
+    for (const auto &r: m_reqD) {
         IReq *requirement = nullptr;
-
 // 1
-        if (rd.req == ET_POINTSECTIONDIST) {
-            point *p_it = &(*(m_pointIDs[rd.objects[0]]));
-            section *s_it = &(*(m_sectionIDs[rd.objects[1]]));
-            requirement = new ReqPointSecDist(p_it, s_it, rd.params[0]);
+        if (r.req == ET_POINTSECTIONDIST) {
+            point *p_it = &(*(m_pointIDs[r.objects[0]]));
+            section *s_it = &(*(m_sectionIDs[r.objects[1]]));
+            requirement = new ReqPointSecDist(p_it, s_it, r.params[0]);
         }
 // 2
-        else if (rd.req == ET_POINTONSECTION) {
-            point *p_it = &(*(m_pointIDs[rd.objects[0]]));
-            section *s_it = &(*(m_sectionIDs[rd.objects[1]]));
+        else if (r.req == ET_POINTONSECTION) {
+            point *p_it = &(*(m_pointIDs[r.objects[0]]));
+            section *s_it = &(*(m_sectionIDs[r.objects[1]]));
             requirement = new ReqPointOnSec(p_it, s_it);
         }
 // 3
-        else if (rd.req == ET_POINTPOINTDIST) {
-            point *p1_it = &(*(m_pointIDs[rd.objects[0]]));
-            point *p2_it = &(*(m_pointIDs[rd.objects[1]]));
-            requirement = new ReqPointPointDist(p1_it, p2_it, rd.params[0]);
+        else if (r.req == ET_POINTPOINTDIST) {
+            point *p1_it = &(*(m_pointIDs[r.objects[0]]));
+            point *p2_it = &(*(m_pointIDs[r.objects[1]]));
+            requirement = new ReqPointPointDist(p1_it, p2_it, r.params[0]);
         }
 // 4
-        else if (rd.req == ET_POINTONPOINT) {
-            point *p1_it = &(*(m_pointIDs[rd.objects[0]]));
-            point *p2_it = &(*(m_pointIDs[rd.objects[1]]));
+        else if (r.req == ET_POINTONPOINT) {
+            point *p1_it = &(*(m_pointIDs[r.objects[0]]));
+            point *p2_it = &(*(m_pointIDs[r.objects[1]]));
             requirement = new ReqPointOnPoint(p1_it, p2_it);
         }
 // 5
-        else if (rd.req == ET_SECTIONCIRCLEDIST) {
-            circle *c_it = &(*(m_circleIDs[rd.objects[0]]));
-            section *s_it = &(*(m_sectionIDs[rd.objects[0]]));
-            requirement = new ReqSecCircleDist(s_it, c_it, rd.params[0]);
+        else if (r.req == ET_SECTIONCIRCLEDIST) {
+            circle *c_it = &(*(m_circleIDs[r.objects[0]]));
+            section *s_it = &(*(m_sectionIDs[r.objects[1]]));
+            requirement = new ReqSecCircleDist(s_it, c_it, r.params[0]);
         }
 // 6
-        else if (rd.req == ET_SECTIONONCIRCLE) {
-            circle *c_it = &(*(m_circleIDs[rd.objects[0]]));
-            section *s_it = &(*(m_sectionIDs[rd.objects[1]]));
+        else if (r.req == ET_SECTIONONCIRCLE) {
+            circle *c_it = &(*(m_circleIDs[r.objects[0]]));
+            section *s_it = &(*(m_sectionIDs[r.objects[1]]));
             requirement = new ReqSecOnCircle(s_it, c_it);
         }
 // 7
-        else if (rd.req == ET_SECTIONINCIRCLE) {
-            circle *c_it = &(*(m_circleIDs[rd.objects[0]]));
-            section *s_it = &(*(m_sectionIDs[rd.objects[1]]));
+        else if (r.req == ET_SECTIONINCIRCLE) {
+            circle *c_it = &(*(m_circleIDs[r.objects[0]]));
+            section *s_it = &(*(m_sectionIDs[r.objects[1]]));
             requirement = new ReqSecInCircle(s_it, c_it);
         }
 // 8
-        else if (rd.req == ET_SECTIONSECTIONPARALLEL) {
-            section *s1_it = &(*(m_sectionIDs[rd.objects[0]]));
-            section *s2_it = &(*(m_sectionIDs[rd.objects[1]]));
+        else if (r.req == ET_SECTIONSECTIONPARALLEL) {
+            section *s1_it = &(*(m_sectionIDs[r.objects[0]]));
+            section *s2_it = &(*(m_sectionIDs[r.objects[1]]));
             requirement = new ReqSecSecParallel(s1_it, s2_it);
         }
 // 9
-        else if (rd.req == ET_SECTIONSECTIONPERPENDICULAR) {
-            section *s1_it = &(*(m_sectionIDs[rd.objects[0]]));
-            section *s2_it = &(*(m_sectionIDs[rd.objects[1]]));
+        else if (r.req == ET_SECTIONSECTIONPERPENDICULAR) {
+            section *s1_it = &(*(m_sectionIDs[r.objects[0]]));
+            section *s2_it = &(*(m_sectionIDs[r.objects[1]]));
             requirement = new ReqSecSecPerpendicular(s1_it, s2_it);
         }
 // 10
-        else if (rd.req == ET_SECTIONSECTIONANGEL) {
-            section *s1_it = &(*(m_sectionIDs[rd.objects[0]]));
-            section *s2_it = &(*(m_sectionIDs[rd.objects[1]]));
-            requirement = new ReqSecSecAngel(s1_it, s2_it, rd.params[0]);
+        else if (r.req == ET_SECTIONSECTIONANGEL) {
+            section *s1_it = &(*(m_sectionIDs[r.objects[0]]));
+            section *s2_it = &(*(m_sectionIDs[r.objects[1]]));
+            requirement = new ReqSecSecAngel(s1_it, s2_it, r.params[0]);
         }
 
 
         if (requirement) {
+            Function *func = new FunctionOfReq(requirement);
+            sq.addFunction(func);
             allRequirements.addElement(requirement);
-            Arry<PARAMID> params = requirement->getParams();
-            for (size_t i = 0; i < params.getSize(); i++) {
-                if (allParams.find(params[i]) == allParams.end()) {
-                    allParams[params[i]] = &(*params[i]);
-                    allParamValues.addElement(*params[i]);
-                }
-            }
         }
     }
-    double factor = 1.0;
-    double oldError = 1.0;
-    for (size_t iter = 0; iter < 10000; ++iter) {
-        Arry<double> antiGradients;
-        double totalError = 0.0;
-        for (const auto &req : allRequirements) {
-            for (auto &grad: req->getAntiGradient()){
-                antiGradients.addElement(grad);
-            }
-            totalError += req->getError() * req->getError();
-            if (iter == 0){
-                oldError = totalError;
-            }
-        }
-        factor = totalError / oldError;
-
-        int i = 0;
-        for (auto &param: allParams) {
-            double value = antiGradients[i++];
-            *param.second += factor * value;  // Шаг градиентного спуска
-        }
-        oldError = totalError;
-        if (totalError < 0.001) {
-            break;
-        }
+    Task optTask(&sq);
+    GradientOptimizer grad(&optTask);
+    grad.solve();
+    if (!grad.isSolved()){
+        throw std::runtime_error("This requirement is wrong");
     }
-
 
 // undo/redo
     for (const auto &req: allRequirements) {
+        /* now in reconstruction
         Arry<PARAMID> params = req->getParams();
         Arry<double> beforeValues, afterValues;
         for (size_t i = 0; i < params.getSize(); ++i) {
@@ -130,15 +103,16 @@ ID Paint::addRequirement(const RequirementData &rd) {
         }
         info.m_paramsBefore.addElement(beforeValues);
         info.m_paramsAfter.addElement(afterValues);
+         */
         s_allFigures = s_allFigures || req->getRectangle();
     }
 // Clear
     for (auto requirement: allRequirements) {
         delete requirement;
     }
+    // c_undoRedo.add(info);
 
-    c_undoRedo.add(info);
-    return s_maxID.id;
+    return s_maxID.id++;
 }
 
 ID Paint::addElement(const ElementData &ed) {
