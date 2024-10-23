@@ -52,6 +52,10 @@ MainWindow::MainWindow(QWidget *parent)
     // Изменение параметров обьектов в левом меню
     connect(ui->leftMenu, &QTreeWidget::itemChanged, this, &MainWindow::LeftMenuChanged);
 
+    connect(ui->componentGrid, &QCheckBox::toggled, [=](bool checked) {
+        emit GridOn(checked);
+    });
+
 
     this->setFocusPolicy(Qt::StrongFocus);
 

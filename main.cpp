@@ -125,13 +125,7 @@ int main(int argc, char *argv[]) {
         } else if (commandParts[0] == "exit") {
             commandRight=true;
             w.close();
-        } else if (commandParts[0] == "CellOn") {
-            commandRight=true;
-            painter->setCell(true);
-        } else if (commandParts[0] == "CellOff") {
-            commandRight=true;
-            painter->setCell(false);
-        } else if (commandParts[0] == "clear") {
+        }  else if (commandParts[0] == "clear") {
             commandRight=true;
             w.setSave(true);
             painter->clear();
@@ -280,6 +274,10 @@ int main(int argc, char *argv[]) {
         painter->draw();
     });
 
+    // Настройки
+    QObject::connect(&w, &MainWindow::GridOn, [&painter](bool T) {
+        painter->setCell(T);
+    });
 
     // Чатик
     QObject::connect(&w, &MainWindow::EnterMessage, [](const QString &text) {

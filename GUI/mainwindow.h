@@ -132,6 +132,9 @@ signals:
     // Чат
     void EnterMessage(const QString &text);
 
+    //Настройки
+    void GridOn(bool T);
+
 
 public slots:
 

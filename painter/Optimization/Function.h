@@ -2,6 +2,7 @@
 #define FUNCTION_H
 
 #include <vector>
+#include <algorithm>
 #include "../../Matrix/Matrix.h"
 #include "../requirements.h"
 
