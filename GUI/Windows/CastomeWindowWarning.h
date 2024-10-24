@@ -14,36 +14,38 @@
 #include <QPushButton>
 #include <QPainter>
 #include <QApplication>
+#include <QTimer>
 #include <QDebug>
 #include <QPropertyAnimation>
+#include <QMessageBox>
 
-class CastomeWindowWaring : public QWidget {
+class CastomeWindowWarning : public QWidget {
 Q_OBJECT
 
 public:
-    CastomeWindowWaring(const QString &message, QWidget *parent = nullptr) : QWidget(parent) {
+    CastomeWindowWarning(const QString &message, QWidget *parent = nullptr) : QWidget(parent) {
         setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
         setAttribute(Qt::WA_TranslucentBackground);
 
-        setWindowModality(Qt::ApplicationModal);  // Для модальности только в пределах родительского окна
-
-        QVBoxLayout *layout = new QVBoxLayout(this);
-        layout->setContentsMargins(10, 10, 10, 10);
+        QHBoxLayout *hLayout = new QHBoxLayout(this);
+        hLayout->setContentsMargins(10, 10, 10, 10);
 
         QLabel *label = new QLabel(message, this);
-        layout->addWidget(label);
+        label->setStyleSheet("color: #D8D8F6;");
+        hLayout->addWidget(label);
 
-        QPushButton *okButton = new QPushButton("OK", this);
-        connect(okButton, &QPushButton::clicked, this, &CastomeWindowWaring::close);
-        layout->addWidget(okButton);
+        QPixmap iconPixmap("../Static/icons/warning.ico");
+        QLabel *iconLabel = new QLabel(this);
+        iconLabel->setPixmap(iconPixmap.scaled(32, 32, Qt::KeepAspectRatio)); // Масштабируем иконку
+        hLayout->addWidget(iconLabel);
 
-        setLayout(layout);
-        resize(300, 150);
+        setLayout(hLayout);
         updatePosition(parent);
+
+        QTimer::singleShot(2000, this, &CastomeWindowWarning::close);
     }
 
 public slots:
-
     void updatePosition(QWidget *parent) {
         if (parent) {
             int x = parent->x() + (parent->width() - width()) / 2;
@@ -64,7 +66,7 @@ protected:
     void showEvent(QShowEvent *event) override {
         QWidget::showEvent(event);
         QPropertyAnimation *animation = new QPropertyAnimation(this, "windowOpacity");
-        animation->setDuration(500);// Устанавливает длительность анимации
+        animation->setDuration(500); // Устанавливает длительность анимации
         animation->setStartValue(0);  // Начальная прозрачность
         animation->setEndValue(1);    // Конечная прозрачность
         animation->start();

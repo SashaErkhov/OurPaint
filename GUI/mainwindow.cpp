@@ -17,6 +17,12 @@ MainWindow::MainWindow(QWidget *parent)
     setAllMouseTracking(this); // Отслеживание мыши
     setAttribute(Qt::WA_OpaquePaintEvent);
 
+    // Кнопки выбора фигур
+    connect(ui->figureMoving, &QPushButton::clicked, this, &MainWindow::Moving);
+    connect(ui->figurePoint, &QPushButton::clicked, this, &MainWindow::Point);
+    connect(ui->figureSection, &QPushButton::clicked, this, &MainWindow::Section);
+    connect(ui->figureCircle, &QPushButton::clicked, this, &MainWindow::Circle);
+
     // Кнопки сохранение/импорт
     connect(ui->actionSave_project_to, &QAction::triggered, this, &MainWindow::saveProjectToFile);
     connect(ui->actionImport_project, &QAction::triggered, this, &MainWindow::LoadProjectFile);
@@ -55,6 +61,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->componentGrid, &QCheckBox::toggled, [=](bool checked) {
         emit GridOn(checked);
     });
+
 
 
     this->setFocusPolicy(Qt::StrongFocus);
@@ -477,7 +484,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
 
 // Обработка кнопки сервера
 void MainWindow::openServer() {
-    WindowServer *windowServer = new WindowServer;
+    WindowServer *windowServer = new WindowServer("Enter port: ");
     QObject::connect(windowServer, &WindowServer::textEnter, [this](const QString &text) {
         emit SigOpenServer(text);
     });
@@ -487,7 +494,7 @@ void MainWindow::openServer() {
 
 // Обработка кнопки сервера
 void MainWindow::joinServer() {
-    WindowServer *windowServer = new WindowServer;
+    WindowServer *windowServer = new WindowServer("Enter IP: ");
     QObject::connect(windowServer, &WindowServer::textEnter, [this](const QString &text) {
         emit SigJoinServer(text);
     });
@@ -497,7 +504,7 @@ void MainWindow::joinServer() {
 
 // Обработка кнопки сервера
 void MainWindow::joinLocalServer() {
-    WindowServer *windowServer = new WindowServer;
+    WindowServer *windowServer = new WindowServer("Enter IP: port ");
     QObject::connect(windowServer, &WindowServer::textEnter, [this](const QString &text) {
         emit SigJoinLocalServer(text);
     });

@@ -135,6 +135,12 @@ signals:
     //Настройки
     void GridOn(bool T);
 
+    // Кнопки выбора фигур
+    void SigMoving();
+    void SigPoint();
+    void SigSection();
+    void SigCircle();
+
 
 public slots:
 
@@ -144,6 +150,10 @@ public slots:
     void openServer();
     void joinServer();
     void joinLocalServer();
+    void Moving(){emit SigMoving();}
+    void Point(){emit SigPoint();}
+    void Section(){emit SigSection();}
+    void Circle(){emit SigCircle();}
 
     void exitSession() {
         emit SigExitSession();

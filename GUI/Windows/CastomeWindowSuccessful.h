@@ -5,15 +5,16 @@
 
 #ifndef OURPAINT_CATOMEWINDOWSUCCESSFUL_H
 #define OURPAINT_CATOMEWINDOWSUCCESSFUL_H
-
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QPushButton>
 #include <QPainter>
 #include <QApplication>
+#include <QTimer>
 #include <QDebug>
 #include <QPropertyAnimation>
+#include <QMessageBox>
 
 class CastomeWindowSuccessful : public QWidget {
 Q_OBJECT
@@ -23,21 +24,22 @@ public:
         setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
         setAttribute(Qt::WA_TranslucentBackground);
 
-        setWindowModality(Qt::ApplicationModal);  // Для модальности только в пределах родительского окна
-
-        QVBoxLayout *layout = new QVBoxLayout(this);
-        layout->setContentsMargins(10, 10, 10, 10);
+        QHBoxLayout *hLayout = new QHBoxLayout(this);
+        hLayout->setContentsMargins(10, 10, 10, 10);
 
         QLabel *label = new QLabel(message, this);
-        layout->addWidget(label);
+        label->setStyleSheet("color: #D8D8F6;");
+        hLayout->addWidget(label);
 
-        QPushButton *okButton = new QPushButton("OK", this);
-        connect(okButton, &QPushButton::clicked, this, &CastomeWindowSuccessful::close);
-        layout->addWidget(okButton);
+        QPixmap iconPixmap("../Static/icons/successful.ico");
+        QLabel *iconLabel = new QLabel(this);
+        iconLabel->setPixmap(iconPixmap.scaled(32, 32, Qt::KeepAspectRatio)); // Масштабируем иконку
+        hLayout->addWidget(iconLabel);
 
-        setLayout(layout);
-        resize(300, 150);
+        setLayout(hLayout);
         updatePosition(parent);
+
+        QTimer::singleShot(2000, this, &CastomeWindowSuccessful::close);
     }
 
 public slots:
@@ -61,11 +63,10 @@ protected:
     void showEvent(QShowEvent *event) override {
         QWidget::showEvent(event);
         QPropertyAnimation *animation = new QPropertyAnimation(this, "windowOpacity");
-        animation->setDuration(500);// Устанавливает длительность анимации
+        animation->setDuration(500); // Устанавливает длительность анимации
         animation->setStartValue(0);  // Начальная прозрачность
         animation->setEndValue(1);    // Конечная прозрачность
         animation->start();
     }
 };
-
 #endif //OURPAINT_CATOMEWINDOWSUCCESSFUL_H
