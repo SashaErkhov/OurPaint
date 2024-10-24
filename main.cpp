@@ -32,7 +32,6 @@ int main(int argc, char *argv[]) {
     painter->setParent(w.getWorkWindow());
     painter->show();
     Paint screen(painter.get());
-
     Server server;
     Client client;
     bool isConnected = false;
@@ -317,8 +316,21 @@ int main(int argc, char *argv[]) {
     });
 
     // Чатик
-    QObject::connect(&w, &MainWindow::EnterMessage, [](const QString &text) {
-        QMessageBox::information(nullptr, "Окно", "Ты ввёл " + text);
+    QObject::connect(&w, &MainWindow::EnterMessage, [&](const QString &text) {
+        if (isConnected){
+            if (isServer){
+                w.setMessage("Me",text.toStdString());
+                server.sendChatToClients(text);
+            }else{
+                if (!text.isEmpty()) {
+                    client.sendChatMessage(text);
+                }
+            }
+        }else{
+            auto *errorWindow = new CastomeWindowError("You are not connected!", &w);
+            errorWindow->show();
+            return;
+        }
     });
 
     //Кнопки сервера
@@ -326,7 +338,7 @@ int main(int argc, char *argv[]) {
         // TODO need to make dissconnect or server close
     });
     QObject::connect(&w, &MainWindow::SigOpenServer, [&](const QString &text) {
-        if (isConnected || isServer){
+        if (isConnected || isServer) {
             auto *errorWindow = new CastomeWindowError("Firstly disconnect!", &w);
             errorWindow->show();
             return;
@@ -376,6 +388,13 @@ int main(int argc, char *argv[]) {
     QObject::connect(&client, &Client::newStateReceived, [&](const QString & state) {
         screen.loadFromString(state.toStdString());
         updateState();
+    });
+    //Chat
+    QObject::connect(&client, &Client::newChatMessageReceived, [&](const QString & msg, const QString & name){
+        w.setMessage(name.toStdString(), msg.toStdString());
+    });
+    QObject::connect(&server, &Server::newMessageReceived, [&](const QString & msg, const QString & name){
+        w.setMessage(name.toStdString(), msg.toStdString());
     });
 
     QObject::connect(&w, &MainWindow::EnterPressed, [&](const QString &command) {

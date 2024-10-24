@@ -25,11 +25,21 @@ void Client::sendCommandToServer(const QString &command) {
 
 void Client::onConnected() {
 }
+void Client::sendChatMessage(const QString &message) {
+    QByteArray data;
+    QDataStream out(&data, QIODevice::WriteOnly);
+    out << QString("CHAT|%1").arg(message);
+    tcpSocket->write(data);
+}
 void Client::onReadyRead() {
     QDataStream in(tcpSocket);
     while (!tcpSocket->atEnd()) {
         QString command;
         in >> command;
+        if (command.startsWith("CHAT|")) {
+            QString msg = command.mid(5);
+            emit newChatMessageReceived(msg, "User");
+        }
         emit newStateReceived(command);
     }
 }

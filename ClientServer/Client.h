@@ -17,8 +17,10 @@ public:
 
     void connectToServer(const QString &ip, quint16 port);
     void sendCommandToServer(const QString &command);
+    void sendChatMessage(const QString &message);
 
 signals:
+    void newChatMessageReceived(const QString& message, const QString& user);
     void newStateReceived(const QString& command);
     void disconnectedFromServer();
 
