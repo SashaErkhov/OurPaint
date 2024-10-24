@@ -331,8 +331,9 @@ void MainWindow::LeftMenuChanged(QTreeWidgetItem *item) {
 }
 
 
+
 // Добавление требований в левое меню
-void MainWindow::Requar_LeftMenu(unsigned long long id, const std::string &text) {
+void MainWindow::Requar_LeftMenu(unsigned long long id, const std::string &text, unsigned long long id1, unsigned long long id2, double parametr) {
     QTreeWidgetItem *itemReq = ui->leftMenu->topLevelItem(2);
 
     if (text == "Clear") {
@@ -340,9 +341,34 @@ void MainWindow::Requar_LeftMenu(unsigned long long id, const std::string &text)
         return;
     }
 
-    QString itemType = QString::fromStdString(std::to_string(id) + ": " + text);
+    QString itemType = QString::fromStdString(text);
     QTreeWidgetItem *newItem = new QTreeWidgetItem(itemReq);
     newItem->setText(0, itemType);
+
+    QIcon textIcon("../Static/icons/Icon.ico");
+    newItem->setIcon(0, textIcon);
+
+    QTreeWidgetItem *idItem = new QTreeWidgetItem(newItem);
+    idItem->setText(0, QString("ID: %1").arg(id));
+
+    idItem->setIcon(0, textIcon);
+
+    QTreeWidgetItem *reqItem = new QTreeWidgetItem(newItem);
+    reqItem->setText(0, QString("Requirement ID: %1").arg(id1));
+    reqItem->setIcon(0, textIcon);
+
+    QTreeWidgetItem *elemItem = new QTreeWidgetItem(newItem);
+    elemItem->setText(0, QString("Element ID: %1").arg(id2));
+    elemItem->setIcon(0, textIcon);
+
+    QTreeWidgetItem *paramItem = new QTreeWidgetItem(newItem);
+    paramItem->setText(0, QString("Parameter: %1").arg(parametr));
+
+    QIcon paramIcon("../Static/icons/Database.ico");
+    paramItem->setIcon(0, paramIcon);
+    reqItem->setIcon(0, paramIcon);
+    elemItem->setIcon(0, paramIcon);
+    idItem->setIcon(0, paramIcon);
 
     itemReq->addChild(newItem);
     // ui->leftMenu->expandAll(); // Разворачивание
