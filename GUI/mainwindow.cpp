@@ -42,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     // Обработка ввода в консоль чата
-    connect(ui->messageConsole,&QLineEdit::returnPressed, this, &MainWindow::Message);
+    connect(ui->messageConsole, &QLineEdit::returnPressed, this, &MainWindow::Message);
 
     // Изменение параметров обьектов в левом меню
     connect(ui->leftMenu, &QTreeWidget::itemChanged, this, &MainWindow::LeftMenuChanged);
@@ -52,10 +52,21 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
 
-
     this->setFocusPolicy(Qt::StrongFocus);
 
     frameOverlay->hide(); // Скрытие наложения рамки
+}
+
+// Добавление сообщений
+void MainWindow::setMessage(const std::string& name, const std::string& message) {
+    QString messageText = QString::fromStdString(name) + ": " + QString::fromStdString(message);
+
+    QLabel *messageLabel = new QLabel(messageText);
+    messageLabel->setStyleSheet("color: #D8D8F6;");
+    messageLabel->setWordWrap(true);
+    messageLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+
+  //  ui->messageContentLayout->addWidget(messageLabel);
 }
 
 
@@ -325,9 +336,9 @@ void MainWindow::LeftMenuChanged(QTreeWidgetItem *item) {
 }
 
 
-
 // Добавление требований в левое меню
-void MainWindow::Requar_LeftMenu(unsigned long long id, const std::string &text, unsigned long long id1, unsigned long long id2, double parametr) {
+void MainWindow::Requar_LeftMenu(unsigned long long id, const std::string &text, unsigned long long id1,
+                                 unsigned long long id2, double parametr) {
     QTreeWidgetItem *itemReq = ui->leftMenu->topLevelItem(2);
 
     if (text == "Clear") {

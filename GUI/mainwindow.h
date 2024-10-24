@@ -76,8 +76,12 @@ public:
 
     void showHelp();
 
+// Добавление сообщений
+    void setMessage(const std::string& name, const std::string& message);
+
 
 protected:
+
     // Обработчики событий клавиатуры и мыши
     void keyPressEvent(QKeyEvent *event) override;
 
@@ -157,12 +161,6 @@ public slots:
         QString input = ui->messageConsole->text();
         if (!input.isEmpty()) {
             ui->messageConsole->clear();
-
-            QLabel *messageLabel = new QLabel(input);
-            messageLabel->setStyleSheet("color: #D8D8F6;");
-            messageLabel->setWordWrap(true);
-            messageLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
-            ui->messageContentLayout->addWidget(messageLabel);
             emit EnterMessage(input);
         }
     }
