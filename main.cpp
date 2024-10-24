@@ -239,10 +239,10 @@ int main(int argc, char *argv[]) {
         if(commandRight){
             updateState();
        }
-       /* std::vector<std::pair<ID, RequirementData>> req = screen.getAllRequirementsInfo();
+        std::vector<std::pair<ID, RequirementData>> req = screen.getAllRequirementsInfo();
         for (auto element: req) {
             //TODO
-        }*/
+        }
     };
 
     QObject::connect(&w, &MainWindow::parameterChanged,

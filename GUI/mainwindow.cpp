@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
     setAllMouseTracking(this); // Отслеживание мыши
     setAttribute(Qt::WA_OpaquePaintEvent);
 
+
     // Кнопки сохранение/импорт
     connect(ui->actionSave_project_to, &QAction::triggered, this, &MainWindow::saveProjectToFile);
     connect(ui->actionImport_project, &QAction::triggered, this, &MainWindow::LoadProjectFile);

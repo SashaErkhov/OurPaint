@@ -63,7 +63,7 @@ public:
     void Print_LeftMenu(unsigned long long id, const std::string &text, const std::vector<double> &object);
 
     // Добавление требований в левое меню
-    void Requar_LeftMenu(unsigned long long int id, const std::string &text);
+    void Requar_LeftMenu(unsigned long long id, const std::string &text, unsigned long long id1, unsigned long long id2, double parametr);
 
     QWidget *getWorkWindow() const { return ui->workWindow; }
 
@@ -135,11 +135,7 @@ signals:
     //Настройки
     void GridOn(bool T);
 
-    // Кнопки выбора фигур
-    void SigMoving();
-    void SigPoint();
-    void SigSection();
-    void SigCircle();
+
 
 
 public slots:
@@ -150,10 +146,7 @@ public slots:
     void openServer();
     void joinServer();
     void joinLocalServer();
-    void Moving(){emit SigMoving();}
-    void Point(){emit SigPoint();}
-    void Section(){emit SigSection();}
-    void Circle(){emit SigCircle();}
+
 
     void exitSession() {
         emit SigExitSession();
