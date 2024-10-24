@@ -9,7 +9,12 @@ Server::Server(QObject *parent) : QObject(parent), tcpServer(new QTcpServer(this
 }
 
 bool Server::startServer(quint16 port) {
-    return tcpServer->listen(QHostAddress::Any, port);
+    if (!tcpServer->listen(QHostAddress::Any, port)) {
+        qDebug() << "Server could not start!";
+        return false;
+    }
+    qDebug() << "Server started!";
+    return true;
 }
 
 void Server::sendToClients(const QString &command) {

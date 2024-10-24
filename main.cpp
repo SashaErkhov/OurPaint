@@ -5,6 +5,8 @@
 #include "ClientServer/Server.h"
 #include "ClientServer/Client.h"
 #include "GUI/Windows/CastomeWindowError.h"
+#include "GUI/Windows/CastomeWindowSuccessful.h"
+#include "GUI/Windows/CastomeWindowWarning.h"
 #include "GUI/Windows/WindowServer.h"
 #include "Arry.h"
 #include "BMPfile.h"
@@ -15,7 +17,7 @@
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
-    a.setWindowIcon(QIcon("..\\Static\\logo\\logo2.ico"));
+    a.setWindowIcon(QIcon(R"(..\Static\logo\logo2.ico)"));
     QApplication::setStyle("Fusion");
     /*   QPixmap splashPixmap("C:\\Users\\Tim\\CLionProjects\\OurPaint\\Static\\logo\\eye.png");
     QPixmap scaledPixmap = splashPixmap.scaled(splashPixmap.width() * 10, splashPixmap.height() * 10, Qt::KeepAspectRatio);
@@ -234,16 +236,13 @@ int main(int argc, char *argv[]) {
                     break;
             }
         }
-        if (commandRight) {
+        if(commandRight){
             updateState();
+       }
+        std::vector<std::pair<ID, RequirementData>> req = screen.getAllRequirementsInfo();
+        for (auto element: req) {
+            //TODO
         }
-        // std::vector<std::pair<ID, ElementData>> req = screen.getAllReqInfo();
-        //for (auto element: elements) {
-        //   w.Requar_LeftMenu(unsigned long long id, const std::string &text);
-        // }
-
-        //Такой же для требований!
-
     };
 
     QObject::connect(&w, &MainWindow::parameterChanged,
@@ -275,60 +274,6 @@ int main(int argc, char *argv[]) {
                          painter->draw();
                      });
 
-    QObject::connect(painter.get(), &QTPainter::SigPoint, [&painter, &w, &screen, &updateState](QPoint Position) {
-        ElementData point;
-        point.et = ET_POINT;
-        point.params.addElement(Position.x());
-        point.params.addElement(Position.y());
-        ID id = screen.addElement(point);
-        w.setSave(false);
-        updateState();
-    });
-
-    QObject::connect(painter.get(), &QTPainter::SigCircle, [&painter, &w, &screen, &updateState](QPoint centerPoint, int radius) {
-        ElementData circle;
-        circle.et = ET_CIRCLE;
-        circle.params.addElement(centerPoint.x());
-        circle.params.addElement(centerPoint.y());
-        circle.params.addElement(radius);
-        ID id = screen.addElement(circle);
-        w.setSave(false);
-        updateState();
-    });
-
-    QObject::connect(painter.get(), &QTPainter::SigSection, [&painter, &w, &screen, &updateState](int startX, int startY, int endX, int endY) {
-        ElementData section;
-        section.et = ET_SECTION;
-        section.params.addElement(startX);
-        section.params.addElement(startY);
-        section.params.addElement(endX);
-        section.params.addElement(endY);
-        ID id = screen.addElement(section);
-        w.setSave(false);
-        updateState();
-    });
-
-
-    // Выбор фигур
-    QObject::connect(&w, &MainWindow::SigMoving, [&painter]() {
-        painter->setEditor(false);
-        painter->setCircle(false);
-        painter->setSection(false);
-        painter->setPoint(false);
-    });
-    QObject::connect(&w, &MainWindow::SigPoint, [&painter]() {
-        painter->setEditor(true);
-        painter->setPoint(true);
-    });
-    QObject::connect(&w, &MainWindow::SigSection, [&painter]() {
-        painter->setEditor(true);
-        painter->setSection(true);
-    });
-    QObject::connect(&w, &MainWindow::SigCircle, [&painter]() {
-        painter->setEditor(true);
-        painter->setCircle(true);
-    });
-
     // Настройки
     QObject::connect(&w, &MainWindow::GridOn, [&painter](bool T) {
         painter->setCell(T);
@@ -341,17 +286,48 @@ int main(int argc, char *argv[]) {
 
     //Кнопки сервера
     QObject::connect(&w, &MainWindow::SigExitSession, []() {
-        QMessageBox::information(nullptr, "Окно", "Ты ввёл " );
+        // TODO need to make dissconnect or server close
     });
-    QObject::connect(&w, &MainWindow::SigOpenServer, [&]() {
-        CastomeWindowError *errorWindow = new CastomeWindowError("Произошла ошибка!", &w);
-        errorWindow->show();
+    QObject::connect(&w, &MainWindow::SigOpenServer, [&](const QString &text) {
+        if (isConnected || isServer){
+            auto *errorWindow = new CastomeWindowError("Firstly disconnect!", &w);
+            errorWindow->show();
+            return;
+        }
+        bool ok = false;
+        text.toUShort(&ok);
+        if (!ok) {
+            auto *errorWindow = new CastomeWindowError("Error! This is not valid port!", &w);
+            errorWindow->show();
+            return;
+        }
+        server.startServer(text.toUShort(&ok));
+        isServer = true;
+        isConnected = true;
+        auto *successWindow = new CastomeWindowSuccessful("Server has been started!", &w);
+        successWindow->show();
     });
-    QObject::connect(&w, &MainWindow::SigJoinServer, [](const QString &text) {
-        QMessageBox::information(nullptr, "Окно", "Ты ввёл " + text);
+    QObject::connect(&w, &MainWindow::SigJoinServer, [&](const QString &text) {
+        if (isConnected || isServer){
+            auto *errorWindow = new CastomeWindowError("Firstly disconnect!", &w);
+            errorWindow->show();
+            return;
+        }
+        bool ok = false;
+        QStringList texts = text.split(':');
+        texts[1].toUShort(&ok);
+        if (ok){
+            auto *errorWindow = new CastomeWindowError("Error! This is not valid port!", &w);
+            errorWindow->show();
+            return;
+        }
+        client.connectToServer(texts[0], texts[1].toUShort(&ok));
+        isConnected = true;
+        auto *successWindow = new CastomeWindowSuccessful("Connected!", &w);
+        successWindow->show();
     });
     QObject::connect(&w, &MainWindow::SigJoinLocalServer, [](const QString &text) {
-        QMessageBox::information(nullptr, "Окно", "Ты ввёл " + text);
+        //TODO need to search find all IP with port 2005
     });
 
     // Сервера
@@ -359,60 +335,23 @@ int main(int argc, char *argv[]) {
         handler(cmd);
         server.sendToClients(QString::fromStdString(screen.to_string()));
     });
-    QObject::connect(&client, &Client::newStateReceived, [&](const QString &state) {
+    QObject::connect(&client, &Client::newStateReceived, [&](const QString & state) {
         screen.loadFromString(state.toStdString());
         updateState();
     });
 
     QObject::connect(&w, &MainWindow::EnterPressed, [&](const QString &command) {
         QStringList commandParts = command.split(' ');
-        if (commandParts[0] == "connect" && commandParts.size() == 2) {
-            QStringList addressParts = commandParts[1].split(':');
-            if (addressParts.size() == 2) {
-                QString ip = addressParts[0];
-                bool portOk;
-                quint16 port = addressParts[1].toUShort(&portOk);
-                if (portOk) {
-                    client.connectToServer(ip, port);
-                    isConnected = true;
-                    QObject::connect(&client, &Client::newStateReceived, [&](const QString &cmd) {
-                        screen.loadFromString(cmd.toStdString());
-                    });
-                    qDebug() << "Connected to server " + ip + ":" + QString::number(port);
-                }
-            } else if (addressParts.size() == 1) {
-                QString ip = addressParts[0];
-                client.connectToServer(ip, 2005);
-                isConnected = true;
-                QObject::connect(&client, &Client::newStateReceived, [&](const QString &cmd) {
-                    screen.loadFromString(cmd.toStdString());
-                });
-                qDebug() << "Connected to server " + ip;
-            }
-        } else if (commandParts[0] == "startserver" and commandParts.size() < 2) {
-            if (commandParts.size() == 1) {
-                server.startServer(2005);
-                isServer = true;
-                isConnected = true;
-                qDebug() << "Started server on port 2005";
-            } else {
-                server.startServer(commandParts[1].toUShort());
-                isServer = true;
-                isConnected = true;
-                qDebug() << "Started server on port " + commandParts[1];
-            }
-            w.setSave(false);
-        } else {
-            if (isConnected) {
-                if (isServer) {
-                    handler(command);
-                    server.sendToClients(QString::fromStdString(screen.to_string()));
-                } else {
-                    client.sendCommandToServer(command);
-                }
-            } else {
+        if (isConnected) {
+            if (isServer) {
                 handler(command);
+                server.sendToClients(QString::fromStdString(screen.to_string()));
+            } else {
+                client.sendCommandToServer(command);
             }
+        }
+        else {
+            handler(command);
         }
     });
 
