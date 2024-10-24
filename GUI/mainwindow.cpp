@@ -17,12 +17,6 @@ MainWindow::MainWindow(QWidget *parent)
     setAllMouseTracking(this); // Отслеживание мыши
     setAttribute(Qt::WA_OpaquePaintEvent);
 
-    // Кнопки выбора фигур
-    connect(ui->figureMoving, &QPushButton::clicked, this, &MainWindow::Moving);
-    connect(ui->figurePoint, &QPushButton::clicked, this, &MainWindow::Point);
-    connect(ui->figureSection, &QPushButton::clicked, this, &MainWindow::Section);
-    connect(ui->figureCircle, &QPushButton::clicked, this, &MainWindow::Circle);
-
     // Кнопки сохранение/импорт
     connect(ui->actionSave_project_to, &QAction::triggered, this, &MainWindow::saveProjectToFile);
     connect(ui->actionImport_project, &QAction::triggered, this, &MainWindow::LoadProjectFile);
