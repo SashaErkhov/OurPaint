@@ -24,6 +24,7 @@
 #include <QIcon>
 #include <QCheckBox>
 #include <QScrollArea>
+#include <QTextEdit>
 
 QT_BEGIN_NAMESPACE
 
@@ -464,6 +465,7 @@ public:
         // Обновление контейнера для leftMenu
         leftMenuContainer = new QWidget();
         leftMenuContainer->setLayout(leftMenuLayout);
+        leftMenuContainer->setFixedWidth(200);
 
         leftMenuContainer->hide();
     }
@@ -527,11 +529,12 @@ public:
         messageContainerLayout->addWidget(message);
         messageContainer->setLayout(messageContainerLayout);
         messageContainer->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
+        messageContainer->setFixedWidth(200);
 
         // Для сообщений
         messageContent = new QWidget();
         messageContentLayout = new QVBoxLayout(messageContent);
-        messageContentLayout->setContentsMargins(1, 1, 1, 1);
+        messageContentLayout->setContentsMargins(10, 1, 1, 1);
         messageContentLayout->setSpacing(5);
         messageContentLayout->setAlignment(Qt::AlignTop);
 
