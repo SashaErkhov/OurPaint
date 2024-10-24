@@ -27,9 +27,10 @@ add_executable(ourpaint
         painter/QTPainter.cpp
         painter/saveload/objectInFile.cpp
         painter/saveload/FileOurP.cpp
+        painter/saveload/requirementInFile.cpp
         ClientServer/Server.cpp ClientServer/Client.cpp
-
-        painter/Optimization/GradientOptimizer.cpp)
+        painter/Optimization/NewtonOptimizer.cpp
+        painter/Optimization/GradientOptimizer.cpp painter/saveload/requirementInFile.h)
 
 include_directories(additions)
 include_directories(UndoRedo)

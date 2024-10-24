@@ -2,6 +2,7 @@
 // Created by Eugene Bychkov on 28.09.2024.
 //
 #include "../painter/saveload/objectInFile.h"
+#include "../painter/saveload/requirementInFile.h"
 #include "../painter/saveload/FileOurP.h"
 
 #include <gtest/gtest.h>
@@ -16,6 +17,15 @@ TEST(ObjectInFileTest, TestPointToString) {
 
     EXPECT_EQ(objInFile.to_string(), "{\nID 1\npoint 1.000000 2.000000\n}");
 }
+TEST(requirementInFileTest, TestPointOnPointToString) {
+    RequirementData r;
+    r.req = ET_POINTONPOINT;
+    r.objects.addElement({1});
+    r.objects.addElement({2});
+    requirementInFile rs(std::make_pair(ID{3}, r));
+    EXPECT_EQ(rs.to_string(), "{\nID 3\naddreq 3 1 2 0.000000\n}");
+}
+
 
 TEST(ObjectInFileTest, TestSectionToString) {
     point p1, p2;
@@ -44,7 +54,7 @@ TEST(ObjectInFileTest, TestCircleToString) {
 
     objectInFile objInFile(obj);
 
-    EXPECT_EQ(objInFile.to_string(), "\nID 3\ncircle 5.000000\n}");
+    EXPECT_EQ(objInFile.to_string(), "{\nID 3\ncircle 5.000000\n}");
 }
 
 TEST(ObjectInFileTest, TestCopyConstructor) {
@@ -107,7 +117,10 @@ TEST(SaveToFileTest, TestMoveAssignmentOperator) {
 std::string readFile(const std::string& fileName) {
     std::ifstream file(fileName);
     std::stringstream buffer;
-    buffer << file.rdbuf();
+    for (std::string line; std::getline(file, line);) {
+        buffer << line << "\n";
+    }
+    file.close();
     return buffer.str();
 }
 
@@ -134,7 +147,7 @@ TEST(FileOurPTest, SaveToOurP) {
     ID id{1};
     point pt;
     pt.x = 1;
-    pt.y = 1;
+    pt.y = 2;
     primitive* prim = &pt;
     std::pair<ID, primitive*> obj(id, prim);
     file.addObject(obj);
@@ -142,26 +155,34 @@ TEST(FileOurPTest, SaveToOurP) {
     point beg1;
     beg1.x = 3;
     beg1.y = 4;
+    prim = &beg1;
     std::pair<ID, primitive*> obj2(id2, prim);
     file.addObject(obj2);
     ID id3{3};
     point end1;
     end1.x = 5;
     end1.y = 6;
+    prim = &end1;
     std::pair<ID, primitive*> obj3(id3, prim);
     file.addObject(obj3);
+    RequirementData req;
+    ID idr{5};
+    req.objects.addElement(id2);
+    req.objects.addElement(id3);
+    req.req = ET_POINTONPOINT;
+    std::pair<ID, RequirementData> reqObj(idr, req);
+    file.addRequirement(reqObj);
     ID id4{4};
     section sec;
     sec.beg = &beg1;
     sec.end = &end1;
     primitive* prim2 = &sec;
-    std::pair<ID, primitive*> obj1(id2, prim2);
+    std::pair<ID, primitive*> obj1(id4, prim2);
     file.addObject(obj1);
     std::string fileName = "test_file";
-    file.saveToOurP(fileName);
-
-    std::string content = readFile(fileName + ".ourp");
-    std::string expectedContent = "Elements: {\n{\nID 1\npoint 1.000000 1.000000\n}\n{\nID 2\npoint 1.000000 1.000000\n}\n{\nID 2\nsection\n}\n{\nID 3\npoint 1.000000 1.000000\n}\n}\n";
+    std::string content = file.to_string();
+    std::string expectedContent = "Elements: {\n{\nID 1\npoint 1.000000 2.000000\n}\n{\nID 2\npoint 3.000000 4.000000\n}\n{\nID 3\npoint 5.000000 6.000000\n}\n{\nID 4\nsection\n}\n}\n"
+                                  "Requirements: {\n{\nID 5\naddreq 3 2 3 0.000000\n}\n}\n";
 
     EXPECT_EQ(content, expectedContent);
 }

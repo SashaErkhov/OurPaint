@@ -8,18 +8,20 @@
 #include <fstream>
 #include <vector>
 #include "objectInFile.h"
+#include "requirementInFile.h"
 #include <sstream>
 #include <algorithm>
 #include <queue>
 
 class FileOurP {
     std::vector<objectInFile> m_objects;
-    std::vector<objectInFile> parseFile(std::istream& file);
+    std::vector<requirementInFile> m_requirements;
+    void parseFile(std::istream& file);
 
 public:
     FileOurP();
 
-    explicit FileOurP(const std::vector<objectInFile> &obj);
+    explicit FileOurP(const std::vector<objectInFile> &obj, std::vector<requirementInFile> &req);
 
     FileOurP(const FileOurP &other);
 
@@ -30,12 +32,13 @@ public:
     FileOurP &operator=(FileOurP &&other) noexcept;
 
     void addObject(std::pair<ID, primitive*> &obj);
-
+    void addRequirement(std::pair<ID, RequirementData> &req);
     void saveToOurP(const std::string &fileName) const;
 
     void loadFromOurP(const std::string &fileName);
 
     const std::vector<objectInFile>& getObjects() const;
+    const std::vector<requirementInFile>& getRequirements() const;
 
     std::string to_string() const;
 
