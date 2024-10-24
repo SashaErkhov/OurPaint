@@ -44,6 +44,7 @@ int main(int argc, char *argv[]) {
       });*/
     auto updateState = [&screen, &w, &painter]() {
         painter->getUsers(false);
+        w.Requar_LeftMenu(1,"Zhopa",1,1,1);
         screen.paint();
         painter->draw();
         w.Print_LeftMenu(0, "Clear", {});
@@ -239,10 +240,10 @@ int main(int argc, char *argv[]) {
         if(commandRight){
             updateState();
        }
-        std::vector<std::pair<ID, RequirementData>> req = screen.getAllRequirementsInfo();
-        for (auto element: req) {
+       // std::vector<std::pair<ID, RequirementData>> req = screen.getAllRequirementsInfo();
+       // for (auto element: req) {
             //TODO
-        }
+    //    }
     };
 
     QObject::connect(&w, &MainWindow::parameterChanged,
