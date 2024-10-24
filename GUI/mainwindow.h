@@ -63,7 +63,8 @@ public:
     void Print_LeftMenu(unsigned long long id, const std::string &text, const std::vector<double> &object);
 
     // Добавление требований в левое меню
-    void Requar_LeftMenu(unsigned long long id, const std::string &text, unsigned long long id1, unsigned long long id2, double parametr);
+    void Requar_LeftMenu(unsigned long long id, const std::string &text, unsigned long long id1, unsigned long long id2,
+                         double parametr);
 
     QWidget *getWorkWindow() const { return ui->workWindow; }
 
@@ -125,8 +126,11 @@ signals:
 
     // Кнопки сервера
     void SigOpenServer(const QString &text);
+
     void SigJoinServer(const QString &text);
+
     void SigJoinLocalServer(const QString &text);
+
     void SigExitSession();
 
     // Чат
@@ -136,16 +140,32 @@ signals:
     void GridOn(bool T);
 
 
-
-
 public slots:
 
-     // Кнопки
+    // Кнопки
     void saveProjectToFile();
+
     void LoadProjectFile();
+
     void openServer();
+
     void joinServer();
+
     void joinLocalServer();
+
+    void Message() {
+        QString input = ui->messageConsole->text();
+        if (!input.isEmpty()) {
+            ui->messageConsole->clear();
+
+            QLabel *messageLabel = new QLabel(input);
+            messageLabel->setStyleSheet("color: #D8D8F6;");
+            messageLabel->setWordWrap(true);
+            messageLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+            ui->messageContentLayout->addWidget(messageLabel);
+            emit EnterMessage(input);
+        }
+    }
 
 
     void exitSession() {
