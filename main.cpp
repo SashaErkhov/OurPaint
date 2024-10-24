@@ -67,6 +67,47 @@ int main(int argc, char *argv[]) {
                 w.Print_LeftMenu(element.first.id, "Circle", {x, y, r});
             }
         }
+        std::vector<std::pair<ID, RequirementData>> req = screen.getAllRequirementsInfo();
+        for (const auto& element: req) {
+            QString text;
+            double param = element.second.params[0];
+            switch (element.second.req) {
+                case ET_POINTSECTIONDIST:
+                    text = QString("PointSectionDist");
+                    break;
+                case ET_POINTONSECTION:
+                    text = QString("PointOnSection");
+                    break;
+                case ET_POINTPOINTDIST:
+                    text = QString("PointPointDist");
+                    break;
+                case ET_POINTONPOINT:
+                    text = QString("PointOnPoint");
+                    break;
+                case ET_SECTIONCIRCLEDIST:
+                    text = QString("SectionCircleDist");
+                    break;
+                case ET_SECTIONONCIRCLE:
+                    text = QString("SectionOnCircle");
+                    break;
+                case ET_SECTIONINCIRCLE:
+                    text = QString("SectionInCircle");
+                    break;
+                case ET_SECTIONSECTIONPARALLEL:
+                    text = QString("ParallelSections");
+                    break;
+                case ET_SECTIONSECTIONPERPENDICULAR:
+                    text = QString("PerpendicularSections");
+                    break;
+                case ET_SECTIONSECTIONANGEL:
+                    text = QString("AngleBetweenSections");
+                    break;
+                case ET_POINTONCIRCLE:
+                    text = QString("PointOnCircle");
+                    break;
+            }
+            w.Requar_LeftMenu(element.first.id, text.toStdString(), element.second.objects[0].id, element.second.objects[1].id, param);
+        }
     };
 
     auto handler = [&w, &screen, &painter, &updateState](const QString &command) {
@@ -239,10 +280,6 @@ int main(int argc, char *argv[]) {
         if(commandRight){
             updateState();
        }
-        std::vector<std::pair<ID, RequirementData>> req = screen.getAllRequirementsInfo();
-        for (auto element: req) {
-            //TODO
-        }
     };
 
     QObject::connect(&w, &MainWindow::parameterChanged,
@@ -315,8 +352,9 @@ int main(int argc, char *argv[]) {
         }
         bool ok = false;
         QStringList texts = text.split(':');
+        qDebug() << texts[1];
         texts[1].toUShort(&ok);
-        if (ok){
+        if (!ok){
             auto *errorWindow = new CastomeWindowError("Error! This is not valid port!", &w);
             errorWindow->show();
             return;

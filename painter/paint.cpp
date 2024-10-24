@@ -1,9 +1,6 @@
 #include "paint.h"
-#include "../Matrix/Matrix.h"
 #include <map>
-#include "./Optimization/Task.h"
-#include "./Optimization/GradientOptimizer.h"
-#include "./Optimization/Function.h"
+
 
 ElementData::ElementData() {
     params = Arry<double>();
@@ -14,8 +11,10 @@ ID Paint::addRequirement(const RequirementData &rd) {
     ActionsInfo info;
     m_reqD.addElement(rd);
     SumOfSquares sq;
+    int countOfReq = 0;
 // Сбор всех требований и их параметров
     for (const auto &r: m_reqD) {
+        countOfReq++;
         IReq *requirement = nullptr;
 // 1
         if (r.req == ET_POINTSECTIONDIST) {
@@ -80,6 +79,9 @@ ID Paint::addRequirement(const RequirementData &rd) {
 
 
         if (requirement) {
+            if (countOfReq == m_reqD.getSize()){
+                m_reqIDs[s_maxID.id++] = m_reqStorage.addElement(requirement);
+            }
             Function *func = new FunctionOfReq(requirement);
             sq.addFunction(func);
             allRequirements.addElement(requirement);
@@ -112,7 +114,7 @@ ID Paint::addRequirement(const RequirementData &rd) {
     }
     // c_undoRedo.add(info);
 
-    return s_maxID.id++;
+    return s_maxID;
 }
 
 ID Paint::addElement(const ElementData &ed) {
@@ -229,14 +231,14 @@ RequirementData Paint::getRequirementInfo(ID id) {
 void Paint::paint() {
 
     c_bmpPainter->changeSize(s_allFigures);
-    for (auto point = m_pointStorage.begin(); point != m_pointStorage.end(); ++point) {
-        c_bmpPainter->drawPoint(*point, false);
+    for (auto & point : m_pointStorage) {
+        c_bmpPainter->drawPoint(point, false);
     }
-    for (auto circle = m_circleStorage.begin(); circle != m_circleStorage.end(); ++circle) {
-        c_bmpPainter->drawCircle(*circle, false);
+    for (auto & circle : m_circleStorage) {
+        c_bmpPainter->drawCircle(circle, false);
     }
-    for (auto section = m_sectionStorage.begin(); section != m_sectionStorage.end(); ++section) {
-        c_bmpPainter->drawSection(*section, false);
+    for (auto & section : m_sectionStorage) {
+        c_bmpPainter->drawSection(section, false);
     }
 }
 
@@ -605,32 +607,32 @@ void Paint::clear() {
 
 std::vector<std::pair<ID, ElementData>> Paint::getAllElementsInfo() {
     std::vector<std::pair<ID, ElementData>> data;
-    for (auto i = m_pointIDs.begin(); i != m_pointIDs.end(); ++i) {
-        point *p = &(*i->second);
+    for (auto & m_pointID : m_pointIDs) {
+        point *p = &(*m_pointID.second);
         ElementData info;
         info.et = ET_POINT;
         info.params.addElement(p->x);
         info.params.addElement(p->y);
-        data.emplace_back(i->first, info);
+        data.emplace_back(m_pointID.first, info);
     }
-    for (auto i = m_sectionIDs.begin(); i != m_sectionIDs.end(); ++i) {
-        section *s = &(*i->second);
+    for (auto & m_sectionID : m_sectionIDs) {
+        section *s = &(*m_sectionID.second);
         ElementData info;
         info.et = ET_SECTION;
         info.params.addElement(s->beg->x);
         info.params.addElement(s->beg->y);
         info.params.addElement(s->end->x);
         info.params.addElement(s->end->y);
-        data.emplace_back(i->first, info);
+        data.emplace_back(m_sectionID.first, info);
     }
-    for (auto i = m_circleIDs.begin(); i != m_circleIDs.end(); ++i) {
-        circle *c = &(*i->second);
+    for (auto & m_circleID : m_circleIDs) {
+        circle *c = &(*m_circleID.second);
         ElementData info;
         info.et = ET_CIRCLE;
         info.params.addElement(c->center->x);
         info.params.addElement(c->center->y);
         info.params.addElement(c->R);
-        data.emplace_back(i->first, info);
+        data.emplace_back(m_circleID.first, info);
     }
     return data;
 }
@@ -662,21 +664,31 @@ void Paint::loadFromString(const std::string & str) {
 
 std::string Paint::to_string() const {
     FileOurP saver;
-    for (auto i = m_pointIDs.begin(); i != m_pointIDs.end(); ++i) {
-        point *p = &(*i->second);
-        std::pair<ID, primitive *> m{i->first, p};
+    for (const auto & m_pointID : m_pointIDs) {
+        point *p = &(*m_pointID.second);
+        std::pair<ID, primitive *> m{m_pointID.first, p};
         saver.addObject(m);
     }
-    for (auto i = m_sectionIDs.begin(); i != m_sectionIDs.end(); ++i) {
-        section *s = &(*i->second);
-        std::pair<ID, primitive *> m{i->first, s};
+    for (const auto & m_sectionID : m_sectionIDs) {
+        section *s = &(*m_sectionID.second);
+        std::pair<ID, primitive *> m{m_sectionID.first, s};
         saver.addObject(m);
     }
-    for (auto i = m_circleIDs.begin(); i != m_circleIDs.end(); ++i) {
-        circle *c = &(*i->second);
-        std::pair<ID, primitive *> m{i->first, c};
+    for (const auto & m_circleID : m_circleIDs) {
+        circle *c = &(*m_circleID.second);
+        std::pair<ID, primitive *> m{m_circleID.first, c};
         saver.addObject(m);
     }
     return saver.to_string();
+}
+
+std::vector<std::pair<ID, RequirementData>> Paint::getAllRequirementsInfo() {
+    std::vector<std::pair<ID, RequirementData>> data;
+    size_t i = 0;
+    for (auto req: m_reqIDs){
+        ID id = req.first;
+        data.emplace_back(id, m_reqD.getElement(i++));
+    }
+    return data;
 }
 

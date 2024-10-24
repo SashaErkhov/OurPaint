@@ -10,8 +10,10 @@
 #include "Assoc.h"
 #include "../Matrix/Matrix.h"
 #include "saveload/FileOurP.h"
-
-//#include "../graph/simpleGraph.h"
+#include "./Optimization/NewtonOptimizer.h"
+#include "./Optimization/Task.h"
+#include "./Optimization/GradientOptimizer.h"
+#include "../graph/simpleGraph.h"
 #include "enums.h"
 #include "requirements.h"
 #include "UndoRedo.h"
@@ -32,8 +34,6 @@ struct ActionsInfo{
 //c_ - класс, v_- переменная, s_структура, m_ - контейнеры(списки, массивы и другие) f_ - приватный метод класса
 class Paint {
     //In the graph, the edges are represented by requirements and the vertices are represented by objects.
-    //Graph<ID, ID> c_graph;
-
     UndoRedo<ActionsInfo> c_undoRedo;
     std::map<ID, List<point>::iterator> m_pointIDs;
     std::map<ID, List<section>::iterator> m_sectionIDs;
@@ -72,6 +72,7 @@ public:
     ElementData getElementInfo(ID id);
     std::vector<std::pair<ID, ElementData>> getAllElementsInfo();
     RequirementData getRequirementInfo(ID id);
+    std::vector<std::pair<ID, RequirementData>> getAllRequirementsInfo();
 
     // Сохранение данных в файл
     void saveToFile(const char *filename);
