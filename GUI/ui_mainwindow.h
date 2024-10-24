@@ -23,6 +23,7 @@
 #include <QPainter>
 #include <QIcon>
 #include <QCheckBox>
+#include <QPropertyAnimation>
 
 QT_BEGIN_NAMESPACE
 
@@ -75,6 +76,17 @@ public:
     QTreeWidgetItem *itemFigures;
     QTreeWidgetItem *itemRequirements;
     QPushButton *leftMenuMessage;
+    QPushButton *Figures;
+
+    // Панель и кнопки фигур
+    QWidget *figuresPanel;
+    QPushButton *figureMoving;
+    QPushButton *figurePoint;
+    QPushButton *figureSection;
+    QPushButton *figureCircle;
+
+    // Анимация для панели
+    QPropertyAnimation *figuresPanelAnimation;
 
     // Чат
     QFrame *message;
@@ -136,6 +148,9 @@ public:
 
         // Настройка чата
         setupMessage();
+
+        // Настройка редактора
+        setupButtonFigures();
 
         // Настройка свернутой панели
         setupCollapsedPanel();
@@ -533,6 +548,61 @@ public:
         messageContainer->hide();
     }
 
+    void setupButtonFigures() {
+        // Создаем панель для кнопок фигур
+        figuresPanel = new QWidget(nullptr, Qt::Popup);
+        figuresPanel->setObjectName("figuresPanel");
+        figuresPanel->setFixedHeight(40);
+        figuresPanel->setStyleSheet("background-color: #494850; border: none;");
+        figuresPanel->hide();
+
+        QHBoxLayout *figuresLayout = new QHBoxLayout(figuresPanel);
+        figuresLayout->setContentsMargins(0, 0, 0, 0);
+        figuresLayout->setSpacing(0);
+
+
+
+        figureMoving = new QPushButton("", figuresPanel);
+        figurePoint = new QPushButton("", figuresPanel);
+        figureSection = new QPushButton("", figuresPanel);
+        figureCircle = new QPushButton("", figuresPanel);
+
+        QIcon IcoMoving("../Static/icons/move.ico");
+        QIcon IcoCircle("../Static/icons/circle.ico");
+        QIcon IcoPoint("../Static/icons/point.ico");
+        QIcon IcoLine("../Static/icons/line.ico");
+
+        figureMoving->setIcon(IcoMoving);
+        figurePoint->setIcon(IcoPoint);
+        figureSection->setIcon(IcoLine);
+        figureCircle->setIcon(IcoCircle);
+
+        figureMoving->setFixedSize(40, 40);
+        figurePoint->setFixedSize(40, 40);
+        figureSection->setFixedSize(40, 40);
+        figureCircle->setFixedSize(40, 40);
+
+        QString buttonStyle = "QPushButton { background: none; color: #D8D8F6;border: none; }"
+                              "QPushButton:hover { background-color: rgba(255, 255, 255, 0.1); }";
+
+        figureMoving->setStyleSheet(buttonStyle);
+        figurePoint->setStyleSheet(buttonStyle);
+        figureSection->setStyleSheet(buttonStyle);
+        figureCircle->setStyleSheet(buttonStyle);
+
+        figuresLayout->addWidget(figureMoving);
+        figuresLayout->addWidget(figurePoint);
+        figuresLayout->addWidget(figureSection);
+        figuresLayout->addWidget(figureCircle);
+
+        figuresPanelAnimation = new QPropertyAnimation(figuresPanel, "maximumWidth");
+        figuresPanelAnimation->setDuration(200);
+        figuresPanelAnimation->setEasingCurve(QEasingCurve::OutQuad);
+
+        figuresPanel->setMaximumWidth(0);
+    }
+
+
     void setupCollapsedPanel()
     {
         // Создание свернутой панели
@@ -568,6 +638,17 @@ public:
                 "QPushButton:hover { background-color: rgba(255, 255, 255, 0.1); border-radius: 0; }"
         );
         collapsedPanelLayout->addWidget(leftMenuMessage);
+
+        // Создание кнопки для открытия панели фигур
+        Figures = new QPushButton("", collapsedPanel);
+        Figures->setFixedSize(40, 40);
+        QIcon IcoM("../Static/icons/modeButton.ico");
+        Figures->setIcon(IcoM);
+        Figures->setStyleSheet(
+                "QPushButton { background: none; border: none; color: #D8D8F6; border-radius: 0; }"
+                "QPushButton:hover { background-color: rgba(255, 255, 255, 0.1); border-radius: 0; }"
+        );
+        collapsedPanelLayout->addWidget(Figures);
     }
 
     void setupConsole()
@@ -656,8 +737,66 @@ public:
         });
 
         QObject::connect(helpButton, &QPushButton::clicked, action_help, &QAction::trigger);
-    }
 
+        QObject::connect(Figures, &QPushButton::clicked, [=]() {
+            if (figuresPanel->isVisible()) {
+                figuresPanelAnimation->stop();
+                figuresPanelAnimation->setStartValue(figuresPanel->maximumWidth());
+                figuresPanelAnimation->setEndValue(0);
+                figuresPanelAnimation->start();
+            } else {
+                QPoint globalPos = Figures->mapToGlobal(QPoint(0, 0));
+                figuresPanel->move(globalPos.x() + Figures->width(), globalPos.y());
+
+                figuresPanel->show();
+                figuresPanel->raise(); // Поднимаем панель на передний план
+
+                figuresPanelAnimation->stop();
+                figuresPanelAnimation->setStartValue(0);
+                figuresPanelAnimation->setEndValue(4 * 40); // 4 кнопки по 40 пикселей
+                figuresPanelAnimation->start();
+            }
+        });
+
+        QObject::connect(figureMoving, &QPushButton::clicked, [=]() {
+            if (figuresPanel->isVisible()) {
+                figuresPanelAnimation->stop();
+                figuresPanelAnimation->setStartValue(figuresPanel->maximumWidth());
+                figuresPanelAnimation->setEndValue(0);
+                figuresPanelAnimation->start();
+            }
+        });
+        QObject::connect(figurePoint, &QPushButton::clicked, [=]() {
+            if (figuresPanel->isVisible()) {
+                figuresPanelAnimation->stop();
+                figuresPanelAnimation->setStartValue(figuresPanel->maximumWidth());
+                figuresPanelAnimation->setEndValue(0);
+                figuresPanelAnimation->start();
+            }
+        });
+        QObject::connect(figureSection, &QPushButton::clicked, [=]() {
+            if (figuresPanel->isVisible()) {
+                figuresPanelAnimation->stop();
+                figuresPanelAnimation->setStartValue(figuresPanel->maximumWidth());
+                figuresPanelAnimation->setEndValue(0);
+                figuresPanelAnimation->start();
+            }
+        });
+        QObject::connect(figureCircle, &QPushButton::clicked, [=]() {
+            if (figuresPanel->isVisible()) {
+                figuresPanelAnimation->stop();
+                figuresPanelAnimation->setStartValue(figuresPanel->maximumWidth());
+                figuresPanelAnimation->setEndValue(0);
+                figuresPanelAnimation->start();
+            }
+        });
+
+        QObject::connect(figuresPanelAnimation, &QPropertyAnimation::finished, [=]() {
+            if (figuresPanel->maximumWidth() == 0) {
+                figuresPanel->hide();
+            }
+        });
+    }
 
     void retranslateUi(QMainWindow *MainWindow)
     {

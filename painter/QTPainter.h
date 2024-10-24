@@ -24,13 +24,29 @@ private:
     const int maxCellSize; // Максимальный размер клетки при масштабировании
     const int minCellSize; // Минимальный размер клетки при масштабировании
     int currentCellSize;   // Текущий размер клетки
+    int cursorX;
+    int cursorY;
     bool CellView;         // Флаг отрисовки сетки
+    bool editor;
+    bool Circle;
+    bool Section;
+    bool Point;
+    int circleClickCount;
+    int sectionClickCount;
+    QPoint sectionPoints[2];
+    QPoint centerPoint;
 
 public:
+    void setCircle(bool T){Circle=T;}
+    void setSection(bool T){Section=T;}
+    void setPoint(bool T){Point=T;}
+
     // Функция включения сетки
     void setCell(bool On_Off);
 
     void draw();
+
+    void setEditor(bool T){editor=T;}
 
     void getUsers(bool var) { Scaling.getUsers(var); }
 
@@ -73,6 +89,9 @@ protected:
 signals:
 
     void RightPress();
+    void SigPoint(QPoint Position);
+    void SigCircle(QPoint centerPoint, int radius);
+    void SigSection(int startX, int startY, int endX, int endY);
 
 
 
