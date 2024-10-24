@@ -49,6 +49,9 @@ public:
 
         centralwidget = new QWidget(HelpWindow);
         centralwidget->setObjectName("centralwidget");
+        centralwidget->setStyleSheet("QWidget#centralwidget { "
+                                     "background-color: #494850;"
+                                     "border-radius: 10px; }");
         mainLayout = new QGridLayout(centralwidget);
         mainLayout->setObjectName("mainLayout");
         mainLayout->setContentsMargins(0, 0, 0, 0);
@@ -110,7 +113,7 @@ public:
     {
         closeButton = new QPushButton("", topBar);
         closeButton->setFixedSize(25, 25);
-        closeButton->setIcon(QIcon("../Static/icons/close1.ico"));
+        closeButton->setIcon(QIcon("../Static/icons/close.ico"));
         closeButton->setStyleSheet("QPushButton { background: none; border: none; color: white; border-radius: 5px; }"
                                    "QPushButton:hover { background-color: rgba(255, 255, 255, 0.3); }");
         QObject::connect(closeButton, &QPushButton::clicked, HelpWindow, &QMainWindow::close);
