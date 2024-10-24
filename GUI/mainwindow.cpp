@@ -42,13 +42,7 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     // Обработка ввода в консоль чата
-    connect(ui->messageConsole, &QLineEdit::returnPressed, this, [this]() {
-        QString input = ui->messageConsole->text();
-        if (!input.isEmpty()) {
-            emit EnterMessage(input);
-            ui->messageConsole->clear();
-        }
-    });
+    connect(ui->messageConsole,&QLineEdit::returnPressed, this, &MainWindow::Message);
 
     // Изменение параметров обьектов в левом меню
     connect(ui->leftMenu, &QTreeWidget::itemChanged, this, &MainWindow::LeftMenuChanged);
@@ -763,3 +757,5 @@ void MainWindow::paintEvent(QPaintEvent *event) {
 
     emit resized();
 }
+
+

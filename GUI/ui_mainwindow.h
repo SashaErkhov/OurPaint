@@ -23,6 +23,8 @@
 #include <QPainter>
 #include <QIcon>
 #include <QCheckBox>
+#include <QScrollArea>
+#include <QTextEdit>
 
 QT_BEGIN_NAMESPACE
 
@@ -83,6 +85,8 @@ public:
     QGridLayout *messageLayout;
     QWidget *messageContainer;
     QGridLayout *messageContainerLayout;
+    QWidget *messageContent;
+    QVBoxLayout *messageContentLayout;
 
     // Панель настроек
     QWidget *settingsPanel;
@@ -461,6 +465,7 @@ public:
         // Обновление контейнера для leftMenu
         leftMenuContainer = new QWidget();
         leftMenuContainer->setLayout(leftMenuLayout);
+        leftMenuContainer->setFixedWidth(200);
 
         leftMenuContainer->hide();
     }
@@ -513,10 +518,6 @@ public:
         messageLayout->setContentsMargins(0, 0, 0, 0);
         messageLayout->setSpacing(0);
 
-        // Добавление элементов в макет message
-        messageLayout->addWidget(messageCollapseButton, 0, 0, Qt::AlignTop | Qt::AlignRight);
-        messageLayout->addWidget(messageConsole, 1, 0);
-
         // Установка макета для message
         message->setLayout(messageLayout);
 
@@ -528,6 +529,25 @@ public:
         messageContainerLayout->addWidget(message);
         messageContainer->setLayout(messageContainerLayout);
         messageContainer->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
+        messageContainer->setFixedWidth(200);
+
+        // Для сообщений
+        messageContent = new QWidget();
+        messageContentLayout = new QVBoxLayout(messageContent);
+        messageContentLayout->setContentsMargins(10, 1, 1, 1);
+        messageContentLayout->setSpacing(5);
+        messageContentLayout->setAlignment(Qt::AlignTop);
+
+        // Прокрутка
+        QScrollArea *messageScrollArea = new QScrollArea();
+        messageScrollArea->setWidgetResizable(true);
+        messageScrollArea->setWidget(messageContent);
+        messageScrollArea->setStyleSheet("background-color: #494850; border: none;");
+
+        // Добавление элементов в макет message
+        messageLayout->addWidget(messageCollapseButton, 0, 0, Qt::AlignTop | Qt::AlignRight);
+        messageLayout->addWidget(messageScrollArea, 1, 0);
+        messageLayout->addWidget(messageConsole, 2, 0);
 
         // Изначально скрываем messageContainer
         messageContainer->hide();

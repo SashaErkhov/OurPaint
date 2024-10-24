@@ -10,7 +10,6 @@
 #include "Assoc.h"
 #include "../Matrix/Matrix.h"
 #include "saveload/FileOurP.h"
-#include "./Optimization/NewtonOptimizer.h"
 #include "./Optimization/Task.h"
 #include "./Optimization/GradientOptimizer.h"
 #include "../graph/simpleGraph.h"
